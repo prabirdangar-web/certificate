@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFHS Official Certificate System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --dashboard-bg: #ecefe6;
+            --primary-color: #145828;
+            --accent-color: #d4b18a;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: var(--dashboard-bg);
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* CONTROL DASHBOARD PANEL */
+        .dashboard-panel {
+            width: 100%;
+            max-width: 190mm;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .dashboard-panel h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #333;
+        }
+
+        .form-control {
+            padding: 6px;
+            border: 1px solid #888;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .auto-memo {
+            background-color: #fffde6;
+            font-weight: bold;
+            color: #b65e00;
+        }
+
+        .print-btn {
+            grid-column: 1 / -1;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        /* A4 SCHOOL CERTIFICATE DISPLAY */
+        .page {
+            width: 190mm;
+            height: 272mm;
+            background: #fcfffc;
+            padding: 6mm 8mm;
+            box-sizing: border-box;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            page-break-after: always;
+            page-break-inside: avoid;
+        }
+
+        .page:before {
+            content: "";
+            position: absolute;
+            top: 3mm;
+            left: 3mm;
+            right: 3mm;
+            bottom: 3mm;
+            border: 2.5px solid var(--primary-color);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        .page:after {
+            content: "";
+            position: absolute;
+            top: 5mm;
+            left: 5mm;
+            right: 5mm;
+            bottom: 5mm;
+            border: 1px dashed #9bb29d;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-family: "Lucida Bright", Cambria, Georgia, serif;
+        }
+
+        .top-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            padding: 0 5px;
+            margin-bottom: 2px;
+        }
+
+        .school {
+            font-size: 30px;
+            font-weight: 900;
+            color: #114d24;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            margin: 4px 0;
+        }
+
+        .schoolbn {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 2px;
+        }
+
+        .motto {
+            display: inline-block;
+            margin: 4px 0;
+            padding: 3px 20px;
+           
+            color: black;
+            border-radius: 4px;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .info-box {
+            width: 100%;
+            margin: 3px auto;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1.5px solid var(--accent-color);
+            font-family: "Lucida Bright", Cambria, serif;
+            font-size: 16px;
+            font-weight: 900;
+            color: #B65E00;
+            text-align: center;
+        }
+
+        .divider {
+            height: 2px;
+            margin-top: 6px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+        }
+
+        .memo-container {
+            margin-top: 5px;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            background: #eef8ef;
+            border: 1px solid #d5e1d6;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+
+        .content {
+            height: 150mm;
+            margin-top: 6px;
+            padding: 20px 25px;
+            box-sizing: border-box;
+            border: 1px solid #b7cbb8;
+            border-radius: 6px;
+            position: relative;
+            z-index: 2;
+            background: repeating-linear-gradient(white, white 28px, #e2e8e2 29px);
+            font-family: "Lucida Bright", Cambria, Georgia, serif;
+            font-style: italic;
+            font-weight: normal;
+            font-size: 20px;
+            line-height: 2.0;
+            text-align: justify;
+            color: #000000;
+        }
+
+        .cert-title {
+            text-align: center;
+            font-size: 19px;
+            font-weight: 900;
+            font-style: normal;
+            text-decoration: underline;
+            margin-bottom: 15px;
+            color: #114d24;
+            text-transform: uppercase;
+        }
+
+        .field-underline {
+            font-style: normal;
+            font-weight: 900;
+            border-bottom: 1px dotted #555555;
+            padding: 0 4px;
+            display: inline-block;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            font-size: 42px;
+            font-weight: 900;
+            font-style: normal;
+            color: rgba(20, 88, 40, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .footer-meta {
+            margin-top: 10px;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: bold;
+            color: var(--primary-color);
+            line-height: 1.4;
+        }
+
+        .signature-area {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* COMPACT VERIFIED SCANNABLE QR BOX */
+        .vcard-box {
+            border: 1px solid #000000;
+            padding: 5px;
+            background: #ffffff;
+            text-align: center;
+            border-radius: 4px;
+            width: 80px;
+            height: 98px;
+            align-self: flex-start;
+        }
+
+        #qrcode img, #qrcode canvas {
+            display: block;
+            margin: 0 auto !important;
+            width: 80px !important;
+            height: 80px !important;
+        }
+
+        .vcard-title {
+            font-size: 7.5px;
+            font-weight: bold;
+            font-style: normal;
+            margin-top: 4px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .sign-block {
+            text-align: center;
+            width: 160px;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: bold;
+        }
+
+        .sign-line {
+            border-top: 1px dashed #000;
+            margin-bottom: 4px;
+        }
+
+        .cut-line {
+            border-top: 2px dashed #666;
+            margin: 12px 0 8px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .cut-line::before {
+            content: "✂ Cut Here";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #fcfffc;
+            padding: 0 10px;
+            font-size: 11px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .counterpart-section {
+            background: #fdfdfd;
+            border: 1px dashed #777;
+            border-radius: 6px;
+            padding: 8px 15px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .counterpart-heading {
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 6px;
+            color: #222;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+        }
+
+        .counterpart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        .counterpart-signatures {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media print {
+            .dashboard-panel {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                background: none;
+            }
+            .page {
+                box-shadow: none;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0;
+                width: 190mm;
+                height: 277mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-panel">
+        <h2>Admission Control & Verification Dashboard</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="studentName" class="form-control" value="Aritra Bhuin" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-group">
+                <label>Sex</label>
+                <select id="sex" class="form-control" onchange="syncData()">
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Session (Year)</label>
+                <input type="text" id="session" class="form-control" value="2026" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Father's Name</label>
+                <input type="text" id="fatherName" class="form-control" value="Subhas Chandra Bhuin" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-group">
+                <label>Mother's Name</label>
+                <input type="text" id="motherName" class="form-control" value="Rinku Bhuin" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-grid" style="grid-column: span 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="class" class="form-control" onchange="syncData()">
+                        <option value="V">V</option><option value="VI" selected>VI</option>
+                        <option value="VII">VII</option><option value="VIII">VIII</option>
+                        <option value="IX">IX</option><option value="X">X</option>
+                        <option value="XI">XI</option><option value="XII">XII</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Section</label>
+                    <select id="sec" class="form-control" onchange="syncData()">
+                        <option value="A" selected>A</option><option value="B">B</option><option value="C">C</option>
+                        <option value="SCIENCE(B)">SCIENCE(B)</option>
+                        <option value="ARTS(A)">ARTS(A)</option>
+                        <option value="SANTALI(C)">SANTALI(C)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Roll No.</label>
+                    <input type="number" id="rollNo" class="form-control" value="6" oninput="syncData()">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Village</label>
+                <input type="text" id="village" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-group">
+                <label>P.O.</label>
+                <input type="text" id="po" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-group">
+                <label>District</label>
+                <input type="text" id="dist" class="form-control" value="Bankura" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-group">
+                <label>PIN Code</label>
+                <input type="text" id="pin" class="form-control" value="722152" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="dob" class="form-control" value="2014-12-07" onchange="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Banglar Siksha ID</label>
+                <input type="text" id="sikshaId" class="form-control" value="004773320000012" oninput="syncData()">
+            </div>
+            <div class="form-group">
+                <label>Auto Computed Memo</label>
+                <input type="text" id="memoNo" class="form-control auto-memo" readonly>
+            </div>
+            <button class="print-btn" onclick="window.print()">Print A4 Page Sheet</button>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="watermark">TALDANGRA FULMATI HIGH SCHOOL</div>
+        
+        <div class="header">
+            <div class="top-meta-row">
+                <div>H.S. CODE: 114071 &bull; VTC CODE: 5006 &bull; INDEX NO: U1-083</div>
+                <div>DISE CODE: 19132104401</div>
+            </div>
+            <div class="school">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</div>
+            <div class="schoolbn">তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</div>
+            <div class="estd">[ Estd:: 1956 ]</div>
+            <div class="info-box">P.O.&BLOCK:TALDANGRA::SUB-DIVISION:KHATRA::DISTRICT:BANKURA::PIN: 722152</div>
+            <div style="font-size: 16px; font-weight: bold; margin-top: 3px; color: #444;">
+                Email: highschooltaldangrafulmati@gmail.com &bull; Contact No: 03243-265114
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="memo-container">
+            <div>Memo No: <span id="lblMemo">____________________</span></div>
+            <div>Date: <span id="lblCurrentDate">30-06-2026</span></div>
+        </div>
+
+        <div class="content">
+            <div class="cert-title">To whom it may concern</div>
+            
+            Certified that <span id="lblHonorific" style="font-style:normal; font-weight:900;">Sri</span> 
+            <span class="field-underline" id="vName" style="min-width:180px;">Aritra Bhuin</span>, 
+            <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Subhas Chandra Bhuin</span>; an inhabitant of Village : <span id="vVillage" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.O. : <span id="vPo" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; District : <span id="vDist" style="font-style:normal; font-weight:1100;" class="field-underline">Bankura</span>, PIN-<span id="vPin" style="font-style:normal; font-weight:900;" class="field-underline">722152</span> is a bonafide student of this school. 
+            
+            <span id="lblPronounCaps">He</span> is reading now in Class: <span class="field-underline" id="vClass" style="min-width:35px;">VI</span> 
+            [Sec-<span class="field-underline" id="vSec" style="min-width:35px;">A</span>; Roll No-<span class="field-underline" id="vRoll" style="min-width:35px;">6</span>]. 
+            
+            <span id="lblPossessiveCaps">His</span> date of birth recorded in the Admission Register is 
+            <span class="field-underline" id="vDob" style="min-width:90px;">07-12-2014</span> 
+            <span id="vDobWords" style="font-style: normal; font-weight: bold; border-bottom: 1px dotted #555;">[Seventh day of December Two Thousand Fourteen]</span>.
+            
+            <span id="lblPronounCaps2">He</span> bears a good moral character. I wish <span id="lblObjective">him</span> every success in life.
+            
+            <div class="footer-meta">
+                Mother's Name : <span class="field-underline" id="vMother" style="min-width:200px;">Rinku Bhuin</span><br>
+                BANGLAR SIKSHA STUDENT ID : <span id="vSikshaId" class="field-underline" style="font-weight:1100; font-style:bold;">004773320000012</span>
+            </div>
+
+            <div class="signature-area">
+                <div class="vcard-box">
+                    <div id="qrcode"></div>
+                    <div class="vcard-title">Scan to Verify</div>
+                </div>
+                
+                <div class="sign-block">
+                    <div class="sign-line"></div>
+                    Headmaster
+                </div>
+            </div>
+        </div>
+
+        <div class="cut-line"></div>
+
+        <div class="counterpart-section">
+            <div class="counterpart-heading">Office Counterpart Copy</div>
+            <div class="counterpart-grid">
+                <div><strong>Student Name:</strong> <span id="cName" style="border-bottom: 1px dotted #333;">Aritra Bhuin</span></div>
+                <div><strong>Class (Sec):</strong> <span id="cClassSec" style="border-bottom: 1px dotted #333;">VI (A)</span></div>
+                <div><strong>Roll No:</strong> <span id="cRoll" style="border-bottom: 1px dotted #333;">6</span></div>
+                <div><strong>BS Student ID:</strong> <span id="cSikshaId" style="border-bottom: 1px dotted #333;">004773320000012</span></div>
+                <div><strong>Memo Reference:</strong> <span id="cMemo" style="border-bottom: 1px dotted #333;">TFHS-26/VI-A-6</span></div>
+                <div><strong>Date Issued:</strong> <span id="cDate" style="border-bottom: 1px dotted #333;">30-06-2026</span></div>
+            </div>
+            
+            <div class="counterpart-signatures">
+                <div class="sign-block" style="width: 220px; margin-top: 15px;">
+                    <div class="sign-line"></div>
+                    Signature of Recipient (with Date)
+                </div>
+                <div class="sign-block" style="width: 220px; margin-top: 15px;">
+                    <div class="sign-line"></div>
+                    Signature of HOI (with Seal)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const today = new Date();
+        const dateString = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
+        document.getElementById('lblCurrentDate').innerText = dateString;
+        document.getElementById('cDate').innerText = dateString;
+
+        const targetVCardURL = "https://qr1.me-qr.com/entry/vcard/fe4e45bw";
+        
+        const qrcodeInstance = new QRCode(document.getElementById("qrcode"), {
+            text: targetVCardURL,
+            width: 80,
+            height: 80,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.M
+        });
+
+        function forceCapitalization(inputElem) {
+            let words = inputElem.value.split(' ');
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].length > 0) {
+                    words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+                }
+            }
+            inputElem.value = words.join(' ');
+        }
+
+        // Separate lists used to prevent shared dictionary overlap bugs
+        const onesOrdinal = ['', 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Eleventh', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth', 'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth'];
+        const onesCardinal = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+        const tensCardinal = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        function dayToWords(day) {
+            if (day === 21) return "Twenty-First";
+            if (day === 22) return "Twenty-Second";
+            if (day === 23) return "Twenty-Third";
+            if (day === 31) return "Thirty-First";
+            if (day < 20) return onesOrdinal[day];
+            return tensCardinal[Math.floor(day / 10)] + (day % 10 !== 0 ? "-" + onesOrdinal[day % 10].toLowerCase() : "");
+        }
+
+        function yearToWords(year) {
+            if(year >= 2000 && year < 2030) {
+                let tail = year - 2000;
+                if(tail === 0) return "Two Thousand";
+                if(tail < 20) return "Two Thousand " + onesCardinal[tail]; // Correctly outputs cardinal word "Fourteen"
+                return "Two Thousand " + tensCardinal[Math.floor(tail / 10)] + (tail % 10 !== 0 ? " " + onesCardinal[tail % 10] : "");
+            }
+            return year.toString();
+        }
+
+        function convertDateToWords(dateStr) {
+            if(!dateStr) return "";
+            const parts = dateStr.split('-');
+            return `[${dayToWords(parseInt(parts[2]))} day of ${months[parseInt(parts[1]) - 1]} ${yearToWords(parseInt(parts[0]))}]`;
+        }
+
+        function syncData() {
+            const name = document.getElementById('studentName').value;
+            const sex = document.getElementById('sex').value;
+            const session = document.getElementById('session').value || '2026';
+            const father = document.getElementById('fatherName').value;
+            const mother = document.getElementById('motherName').value;
+            const cls = document.getElementById('class').value || 'VI';
+            const sec = document.getElementById('sec').value || 'A';
+            const roll = document.getElementById('rollNo').value || '6';
+            const village = document.getElementById('village').value;
+            const po = document.getElementById('po').value;
+            const dist = document.getElementById('dist').value;
+            const pin = document.getElementById('pin').value;
+            const dob = document.getElementById('dob').value;
+            const sikshaId = document.getElementById('sikshaId').value;
+
+            if (sex === "Female") {
+                document.getElementById('lblHonorific').innerText = "Smt.";
+                document.getElementById('lblParentage').innerText = "daughter of";
+                document.getElementById('lblPronounCaps').innerText = "She";
+                document.getElementById('lblPronounCaps2').innerText = "She";
+                document.getElementById('lblPossessiveCaps').innerText = "Her";
+                document.getElementById('lblObjective').innerText = "her";
+            } else {
+                document.getElementById('lblHonorific').innerText = "Sri";
+                document.getElementById('lblParentage').innerText = "son of";
+                document.getElementById('lblPronounCaps').innerText = "He";
+                document.getElementById('lblPronounCaps2').innerText = "He";
+                document.getElementById('lblPossessiveCaps').innerText = "His";
+                document.getElementById('lblObjective').innerText = "him";
+            }
+
+            const shortYear = session.slice(-2);
+            const computedMemo = `TFHS-${shortYear}/${cls}-${sec}-${roll}`.toUpperCase();
+            document.getElementById('memoNo').value = computedMemo;
+            document.getElementById('lblMemo').innerText = computedMemo;
+
+            document.getElementById('vName').innerText = name || '________________________';
+            document.getElementById('vFather').innerText = father || '______________________';
+            document.getElementById('vMother').innerText = mother || '______________________';
+            document.getElementById('vVillage').innerText = village || '___________';
+            document.getElementById('vPo').innerText = po || '___________';
+            document.getElementById('vDist').innerText = dist || '___________';
+            document.getElementById('vPin').innerText = pin || '______';
+            document.getElementById('vClass').innerText = cls;
+            document.getElementById('vSec').innerText = sec;
+            document.getElementById('vRoll').innerText = roll;
+            document.getElementById('vSikshaId').innerText = sikshaId || '______________________';
+
+            document.getElementById('cName').innerText = name || '________________________';
+            document.getElementById('cClassSec').innerText = `${cls} (${sec})`;
+            document.getElementById('cRoll').innerText = roll;
+            document.getElementById('cSikshaId').innerText = sikshaId || '______________________';
+            document.getElementById('cMemo').innerText = computedMemo;
+
+            if (dob) {
+                const p = dob.split('-');
+                document.getElementById('vDob').innerText = `${p[2]}-${p[1]}-${p[0]}`;
+                document.getElementById('vDobWords').innerText = convertDateToWords(dob);
+            } else {
+                document.getElementById('vDob').innerText = '__________';
+                document.getElementById('vDobWords').innerText = '[________________________________________]';
+            }
+        }
+
+        syncData();
+    </script>
+</body>
+</html>
