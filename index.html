@@ -577,6 +577,30 @@
     }
 }
 /* Reports are view-only optional: never make report display a requirement for certificate lookup. */
+
+        .detailed-class-report th,
+        .detailed-class-report td {
+            white-space: nowrap;
+            vertical-align: top;
+        }
+        .detailed-class-report th {
+            text-align: center;
+        }
+
+
+        .count-report th,
+        .count-report td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        .count-report th {
+            text-align: center;
+        }
+        .count-report .report-total-row td {
+            background: #fffde6;
+            font-weight: bold;
+        }
+
 </style>
 </head>
 <body>
@@ -597,13 +621,13 @@
                 Classes V–X and XII retain the previous STUDENT_DB records. Caste is shown where it exists; otherwise NOT AVAILABLE is displayed.
             </div>
             <div class="report-buttons">
-                <button class="report-btn" onclick="generateStudentReport('class')">CLASS-WISE REPORT</button>
+                <button class="report-btn" onclick="generateDetailedClassReport()">CLASS-WISE DETAILED REPORT</button>
 <button class="report-btn" onclick="generateStudentReport('classSexCaste')">FULL V–XII</button>
                 <button class="report-btn" onclick="generateStudentReport('sex')">SEX-WISE REPORT</button>
                 <button class="report-btn" onclick="generateStudentReport('caste')">CASTE-WISE REPORT</button>
                 <button class="report-btn" onclick="generateStudentReport('classSex')">CLASS + SEX</button>
                 <button class="report-btn" onclick="generateStudentReport('classCaste')">CLASS + CASTE</button>
-                <button class="report-btn" onclick="generateStudentReport('classSexCaste')">CLASS + SEX + CASTE</button>
+                <button class="report-btn" onclick="generateClassSexCasteCountReport()">CLASS + SEX + CASTE-WISE COUNT</button>
                 <button class="report-btn secondary" onclick="printStudentReport()">PRINT REPORT</button>
                 <button class="report-btn secondary" onclick="exportStudentReportCSV()">EXPORT CSV</button>
             </div>
@@ -1075,7 +1099,179 @@
                 });
         }
 
-        function generateStudentReport(type) {
+        
+
+function generateClassSexCasteCountReport() {
+    const cls = document.getElementById('class').value;
+    const output = document.getElementById('reportOutput');
+
+    if (!cls) {
+        output.style.display = 'block';
+        output.innerHTML = '<div class="report-title">CLASS + SEX + CASTE-WISE STUDENT COUNT</div><div class="report-summary">Please select a Class first.</div>';
+        return;
+    }
+
+    const rows = STUDENT_DB.filter(s =>
+        String(s.cls || '').trim().toUpperCase() === cls.toUpperCase()
+    );
+
+    const normSex = s => String(s.sex || 'NOT AVAILABLE').trim().toUpperCase() || 'NOT AVAILABLE';
+    const normCaste = s => String(s.caste || 'NOT AVAILABLE').trim().toUpperCase() || 'NOT AVAILABLE';
+
+    const groups = {};
+    rows.forEach(s => {
+        const key = `${s.cls || cls}|${s.sec || 'NOT AVAILABLE'}|${normSex(s)}|${normCaste(s)}`;
+        if (!groups[key]) {
+            groups[key] = {
+                cls: s.cls || cls,
+                sec: s.sec || 'NOT AVAILABLE',
+                sex: normSex(s),
+                caste: normCaste(s),
+                count: 0
+            };
+        }
+        groups[key].count++;
+    });
+
+    const reportRows = Object.values(groups).sort((a,b) =>
+        String(a.sec).localeCompare(String(b.sec)) ||
+        String(a.sex).localeCompare(String(b.sex)) ||
+        String(a.caste).localeCompare(String(b.caste))
+    );
+
+    const esc = value => String(value ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+
+    let total = 0;
+    let table = `
+        <div class="report-title">CLASS ${esc(cls)} — CLASS + SEX + CASTE-WISE STUDENT COUNT</div>
+        <div class="report-summary">Total Students: ${rows.length} &nbsp; | &nbsp; Groups: ${reportRows.length}</div>
+        <div style="overflow:auto;">
+        <table class="report-table count-report">
+            <thead>
+                <tr>
+                    <th>Sl.</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Sex</th>
+                    <th>Caste</th>
+                    <th>Student Count</th>
+                    <th>Percentage</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead><tbody>`;
+
+    reportRows.forEach((r, i) => {
+        total += r.count;
+        const pct = rows.length ? ((r.count / rows.length) * 100).toFixed(2) + '%' : '0.00%';
+        table += `<tr>
+            <td>${i + 1}</td>
+            <td>${esc(r.cls)}</td>
+            <td>${esc(r.sec)}</td>
+            <td>${esc(r.sex)}</td>
+            <td>${esc(r.caste)}</td>
+            <td style="text-align:center">${r.count}</td>
+            <td style="text-align:center">${pct}</td>
+            <td></td>
+        </tr>`;
+    });
+
+    table += `<tr class="report-total-row">
+        <td></td><td colspan="4"><strong>TOTAL</strong></td>
+        <td style="text-align:center"><strong>${total}</strong></td>
+        <td style="text-align:center"><strong>100.00%</strong></td>
+        <td></td>
+    </tr></tbody></table></div>`;
+
+    output.innerHTML = table;
+    output.style.display = 'block';
+}
+
+function generateDetailedClassReport() {
+    const cls = document.getElementById('class').value;
+    const output = document.getElementById('reportOutput');
+
+    if (!cls) {
+        output.style.display = 'block';
+        output.innerHTML = '<div class="report-title">CLASS-WISE DETAILED REPORT</div><div class="report-summary">Please select a Class first.</div>';
+        return;
+    }
+
+    const rows = STUDENT_DB
+        .filter(s => String(s.cls || '').trim().toUpperCase() === cls.toUpperCase())
+        .sort((a,b) => {
+            const sa = String(a.sec || '').localeCompare(String(b.sec || ''));
+            if (sa !== 0) return sa;
+            return (parseInt(a.roll, 10) || 0) - (parseInt(b.roll, 10) || 0);
+        });
+
+    const esc = value => String(value ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+
+    const fmtDob = value => {
+        if (!value) return '';
+        const m = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return m ? `${m[3]}-${m[2]}-${m[1]}` : value;
+    };
+
+    let table = `
+        <div class="report-title">CLASS ${esc(cls)} — DETAILED STUDENT REPORT</div>
+        <div class="report-summary">Total Students: ${rows.length} &nbsp; | &nbsp; Columns: ID, Name, Father, Mother, DOB, Class, Section, Roll, Sex, Caste, Mobile, Remarks, Address</div>
+        <div style="overflow:auto;">
+        <table class="report-table detailed-class-report">
+            <thead>
+                <tr>
+                    <th>Sl.</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Father</th>
+                    <th>Mother</th>
+                    <th>DOB</th>
+                    <th>Class</th>
+                    <th>Sec</th>
+                    <th>Roll</th>
+                    <th>Sex</th>
+                    <th>Caste</th>
+                    <th>Mobile</th>
+                    <th>Remarks</th>
+                    <th>Address</th>
+                </tr>
+            </thead><tbody>`;
+
+    rows.forEach((s, i) => {
+        const address = [s.village, s.po, s.dist, s.pin].filter(Boolean).join(', ');
+        table += `<tr>
+            <td>${i + 1}</td>
+            <td>${esc(s.sikshaId || s.id || '')}</td>
+            <td>${esc(s.name)}</td>
+            <td>${esc(s.father)}</td>
+            <td>${esc(s.mother)}</td>
+            <td>${esc(fmtDob(s.dob))}</td>
+            <td>${esc(s.cls)}</td>
+            <td>${esc(s.sec)}</td>
+            <td>${esc(s.roll)}</td>
+            <td>${esc(s.sex)}</td>
+            <td>${esc(s.caste || 'NOT AVAILABLE')}</td>
+            <td>${esc(s.mobile || '')}</td>
+            <td>${esc(s.remarks || s.remark || '')}</td>
+            <td>${esc(address)}</td>
+        </tr>`;
+    });
+
+    table += `</tbody></table></div>`;
+    output.innerHTML = table;
+    output.style.display = 'block';
+}
+
+function generateStudentReport(type) {
             const output = document.getElementById("reportOutput");
             if (!output) return;
 
