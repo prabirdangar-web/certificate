@@ -698,19 +698,24 @@
             </div>
 
             <div class="form-group">
-                <label>Village — Address (Manual)</label>
-                <input type="text" id="village" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
+                <label>Village — Address (Type/Select, Auto-fills PO/PS/Dist/PIN)</label>
+                <input type="text" id="village" class="form-control" list="dlVillage" value="Taldangra" autocomplete="off" oninput="forceCapitalization(this); autofillFromVillage(); syncData();" onchange="autofillFromVillage(); syncData();">
+                <datalist id="dlVillage"></datalist>
             </div>
             <div class="form-group">
-                <label>P.O. — Address (Manual)</label>
+                <label>P.O. — Address (Manual / Auto)</label>
                 <input type="text" id="po" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
             </div>
             <div class="form-group">
-                <label>District — Address (Manual)</label>
+                <label>P.S. — Address (Manual / Auto)</label>
+                <input type="text" id="ps" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
+            </div>
+            <div class="form-group">
+                <label>District — Address (Manual / Auto)</label>
                 <input type="text" id="dist" class="form-control" value="Bankura" oninput="forceCapitalization(this); syncData();">
             </div>
             <div class="form-group">
-                <label>PIN Code — Address (Manual)</label>
+                <label>PIN Code — Address (Manual / Auto)</label>
                 <input type="text" id="pin" class="form-control" value="722152" oninput="syncData()">
             </div>
             <div class="form-group">
@@ -765,7 +770,7 @@
             
             Certified that <span id="lblHonorific" style="font-style:normal; font-weight:900;">Sri</span> 
             <span class="field-underline" id="vName" style="min-width:180px;">Aritra Bhuin</span>, 
-            <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Subhas Chandra Bhuin</span>; an inhabitant of Village : <span id="vVillage" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.O. : <span id="vPo" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; District : <span id="vDist" style="font-style:normal; font-weight:1100;" class="field-underline">Bankura</span>, PIN-<span id="vPin" style="font-style:normal; font-weight:900;" class="field-underline">722152</span> is a bonafide student of this school. 
+            <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Subhas Chandra Bhuin</span>; an inhabitant of Village : <span id="vVillage" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.O. : <span id="vPo" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.S. : <span id="vPs" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; District : <span id="vDist" style="font-style:normal; font-weight:1100;" class="field-underline">Bankura</span>, PIN-<span id="vPin" style="font-style:normal; font-weight:900;" class="field-underline">722152</span> is a bonafide student of this school. 
             
             <span id="lblPronounCaps">He</span> is reading now in Class: <span class="field-underline" id="vClass" style="min-width:35px;">VI</span> 
             [Sec-<span class="field-underline" id="vSec" style="min-width:35px;">A</span>; Roll No-<span class="field-underline" id="vRoll" style="min-width:35px;">6</span>]. 
@@ -899,6 +904,36 @@
             el.style.color = ok ? '#145828' : '#b00020';
         }
 
+        // ------------------------------------------------------------------
+        // Village / P.O. / P.S. / District / PIN address auto-populate.
+        // Built from real Taldangra & Simlapal-area school-leaving records
+        // (village -> most common P.O./P.S./PIN/District combination).
+        // Covers {} distinct villages seen in that dataset.
+        // ------------------------------------------------------------------
+        const VILLAGE_DB = [{"village":"Adgargara","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Adhkara","po":"Panchmura","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Agaya","po":"Fulmati","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Akandboni","po":"Lauda","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Asanboni","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Asna","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Aulia","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bagdoba","po":"Pukuriya","ps":"Simlapal","pin":"722160","dist":"Bankura"},{"village":"Bagisha","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bahara","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bairagibandh","po":"Nachna","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Baktore","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Balarampur","po":"Prardanga","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Balibandh","po":"Harmasra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bamun Para","po":"Nutangram","ps":"Onda","pin":"722101","dist":"Bankura"},{"village":"Bankata","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Banktore","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Barakura","po":"Baital","ps":"Jaypur","pin":"722138","dist":"Bankura"},{"village":"Baramehshya","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Barameshya","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Belatikri","po":"Moukura","ps":"Sarenga","pin":"722150","dist":"Bankura"},{"village":"Belsula","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Belsulia","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Benagari","po":"Chhagulia","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Besulia","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bhallickchira","po":"Sukhidali","ps":"Sarenga","pin":"722150","dist":"Bankura"},{"village":"Bhaluka","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bhalukchira","po":"Sukhadhali","ps":"Sarenga","pin":"722150","dist":"Bankura"},{"village":"Bhatmara","po":"Gopalsole","ps":"Garhbeta","pin":"721127","dist":"Bankura"},{"village":"Bhedua","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bhelara","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bhutama","po":"Nachna","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Bonsarenga","po":"Bonsarenga","ps":"Simlapal","pin":"722160","dist":"Bankura"},{"village":"Boserdanga","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Brahamandanga","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Brahmandanga","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Brindabanpur","po":"Murakata","ps":"Onda","pin":"722144","dist":"Bankura"},{"village":"Chakshyampur","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Chenchurya","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Chhatrakhanda","po":"Dighalgram","ps":"Indas","pin":"722201","dist":"Bankura"},{"village":"Chingani","po":"Chingani","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Dahala","po":"Dahala","ps":"Khatra","pin":"722151","dist":"Bankura"},{"village":"Dakshinsole","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Deuli","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Dhabani","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Dhanara","po":"Arkama","ps":"Khatra","pin":"722140","dist":"Bankura"},{"village":"Dulalpur","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Dumuria","po":"Gholkunda","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Dunduria","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Fulmati","po":"Fulmati","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Gengari","po":"Khulyamuri","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Gopalnagar","po":"Hetyagora","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Gopalpur","po":"Palashboni","ps":"Onda","pin":"722144","dist":"Bankura"},{"village":"Harakona","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Harulia","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Jafala","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Jhenja","po":"Shyamsundarpur","ps":"Barikul","pin":"722134","dist":"Bankura"},{"village":"Joypur","po":"Panchmura","ps":"Taldangra","pin":"722156","dist":"Bankura"},{"village":"Kadagote","po":"Ratanpur","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Kadamara","po":"Harmasra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Kajla","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Kalindipur","po":"Sandhipur","ps":"Garhbeta","pin":"721127","dist":"Bankura"},{"village":"Karakanali","po":"Pathardoba","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Kashibani","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Kasidanga","po":"Douni","ps":"Onda","pin":"722149","dist":"Bankura"},{"village":"Kendbuda","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Kendubuda","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Khalgram","po":"Khalgram","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Khamarberia","po":"Onda","ps":"Onda","pin":"722144","dist":"Bankura"},{"village":"Khatbanda","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Khayergeria","po":"Bandubrajpur","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Khiraisole","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Khulimuri","po":"Khuilamuri","ps":"Khatra","pin":"722152","dist":"Bankura"},{"village":"Khulyamuri","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Kuldiha","po":"Sarenga","ps":"Sarenga","pin":"722150","dist":"Bankura"},{"village":"Laltyagora","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Laltyagra","po":"Chechurya","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Laltyagura","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Latyagora","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Laxmanpur","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Machhrakhi","po":"Ratanpur","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Machla","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Majir Danga","po":"Manjir Danga","ps":"Sonamukhi","pin":"722207","dist":"Bankura"},{"village":"Malatore","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Mallickdanga","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Manderboni","po":"Manderboni","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Masatkhal","po":"Pathardoba","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Molboni","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Molebani","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Mugai","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Napitbandh","po":"Jamjuri","ps":"Jamjuri","pin":"722144","dist":"Bankura"},{"village":"Natungram","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Nayabasat","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Nibra","po":"Gargariya","ps":"Sarenga","pin":"722150","dist":"Bankura"},{"village":"Nutangara","po":"Pratappur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Nutangram","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Pakurdiha","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Palashboni","po":"Palashboni","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Pararbandh","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Parulia","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Pathardoba","po":"Pathardoba","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Patharjal","po":"Dangordih","ps":"Boro","pin":"723131","dist":"Bankura"},{"village":"Patrabandh","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Petyakana","po":"Gholkunda","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Pratappur","po":"Palashbani","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Punesa","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Puneshya","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Punisole","po":"Punisole","ps":"Onda","pin":"722101","dist":"Bankura"},{"village":"Radamohanpur","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Radhamohanpur","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Raniara","po":"Vedua","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Ratanpur","po":"Ratanpur","ps":"Onda","pin":"722152","dist":"Bankura"},{"village":"Rengta Khulia","po":"Fulmati","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Rengtakhula","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Rengtakhulia","po":"Fulmoti","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Rengtatakhulia","po":"Fulmati","ps":"Bankura","pin":"722152","dist":"Bankura"},{"village":"Saharghati","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Salboni","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Sankaria","po":"Choutar","ps":"Sarenga","pin":"722150","dist":"Bankura"},{"village":"Saralia","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Shyampur","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Sialbathan","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Sidabad","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Simlapal","po":"Simlapal","ps":"Simlapal","pin":"722151","dist":"Bankura"},{"village":"Sukhanibas","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Suraldangaq","po":"Sukhadali","ps":"Sarenga","pin":"722152","dist":"Bankura"},{"village":"Taldangra","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Taldiha","po":"Saralia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tangrasole","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tantidanga","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Telanbandi","po":"Khulymuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tengrasole","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tengrosole","po":"Chhagulia","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tentuliadanga","po":"Pirrabani","ps":"Beliatore","pin":"722203","dist":"Bankura"},{"village":"Tilaghagri","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tiring","po":"Tiring","ps":"Khatra","pin":"722140","dist":"Bankura"},{"village":"Tring","po":"Khatra","ps":"Tiring","pin":"722140","dist":"Bankura"},{"village":"Tulderia","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tulderya","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Tuldetya","po":"Khulyamuri","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Udayanpalli","po":"Taldangra","ps":"Taldangra","pin":"722152","dist":"Bankura"},{"village":"Velara","po":"Chakshyampur","ps":"Taldangra","pin":"722152","dist":"Bankura"}];
+        const VILLAGE_LOOKUP = {};
+        VILLAGE_DB.forEach(v => { VILLAGE_LOOKUP[v.village.trim().toUpperCase()] = v; });
+
+        function populateVillageDatalist() {
+            const dl = document.getElementById('dlVillage');
+            if (!dl) return;
+            dl.innerHTML = VILLAGE_DB
+                .map(v => `<option value="${v.village}"></option>`)
+                .join('');
+        }
+
+        function autofillFromVillage() {
+            const villageInput = document.getElementById('village');
+            if (!villageInput) return;
+            const key = villageInput.value.trim().toUpperCase();
+            const match = VILLAGE_LOOKUP[key];
+            if (!match) return;
+            document.getElementById('po').value = match.po;
+            document.getElementById('ps').value = match.ps;
+            document.getElementById('dist').value = match.dist;
+            document.getElementById('pin').value = match.pin;
+        }
+
         function normalizeMobile(value) {
             return String(value ?? '').replace(/\D/g, '').slice(0, 10);
         }
@@ -1001,6 +1036,7 @@
             const roll = document.getElementById('rollNo').value || '';
             const village = document.getElementById('village').value;
             const po = document.getElementById('po').value;
+            const ps = document.getElementById('ps').value;
             const dist = document.getElementById('dist').value;
             const pin = document.getElementById('pin').value;
             const dob = document.getElementById('dob').value;
@@ -1039,6 +1075,7 @@
             document.getElementById('vMother').innerText = mother || '______________________';
             document.getElementById('vVillage').innerText = village || '___________';
             document.getElementById('vPo').innerText = po || '___________';
+            document.getElementById('vPs').innerText = ps || '___________';
             document.getElementById('vDist').innerText = dist || '___________';
             document.getElementById('vPin').innerText = pin || '______';
             document.getElementById('vClass').innerText = cls || '___';
@@ -1384,6 +1421,11 @@ function generateStudentReport(type) {
             URL.revokeObjectURL(url);
         }
 
+
+        // Populate the village datalist (PO/PS/Dist/PIN autopopulate) as soon as the DOM is ready.
+        document.addEventListener('DOMContentLoaded', function () {
+            populateVillageDatalist();
+        });
 
         // Optional reports: hidden by default so they never cover the Class/Section/Roll lookup.
         document.addEventListener('DOMContentLoaded', function () {
