@@ -215,7 +215,7 @@
             border-radius: 6px;
             position: relative;
             z-index: 2;
-            background: repeating-linear-gradient(white, white 28px, #e2e8e2 29px);
+            background: transparent;
             font-family: "Lucida Bright", Cambria, Georgia, serif;
             font-style: italic;
             font-weight: normal;
@@ -246,18 +246,19 @@
 
         .watermark {
             position: absolute;
-            top: 45%;
+            top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-20deg);
-            font-size: 42px;
+            transform: translate(-50%, -50%) rotate(-18deg);
+            font-size: 46px;
             font-weight: 900;
             font-style: normal;
-            color: rgba(20, 88, 40, 0.03);
+            color: rgba(20, 88, 40, 0.035);
             white-space: nowrap;
             pointer-events: none;
             width: 100%;
             text-align: center;
-            z-index: 1;
+            z-index: 3;
+            opacity: 0.9;
         }
 
         .footer-meta {
@@ -742,7 +743,7 @@
     </div>
 
     <div class="page">
-        <div class="watermark">TALDANGRA FULMATI HIGH SCHOOL</div>
+        <div class="watermark">তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</div>
         
         <div class="header">
             <div class="top-meta-row">
