@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -893,10 +893,13 @@
 <style>
 /* ===== WIFS: data entry becomes a left side panel, Annex-3 preview on the right ===== */
 @media screen and (min-width:1350px){
- body[data-view=wifs]{display:grid!important;grid-template-columns:430px minmax(0,1fr);column-gap:18px;align-items:start;justify-content:center}
+ body[data-view=wifs]{display:grid!important;grid-template-columns:460px minmax(0,1fr);column-gap:18px;align-items:start;justify-content:center}
  body[data-view=wifs] .wifs-panel{position:sticky;top:84px;max-height:calc(100vh - 100px);overflow-y:auto;width:auto!important;margin:0!important;padding:12px 14px!important;border-top:4px solid #145828}
- body[data-view=wifs] .wf-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px 10px!important}
- body[data-view=wifs] .wifs-panel input,body[data-view=wifs] .wifs-panel select,body[data-view=wifs] .wifs-panel textarea{min-width:0;max-width:100%;box-sizing:border-box}
+ body[data-view=wifs] .wf-grid{grid-template-columns:minmax(0,1fr)!important;gap:5px!important}
+ body[data-view=wifs] .wf-grp{margin-top:8px}
+ body[data-view=wifs] .wf-fg{display:grid!important;grid-template-columns:minmax(0,1fr) 170px;align-items:center;gap:8px}
+ body[data-view=wifs] .wf-fg label{margin:0!important;font-size:12px!important;line-height:1.25}
+ body[data-view=wifs] .wf-fg input,body[data-view=wifs] .wf-fg select,body[data-view=wifs] .wf-fg textarea{min-width:0;width:100%!important;max-width:100%;box-sizing:border-box;padding:5px 7px!important;font-size:13px!important;margin:0!important}
  body[data-view=wifs] .wifs-panel{box-sizing:border-box;overflow-x:hidden!important}
  body[data-view=wifs] .wifs-panel summary{font-size:15px!important;padding:2px 0 8px!important}
  body[data-view=wifs] .wifs-sheet{justify-self:center;margin:0}
