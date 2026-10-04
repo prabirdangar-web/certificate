@@ -662,47 +662,24 @@
  .tf-side button{all:unset;cursor:pointer;padding:9px 11px;border-radius:9px;font-size:13px;display:flex;gap:9px;align-items:center;color:#dcebdc}
  .tf-side button:hover{background:rgba(255,255,255,.12)}.tf-side button.on{background:#d4b18a;color:#2b1f0b;font-weight:700}
  .tf-side .ft{margin-top:auto;font-size:10px;opacity:.6;padding:6px}
- body[data-view=cert] .dashboard-reports,body[data-view=cert] .wifs-panel,body[data-view=cert] .wifs-sheet,body[data-view=cert] #liveView{display:none!important}
+ body[data-view=cert] .dashboard-reports,body[data-view=cert] .wifs-panel,body[data-view=cert] .wifs-sheet{display:none!important}
  body[data-view=cert] .dashboard-panel{padding:10px 14px;border-top:4px solid #145828}
  body[data-view=cert] .dashboard-panel h2{font-size:15px;margin:0 0 6px}
  body[data-view=cert] .dashboard-panel>.form-grid{width:100%!important;grid-template-columns:repeat(4,1fr)!important;gap:6px 10px!important}
  body[data-view=cert] .form-group label{font-size:10px!important;margin-bottom:1px}
  body[data-view=cert] .form-control{padding:4px 6px!important;font-size:12px!important}
  body[data-view=cert] .lookup-box{padding:7px!important;margin-bottom:6px!important}
- body[data-view=reports] .page,body[data-view=reports] .wifs-panel,body[data-view=reports] .wifs-sheet,body[data-view=reports] #liveView,body[data-view=reports] .dashboard-panel>.form-grid,body[data-view=reports] .lookup-box>*:not(.dashboard-main-row){display:none!important}
+ body[data-view=reports] .page,body[data-view=reports] .wifs-panel,body[data-view=reports] .wifs-sheet,body[data-view=reports] .dashboard-panel>.form-grid,body[data-view=reports] .lookup-box>*:not(.dashboard-main-row){display:none!important}
  body[data-view=reports] .dashboard-panel{max-width:1000px}
  body[data-view=reports] .dashboard-data-entry{display:none!important}
  body[data-view=reports] .dashboard-main-row,body[data-view=reports] .dashboard-reports,body[data-view=reports] .dashboard-reports .report-panel{position:static!important;width:100%!important;max-width:none!important;display:block}
- body[data-view=wifs] .dashboard-panel,body[data-view=wifs] .page,body[data-view=wifs] #liveView{display:none!important}
- body[data-view=live] .dashboard-panel,body[data-view=live] .page,body[data-view=live] .wifs-panel,body[data-view=live] .wifs-sheet{display:none!important}
- body:not([data-view=live]) #liveView{display:none!important}
+ body[data-view=wifs] .dashboard-panel,body[data-view=wifs] .page{display:none!important}
  @media(max-width:800px){body{padding-left:8px!important;padding-top:58px!important}.tf-side{width:auto;bottom:auto;right:0;flex-direction:row;overflow-x:auto;padding:8px}.tf-side .br,.tf-side .ft{display:none}.tf-side button{white-space:nowrap}}
 }
-@media print{.tf-side,#liveView{display:none!important}}
-#liveView{width:100%;max-width:1000px;font-family:'Segoe UI',Arial,sans-serif;color:#1d2b22}
-.lv-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 3px 12px rgba(0,0,0,.08);border-top:4px solid #145828}
-.lv-top h2{margin:0 auto 0 0;font-size:16px;color:#145828}.lv-top input{border:1px solid #c9d6cc;border-radius:8px;padding:6px 8px;font-size:12px}
-.lv-b{border:0;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;background:#145828;color:#fff}.lv-b.g{background:#e8efe9;color:#145828}
-.lv-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;background:#eee;color:#666}.lv-pill.on{background:#dff3e3;color:#145828}.lv-pill.bad{background:#fde8e8;color:#b00020}
-.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}@media(max-width:900px){.lv-grid{grid-template-columns:1fr}}
-.lv-c{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 3px 12px rgba(0,0,0,.08);min-width:0}.lv-c h3{margin:0 0 8px;font-size:14px;color:#145828;display:flex;justify-content:space-between}
-.lv-k{display:flex;gap:8px;margin-bottom:8px}.lv-k div{flex:1;background:#f1f7f2;border-radius:10px;padding:8px;text-align:center}.lv-k b{display:block;font-size:20px;color:#0e3d1c}.lv-k span{font-size:10px;text-transform:uppercase;color:#5c6f61}
-.lv-w{max-height:340px;overflow:auto;border:1px solid #e3ebe5;border-radius:8px}.lv-t{width:100%;border-collapse:collapse;font-size:12px}.lv-t th{position:sticky;top:0;background:#145828;color:#fff;padding:5px;text-align:left}.lv-t td{padding:4px 6px;border-bottom:1px solid #eef2ef}.lv-t tr.cl{cursor:pointer}.lv-t tr.cl:hover{background:#f4faf5}
-.lv-c pre{background:#f6f8f6;border-radius:8px;padding:8px;font-size:11px;max-height:200px;overflow:auto;margin:8px 0 0;white-space:pre-wrap}
+@media print{.tf-side{display:none!important}}
 </style>
 <nav class="tf-side"><div class="br">TFHS Portal<small>Taldangra Fulmati High School</small></div>
-<button data-v="cert" class="on">📜 Certificate</button><button data-v="reports">📊 Student Reports</button><button data-v="wifs">💊 WIFS Annex-3</button><button data-v="live">⚡ Live: MDM &amp; XI</button><div class="ft">Certificate opens by default</div></nav>
-<div id="liveView">
- <div class="lv-top"><h2>⚡ Firebase Live — MDM &amp; Class XI</h2><span class="lv-pill" id="lvPill">OFFLINE</span>
-  <input type="email" id="lvE" placeholder="Email" autocomplete="username"><input type="password" id="lvP" placeholder="Password" autocomplete="current-password">
-  <button class="lv-b" type="button" onclick="LIVE.login()">Login</button><button class="lv-b g" type="button" onclick="LIVE.logout()">Logout</button></div>
- <div class="lv-grid">
-  <div class="lv-c"><h3>🎓 Class XI students <span id="xiT" class="lv-pill"></span></h3><div class="lv-k"><div><b id="xiN">–</b><span>Total</span></div><div><b id="xiB">–</b><span>Boys</span></div><div><b id="xiG">–</b><span>Girls</span></div></div>
-   <input id="xiQ" placeholder="Search name / reg no…" style="width:100%;box-sizing:border-box;border:1px solid #c9d6cc;border-radius:8px;padding:6px 8px;font-size:12px;margin-bottom:6px"><div class="lv-w"><table class="lv-t" id="xiTb"></table></div></div>
-  <div class="lv-c"><h3>🍲 Mid-Day Meal months <span id="mdT" class="lv-pill"></span></h3><div class="lv-k"><div><b id="mdN">–</b><span>Months saved</span></div><div><b id="mdL">–</b><span>Latest</span></div></div>
-   <div class="lv-w"><table class="lv-t" id="mdTb"></table></div><pre id="mdJ" style="display:none"></pre></div>
- </div>
-</div>
+<button data-v="cert" class="on">📜 Certificate</button><button data-v="reports">📊 Student Reports</button><button data-v="wifs">💊 WIFS Annex-3</button><div class="ft">Certificate opens by default</div></nav>
 
     <!-- CLASS XI DATABASE UPDATED FROM New Microsoft Excel Worksheet.xlsx -->
 
@@ -1761,32 +1738,12 @@ const WIFS = (function(){
 })();
 </script>
 <script>
-/* ===== SIDEBAR VIEWS + FIREBASE LIVE (read-only: students, mdmMonths) ===== */
+/* ===== SIDEBAR VIEWS ===== */
 (function(){
  const $=id=>document.getElementById(id);
  function setView(v){document.body.setAttribute('data-view',v);document.querySelectorAll('.tf-side button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo(0,0)}
  document.querySelector('.tf-side').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setView(b.dataset.v)});
  setView('cert');
- const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
- const pick=(o,ks)=>{for(const k of ks){if(o[k]!=null&&o[k]!=='')return o[k]}return ''};
- const ok=typeof firebase!=='undefined';let db,auth,u1=null,u2=null,xi=[],md=[];
- function pill(t,c){const p=$('lvPill');p.textContent=t;p.className='lv-pill '+(c||'')}
- function drawXi(){const q=($('xiQ').value||'').toLowerCase(),isG=s=>/^(f|female|girl)/i.test(String(s).trim());
-  const rows=xi.map(d=>({n:pick(d,['name','studentName','Name','student_name']),r:pick(d,['regNo','registrationNo','registration','reg','regNumber','Registration No.']),g:pick(d,['gender','sex','Gender']),id:d._id}));
-  const g=rows.filter(r=>isG(r.g)).length;$('xiN').textContent=rows.length;$('xiG').textContent=g;$('xiB').textContent=rows.length-g;
-  $('xiTb').innerHTML='<tr><th>#</th><th>Name</th><th>Reg. No.</th><th>Sex</th></tr>'+rows.filter(r=>!q||(r.n+' '+r.r).toLowerCase().includes(q)).slice(0,300).map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.n||r.id)+'</td><td>'+esc(r.r)+'</td><td>'+esc(r.g)+'</td></tr>').join('')}
- function drawMd(){md.sort((a,b)=>a._id<b._id?1:-1);$('mdN').textContent=md.length;$('mdL').textContent=md[0]?md[0]._id:'–';
-  $('mdTb').innerHTML='<tr><th>Month</th><th>Fields</th><th>Last update</th></tr>'+md.map(d=>{const t=d.updated||d.updatedAt||d.savedAt,ts=t&&t.toDate?t.toDate().toLocaleString():(t||'');return '<tr class="cl" data-id="'+esc(d._id)+'"><td><b>'+esc(d._id)+'</b></td><td>'+(Object.keys(d).length-1)+'</td><td>'+esc(ts)+'</td></tr>'}).join('')}
- function stop(){if(u1)u1();if(u2)u2();u1=u2=null;xi=[];md=[];drawXi();drawMd();$('xiT').textContent=$('mdT').textContent='';$('xiT').className=$('mdT').className='lv-pill'}
- function start(){
-  u1=db.collection('students').onSnapshot(s=>{xi=s.docs.map(d=>Object.assign({_id:d.id},d.data()));drawXi();$('xiT').textContent='● LIVE';$('xiT').className='lv-pill on'},e=>{$('xiT').textContent=e.code;$('xiT').className='lv-pill bad'});
-  u2=db.collection('mdmMonths').onSnapshot(s=>{md=s.docs.map(d=>Object.assign({_id:d.id},d.data()));drawMd();$('mdT').textContent='● LIVE';$('mdT').className='lv-pill on'},e=>{$('mdT').textContent=e.code;$('mdT').className='lv-pill bad'})}
- $('xiQ').addEventListener('input',drawXi);
- $('mdTb').addEventListener('click',e=>{const tr=e.target.closest('tr.cl');if(!tr)return;const d=md.find(x=>x._id===tr.dataset.id),p=$('mdJ');if(!d)return;const o=Object.assign({},d);delete o._id;p.textContent=JSON.stringify(o,(k,v)=>v&&v.toDate?v.toDate().toISOString():v,1).slice(0,4000);p.style.display='block'});
- window.LIVE={login(){if(!ok){pill('Firebase not loaded','bad');return}auth.signInWithEmailAndPassword($('lvE').value.trim(),$('lvP').value).catch(e=>pill(e.code||'login failed','bad'))},logout(){if(auth)auth.signOut()}};
- if(ok){const app=firebase.apps.find(a=>a.name==='live')||firebase.initializeApp(CFG,'live');db=app.firestore();auth=app.auth();
-  auth.onAuthStateChanged(x=>{stop();if(x){pill('● LIVE · '+x.email,'on');start()}else pill('OFFLINE — login to go live')})}else pill('Firebase not loaded','bad');
 })();
 </script>
 </body>
