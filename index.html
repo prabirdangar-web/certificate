@@ -656,30 +656,56 @@
 <body>
 <style>
 @media screen{
- body{padding-left:214px!important}
- .tf-side{position:fixed;left:0;top:0;bottom:0;width:198px;background:linear-gradient(180deg,#0b3319,#145828 70%,#1d6f37);color:#fff;font-family:'Segoe UI',Arial,sans-serif;padding:14px 10px;box-sizing:border-box;z-index:50;display:flex;flex-direction:column;gap:4px;box-shadow:3px 0 14px rgba(0,0,0,.2)}
- .tf-side .br{font-weight:700;font-size:14px;line-height:1.25;padding:4px 6px 10px;border-bottom:1px solid rgba(255,255,255,.18);margin-bottom:8px}.tf-side .br small{display:block;font-weight:400;font-size:10.5px;opacity:.75;margin-top:2px}
- .tf-side button{all:unset;cursor:pointer;padding:9px 11px;border-radius:9px;font-size:13px;display:flex;gap:9px;align-items:center;color:#dcebdc}
- .tf-side button:hover{background:rgba(255,255,255,.12)}.tf-side button.on{background:#d4b18a;color:#2b1f0b;font-weight:700}
- .tf-side .ft{margin-top:auto;font-size:10px;opacity:.6;padding:6px}
- body[data-view=cert] .dashboard-reports,body[data-view=cert] .wifs-panel,body[data-view=cert] .wifs-sheet{display:none!important}
- body[data-view=cert] .dashboard-panel{padding:10px 14px;border-top:4px solid #145828}
- body[data-view=cert] .dashboard-panel h2{font-size:15px;margin:0 0 6px}
+ :root{--sw:232px}body.tf-c{--sw:68px}
+ body{padding-left:calc(var(--sw) + 16px)!important;padding-top:84px!important}
+ .tf-top{position:fixed;left:var(--sw);right:0;top:0;height:68px;background:#fff;border-bottom:1px solid #e1e8e2;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:40;font-family:'Segoe UI',Arial,sans-serif}
+ .tf-top h1{margin:0;font-size:20px;color:#145828}.tf-top p{margin:1px 0 0;font-size:12px;color:#6b7d70}
+ .tf-chip{display:inline-block;margin-left:8px;padding:7px 14px;border:1px solid #d6e0d8;border-radius:99px;font-size:12.5px;font-weight:600;color:#145828;background:#fff}.tf-chip.on{background:#dff3e3}
+ .tf-side{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:linear-gradient(180deg,#0b3319,#145828);color:#fff;font-family:'Segoe UI',Arial,sans-serif;padding:12px 10px;box-sizing:border-box;z-index:50;display:flex;flex-direction:column;gap:3px;overflow:hidden}
+ .tf-side .br{display:flex;gap:10px;align-items:center;padding:4px 4px 14px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:8px}.tf-side .lg{width:40px;height:40px;border-radius:10px;background:#d4b18a;display:grid;place-items:center;font-size:20px;flex:none}.tf-side .br b{font-size:17px;display:block}.tf-side .br small{font-size:10.5px;opacity:.75}
+ .tf-side .gp{font-size:10.5px;letter-spacing:1.2px;opacity:.6;padding:10px 8px 3px}
+ .tf-side button{all:unset;cursor:pointer;padding:10px 11px;border-radius:9px;font-size:14px;display:flex;gap:11px;align-items:center;color:#e3f0e4;white-space:nowrap;box-sizing:border-box}
+ .tf-side button:hover{background:rgba(255,255,255,.1)}.tf-side button.on{background:rgba(255,255,255,.16);font-weight:700;box-shadow:inset 3px 0 #d4b18a}
+ .tf-side .ic{width:22px;text-align:center;flex:none}.tf-side .fo{margin-top:auto;border-top:1px solid rgba(255,255,255,.15);padding-top:8px}.tf-side .fo div{font-size:12px;opacity:.7;padding:4px 11px}
+ body.tf-c .tf-side .l,body.tf-c .tf-side .br div,body.tf-c .tf-side .gp,body.tf-c .tf-side .fo div{display:none}
+ #tfLogin{position:fixed;left:calc(var(--sw) + 8px);bottom:70px;background:#fff;color:#1d2b22;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.28);padding:12px;z-index:60;display:none;flex-direction:column;gap:6px;width:230px;font-family:'Segoe UI',Arial,sans-serif}
+ #tfLogin.show{display:flex}#tfLogin input{border:1px solid #c9d6cc;border-radius:8px;padding:7px;font-size:13px}
+ .dv-b{border:0;border-radius:8px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:#145828;color:#fff}.dv-b.g{background:#e8efe9;color:#145828}
+ body[data-view=cert] .dashboard-reports,body[data-view=cert] .wifs-panel,body[data-view=cert] .wifs-sheet,body[data-view=cert] #dataView{display:none!important}
+ body[data-view=cert] .dashboard-panel h2{display:none}
+ body[data-view=cert] .dashboard-panel{padding:10px 14px}
  body[data-view=cert] .dashboard-panel>.form-grid{width:100%!important;grid-template-columns:repeat(4,1fr)!important;gap:6px 10px!important}
  body[data-view=cert] .form-group label{font-size:10px!important;margin-bottom:1px}
  body[data-view=cert] .form-control{padding:4px 6px!important;font-size:12px!important}
  body[data-view=cert] .lookup-box{padding:7px!important;margin-bottom:6px!important}
- body[data-view=reports] .page,body[data-view=reports] .wifs-panel,body[data-view=reports] .wifs-sheet,body[data-view=reports] .dashboard-panel>.form-grid,body[data-view=reports] .lookup-box>*:not(.dashboard-main-row){display:none!important}
+ body[data-view=reports] .page,body[data-view=reports] .wifs-panel,body[data-view=reports] .wifs-sheet,body[data-view=reports] #dataView,body[data-view=reports] .dashboard-panel>.form-grid,body[data-view=reports] .lookup-box>*:not(.dashboard-main-row),body[data-view=reports] .dashboard-data-entry,body[data-view=reports] .dashboard-panel h2{display:none!important}
  body[data-view=reports] .dashboard-panel{max-width:1000px}
- body[data-view=reports] .dashboard-data-entry{display:none!important}
  body[data-view=reports] .dashboard-main-row,body[data-view=reports] .dashboard-reports,body[data-view=reports] .dashboard-reports .report-panel{position:static!important;width:100%!important;max-width:none!important;display:block}
- body[data-view=wifs] .dashboard-panel,body[data-view=wifs] .page{display:none!important}
- @media(max-width:800px){body{padding-left:8px!important;padding-top:58px!important}.tf-side{width:auto;bottom:auto;right:0;flex-direction:row;overflow-x:auto;padding:8px}.tf-side .br,.tf-side .ft{display:none}.tf-side button{white-space:nowrap}}
+ body[data-view=wifs] .dashboard-panel,body[data-view=wifs] .page,body[data-view=wifs] #dataView{display:none!important}
+ body[data-view=data] .dashboard-panel,body[data-view=data] .page,body[data-view=data] .wifs-panel,body[data-view=data] .wifs-sheet{display:none!important}
+ @media(max-width:800px){:root{--sw:0px}body{padding-left:8px!important}.tf-side{top:auto;bottom:0;width:auto;right:0;height:58px;flex-direction:row;padding:6px}.tf-side .br,.tf-side .gp,.tf-side .fo,.tf-side .l{display:none}.tf-top{left:0}.tf-chip{display:none}}
 }
-@media print{.tf-side{display:none!important}}
+@media print{.tf-side,.tf-top,#dataView,#tfLogin{display:none!important}}
+#dataView{width:100%;max-width:1000px;font-family:'Segoe UI',Arial,sans-serif;color:#1d2b22;display:flex;flex-direction:column;gap:14px}
+.dv-c{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 3px 12px rgba(0,0,0,.08)}.dv-c h3{margin:0 0 10px;font-size:15px;color:#145828}
+.dv-r{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.dv-r select{border:1px solid #c9d6cc;border-radius:8px;padding:8px;font-size:14px}
+.dv-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.dv-k div{background:#f1f7f2;border-radius:12px;padding:12px}.dv-k b{display:block;font-size:22px;color:#0e3d1c}.dv-k span{font-size:11px;text-transform:uppercase;color:#5c6f61}
+.dv-t{width:100%;border-collapse:collapse;font-size:13px}.dv-t th{background:#145828;color:#fff;padding:6px}.dv-t td{padding:5px;border-bottom:1px solid #e6eee8;text-align:center}
+#dvMsg{font-size:13px;font-weight:600;color:#145828}#dvMsg.bad{color:#b00020}
 </style>
-<nav class="tf-side"><div class="br">TFHS Portal<small>Taldangra Fulmati High School</small></div>
-<button data-v="cert" class="on">📜 Certificate</button><button data-v="reports">📊 Student Reports</button><button data-v="wifs">💊 WIFS Annex-3</button><div class="ft">Certificate opens by default</div></nav>
+<header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span></div></header>
+<nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
+<div class="gp">DAILY</div><button data-v="cert" class="on"><span class="ic">📜</span><span class="l">Certificate</span></button>
+<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">💊</span><span class="l">WIFS Annex-3</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
+<div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
+<div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
+<div id="dataView">
+ <div class="dv-c"><h3>Student database &amp; year</h3><div class="dv-r"><label>Year <select id="dvYear"></select></label>
+  <button class="dv-b" type="button" onclick="TFDB.load()">⬇ Load from Firebase</button><button class="dv-b" type="button" onclick="TFDB.upload()" style="background:#8a5600">⬆ Upload current DB to Firebase (admin)</button><button class="dv-b g" type="button" onclick="TFDB.builtin()">Use built-in (offline)</button></div>
+  <p id="dvMsg" style="margin:10px 0 0">Source: built-in database (offline).</p></div>
+ <div class="dv-c"><h3>Class-wise strength (current database)</h3><div id="dvCls"></div></div>
+ <div class="dv-c"><h3>Linked live data (read-only, needs sign in)</h3><div class="dv-k"><div><b id="dvXi">–</b><span>Class XI students (Firebase)</span></div><div><b id="dvMd">–</b><span>MDM months saved</span></div><div><b id="dvMl">–</b><span>Latest MDM month</span></div></div><div class="dv-r" style="margin-top:10px"><button class="dv-b g" type="button" onclick="TFDB.linked()">↻ Refresh</button></div></div>
+</div>
 
     <!-- CLASS XI DATABASE UPDATED FROM New Microsoft Excel Worksheet.xlsx -->
 
@@ -1738,12 +1764,34 @@ const WIFS = (function(){
 })();
 </script>
 <script>
-/* ===== SIDEBAR VIEWS ===== */
-(function(){
- const $=id=>document.getElementById(id);
- function setView(v){document.body.setAttribute('data-view',v);document.querySelectorAll('.tf-side button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo(0,0)}
- document.querySelector('.tf-side').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setView(b.dataset.v)});
- setView('cert');
+/* ===== SIDEBAR + DATA & YEAR (Firebase: certDb/{year}, read-only: students, mdmMonths) ===== */
+const TFDB=(function(){
+ const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
+ const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
+ const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Annex-3','Monthly report and A4 print'],data:['Data & Year','Student database by year, live from Firebase']};
+ const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
+ function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
+ function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
+ function summary(){const m={};CLS.forEach(c=>m[c]=[0,0]);STUDENT_DB.forEach(s=>{const c=String(s.cls).trim().toUpperCase();if(m[c])m[c][/^(f|female|girl)/i.test(String(s.sex).trim())?1:0]++});
+  let b=0,g=0;$('dvCls').innerHTML='<table class="dv-t"><tr><th>Class</th><th>Boys</th><th>Girls</th><th>Total</th></tr>'+CLS.map(c=>{b+=m[c][0];g+=m[c][1];return '<tr><td><b>'+c+'</b></td><td>'+m[c][0]+'</td><td>'+m[c][1]+'</td><td>'+(m[c][0]+m[c][1])+'</td></tr>'}).join('')+'<tr><th>Total</th><th>'+b+'</th><th>'+g+'</th><th>'+(b+g)+'</th></tr></table>'}
+ function apply(rows,label){STUDENT_DB.length=0;rows.forEach(r=>STUDENT_DB.push(r));Object.keys(STUDENT_INDEX).forEach(k=>delete STUDENT_INDEX[k]);STUDENT_DB.forEach(s=>{STUDENT_INDEX[s.cls+'|'+s.sec+'|'+s.roll]=s});
+  const se=$('session');if(se){se.value=year;se.dispatchEvent(new Event('input'))}try{lookupStudent()}catch(e){}src=label;chips();summary()}
+ function need(){if(!(auth&&auth.currentUser)){msg('Sign in first (sidebar → Sign in).',true);return false}return true}
+ async function load(){if(!need())return;year=$('dvYear').value;msg('Loading '+year+'…');
+  try{const m=await db.collection('certDb').doc(year).get();if(!m.exists){msg('No online database saved for '+year+' yet.',true);return}
+   const n=m.data().chunks,rows=[];for(let i=0;i<n;i++){const c=await db.collection('certDb').doc(year+'_'+i).get();(c.data().rows||[]).forEach(r=>rows.push(r))}
+   apply(rows,'firebase');msg('Loaded '+rows.length+' students for '+year+' from Firebase ✔')}catch(e){msg('Load failed: '+(e.code||e.message),true)}}
+ async function upload(){if(!need())return;year=$('dvYear').value;if(!confirm('Upload '+STUDENT_DB.length+' students as database for '+year+'? This replaces the online copy.'))return;
+  try{const b=db.batch(),n=Math.ceil(STUDENT_DB.length/CH);for(let i=0;i<n;i++)b.set(db.collection('certDb').doc(year+'_'+i),{year,i,rows:STUDENT_DB.slice(i*CH,(i+1)*CH).map(s=>Object.assign({},s))});
+   b.set(db.collection('certDb').doc(year),{year,count:STUDENT_DB.length,chunks:n,updatedBy:auth.currentUser.email,updated:firebase.firestore.FieldValue.serverTimestamp()});await b.commit();chips();msg('Uploaded '+STUDENT_DB.length+' students for '+year+' ✔')}catch(e){msg('Upload failed (admin only): '+(e.code||e.message),true)}}
+ function builtin(){apply(BUILTIN.slice(),'built-in');msg('Source: built-in database (offline).')}
+ async function linked(){if(!need())return;try{const a=await db.collection('students').get();$('dvXi').textContent=a.size;const m=await db.collection('mdmMonths').get();$('dvMd').textContent=m.size;$('dvMl').textContent=m.docs.map(d=>d.id).sort().pop()||'–'}catch(e){msg('Linked data: '+(e.code||e.message),true)}}
+ function setView(v){document.body.setAttribute('data-view',v);document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('tfT').textContent=T[v][0];$('tfS').textContent=T[v][1];if(v==='data')summary();window.scrollTo(0,0)}
+ const y=new Date().getFullYear();$('dvYear').innerHTML=[y-2,y-1,y,y+1].map(v=>'<option'+(v===y?' selected':'')+'>'+v+'</option>').join('');
+ document.querySelector('.tf-side').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.v)setView(b.dataset.v);else if(b.id==='tfCol'){document.body.classList.toggle('tf-c');$('tfCol').querySelector('.ic').textContent=document.body.classList.contains('tf-c')?'»':'«'}else if(b.id==='tfSign')$('tfLogin').classList.toggle('show')});
+ setView('cert');chips();summary();
+ if(ok){const app=firebase.apps.find(a=>a.name==='tfdb')||firebase.initializeApp(CFG,'tfdb');db=app.firestore();auth=app.auth();auth.onAuthStateChanged(u=>{chips();if(u){$('tfLogin').classList.remove('show');$('tfLm').textContent='';msg('Signed in as '+u.email+'. Source: '+src+'.')}})}
+ return{load,upload,builtin,linked,login(){if(!ok){$('tfLm').textContent='Firebase not loaded';return}auth.signInWithEmailAndPassword($('tfE').value.trim(),$('tfP').value).catch(e=>$('tfLm').textContent=e.code||e.message)},logout(){if(auth)auth.signOut().then(()=>$('tfLogin').classList.remove('show'))}};
 })();
 </script>
 </body>
