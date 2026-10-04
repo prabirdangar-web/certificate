@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -707,7 +707,7 @@
 <header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span></div></header>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
 <div class="gp">DAILY</div><button data-v="cert" class="on"><span class="ic">📜</span><span class="l">Certificate</span></button>
-<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
+<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <div id="dataView">
@@ -890,6 +890,90 @@
  body.print-roll #rollSheet{display:block!important;box-shadow:none;margin:0;width:auto;padding:0}body.print-roll{padding:0!important}.rs-ctl{display:none!important}}
 </style>
 <div id="rollSheet"></div>
+<style>
+/* ===== WIFS: data entry becomes a left side panel, Annex-3 preview on the right ===== */
+@media screen and (min-width:1350px){
+ body[data-view=wifs]{display:grid!important;grid-template-columns:430px minmax(0,1fr);column-gap:18px;align-items:start;justify-content:center}
+ body[data-view=wifs] .wifs-panel{position:sticky;top:84px;max-height:calc(100vh - 100px);overflow-y:auto;width:auto!important;margin:0!important;padding:12px 14px!important;border-top:4px solid #145828}
+ body[data-view=wifs] .wf-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px 10px!important}
+ body[data-view=wifs] .wifs-panel input,body[data-view=wifs] .wifs-panel select,body[data-view=wifs] .wifs-panel textarea{min-width:0;max-width:100%;box-sizing:border-box}
+ body[data-view=wifs] .wifs-panel{box-sizing:border-box;overflow-x:hidden!important}
+ body[data-view=wifs] .wifs-panel summary{font-size:15px!important;padding:2px 0 8px!important}
+ body[data-view=wifs] .wifs-sheet{justify-self:center;margin:0}
+}
+/* ===== NEXT-YEAR FEE RECEIPTS ===== */
+#feeView{display:none;font-family:'Segoe UI',Arial,sans-serif;color:#1d2b22}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.fc-grid label{font-size:11px;font-weight:700;display:flex;flex-direction:column;gap:3px;color:#333}
+.fc-grid input,.fc-grid select{padding:7px;border:1px solid #c9d6cc;border-radius:8px;font-size:13px}
+.fc-chk{flex-direction:row!important;align-items:center;gap:6px!important}
+.fc-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.fc-tbl th{background:#145828;color:#fff;padding:6px;font-size:12px}
+.fc-tbl td{padding:4px;border-bottom:1px solid #e6eee8;text-align:center}
+.fc-tbl input{width:72px;padding:5px;border:1px solid #c9d6cc;border-radius:6px;text-align:right}
+#fcMsg{font-size:13px;font-weight:600;color:#145828;margin:10px 0 0}
+@media screen{
+ body[data-view=fees] #feeView{display:flex;width:100%;max-width:1150px;flex-direction:column;gap:14px}
+ body[data-view=fees] .dashboard-panel,body[data-view=fees] .page,body[data-view=fees] .wifs-panel,body[data-view=fees] .wifs-sheet,body[data-view=fees] #dataView{display:none!important}
+ #feeSheets{zoom:.6}
+ .fee-page{margin:0 auto 14px;border:1px dashed #999;background:#fff}
+}
+@page fee{size:A4 landscape;margin:0}
+.fee-wrap{page:fee}
+.fee-page{display:flex;justify-content:space-between;width:297mm;height:200mm;padding:8mm 10mm;box-sizing:border-box;page-break-after:always;break-after:page;font-family:'Courier New',Courier,monospace;color:#000}
+.fr-card{container-type:inline-size;width:48%;box-sizing:border-box;position:relative;background:#fff;padding:15px 20px;border:4px double #000;outline:2px solid #000;outline-offset:-8px;display:flex;flex-direction:column;justify-content:space-between}
+.fr-tag{position:absolute;top:10px;right:14px;font-size:.7rem;font-weight:bold;letter-spacing:1px}
+.fr-head{text-align:center;border-bottom:2px solid #000;padding-bottom:6px;margin:10px 0 5px}
+.fr-school{font-size:4.5cqi;font-weight:900;margin:0 0 4px;text-transform:uppercase;white-space:nowrap;letter-spacing:-.5px}
+.fr-addr{font-size:.8rem;font-weight:bold;margin:0;line-height:1.3}
+.fr-meta{display:flex;justify-content:space-between;align-items:center;margin:8px 0;font-weight:bold;font-size:1.05rem}
+.fr-no{display:inline-block;background:#FFD700;color:#8B0000;padding:3px 12px;border-radius:50px;font-weight:900;font-size:.9rem;border:1px solid #cca100;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.fr-row{margin:8px 0;font-size:1.05rem;font-weight:bold;display:flex;align-items:flex-end}
+.fr-row3{margin:8px 0;font-size:1.05rem;font-weight:bold;display:flex;gap:20px;width:100%}
+.fr-it{display:flex;align-items:flex-end}
+.fr-lb{white-space:nowrap;padding-right:4px}
+.fr-ul{border-bottom:2px solid #000;font-weight:900;padding:0 5px;flex-grow:1;min-height:20px;display:inline-block;white-space:nowrap}
+.fr-note{font-size:.7rem;font-style:italic;font-weight:bold;margin:-4px 0 2px}
+.fr-fee{width:100%;border-collapse:collapse;margin:10px 0;table-layout:fixed}
+.fr-fee th,.fr-fee td{border:2px solid #000;padding:5px 8px;font-size:.95rem;font-weight:bold;box-sizing:border-box}
+.fr-fee th{background:#f2f2f2;font-size:1rem}
+.fr-r{text-align:right}
+.fr-tot td{font-size:1.15rem!important;font-weight:900!important;border:4px solid #000!important}
+.fr-words{border:3px solid #000;padding:8px;font-size:1rem;font-weight:bold;margin:8px 0;line-height:1.3;min-height:40px;box-sizing:border-box}
+.fr-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px;font-size:.95rem;font-weight:bold}
+.fr-seal{width:85px;height:85px;border:2px dotted #000;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;padding:5px;box-sizing:border-box;font-size:.65rem;font-weight:bold}
+.fr-sig{width:180px;border-top:2px solid #000;text-align:center;padding-top:5px;font-weight:900}
+@media print{
+ body:not(.print-fee) #feeView{display:none!important}
+ body.print-fee{padding:0!important;display:block!important;background:#fff}
+ body.print-fee .page,body.print-fee .dashboard-panel,body.print-fee .wifs-panel,body.print-fee .wifs-sheet,body.print-fee #rollSheet,body.print-fee #dataView{display:none!important}
+ body.print-fee #feeView{display:block!important}
+ body.print-fee .fee-ctl{display:none!important}
+ body.print-fee #feeSheets{zoom:1}
+ body.print-fee .fee-page{border:none;margin:0;height:209mm}
+}
+</style>
+<div id="feeView">
+ <div class="dv-c fee-ctl"><h3>Next-year admission fee receipts — class-wise (promoted to next class)</h3>
+  <div class="fc-grid">
+   <label>New session <input id="fcSes" type="text"></label>
+   <label>Currently studying in <select id="fcCls"><option value="">All (V → XI)</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option></select></label>
+   <label>Section (current) <select id="fcSec"><option value="">All</option><option>A</option><option>B</option><option>C</option><option value="__">No section</option></select></label>
+   <label>Roll from <input id="fcFrom" type="number" min="0"></label>
+   <label>Roll to <input id="fcTo" type="number" min="0"></label>
+   <label>Blank Class V receipts (new admission) <input id="fcNew" type="number" min="0" value="0"></label>
+   <label class="fc-chk"><input id="fcKeep" type="checkbox" checked> Keep current section on receipt</label>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+   <button class="dv-b" type="button" onclick="FEE.gen()">Generate receipts</button>
+   <button class="dv-b" type="button" style="background:#8a5600" onclick="FEE.print()">🖨 Print A4 landscape / Save PDF</button>
+  </div>
+  <p id="fcMsg">Class XII students are leaving, so they get no receipt. Pick a class and press Generate.</p>
+ </div>
+ <div class="dv-c fee-ctl"><h3>Fee structure by new class (Rs.) — editable, saved in this browser</h3><div id="fcFees"></div></div>
+ <div class="fee-wrap"><div id="feeSheets"></div></div>
+</div>
+
 <div class="page">
         <div class="watermark">তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</div>
         
@@ -1538,7 +1622,8 @@ function generateStudentReport(type) {
                 </style></head><body>
                 <h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2>
                 ${reportHTML}
-                </body></html>`);
+
+</body></html>`);
             w.document.close();
             w.focus();
             setTimeout(() => w.print(), 300);
@@ -1793,7 +1878,7 @@ const WIFS = (function(){
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],data:['Data & Year','Student database by year, live from Firebase']};
+ const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],data:['Data & Year','Student database by year, live from Firebase']};
  const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
  function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
  function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
@@ -1848,6 +1933,57 @@ const ROLL=(function(){
   $('rsD').onchange=e=>{d0=e.target.value||d0;render()};$('rsS').onchange=e=>{sig=e.target.value;render()}}
  return{show(){render();$('rollSheet').classList.add('on');document.body.classList.add('roll-on');window.scrollTo(0,0)},hide(){$('rollSheet').classList.remove('on');document.body.classList.remove('roll-on')},
   print(){render();document.body.classList.add('print-roll');const done=()=>{document.body.classList.remove('print-roll');window.removeEventListener('afterprint',done)};window.addEventListener('afterprint',done);window.print()}};
+})();
+</script>
+                <script>
+/* ===== NEXT-YEAR FEE RECEIPTS (class-wise, promoted to next class) ===== */
+const FEE=(function(){
+ const $=id=>document.getElementById(id);
+ const ORDER=['V','VI','VII','VIII','IX','X','XI','XII'],NEXT={V:'VI',VI:'VII',VII:'VIII',VIII:'IX',IX:'X',X:'XI',XI:'XII'};
+ const HEADS=['Development Fee','Examination Fee','Saraswati Puja Fee','Computer Fee','Lab Fee','Others'];
+ /* ASSUMED defaults - edit in the page; saved in this browser */
+ const DEF={V:[240,0,60,0,0,0],VI:[240,0,60,0,0,0],VII:[240,0,60,0,0,0],VIII:[240,0,60,0,0,0],IX:[240,150,60,0,0,0],X:[240,150,60,0,0,0],XI:[240,150,60,200,300,0],XII:[240,150,60,200,300,0]};
+ let fees=JSON.parse(JSON.stringify(DEF));
+ try{const s=localStorage.getItem('tfhsFees');if(s)fees=Object.assign(fees,JSON.parse(s))}catch(e){}
+ const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ const A1=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'],T10=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+ function w2(n){return n<20?A1[n]:T10[Math.floor(n/10)]+(n%10?' '+A1[n%10]:'')}
+ function w3(n){return (n>=100?A1[Math.floor(n/100)]+' Hundred'+(n%100?' and ':''):'')+(n%100?w2(n%100):'')}
+ function words(n){n=Math.round(n);if(!n)return 'Zero Only';let o=[];const th=Math.floor(n/1000),r=n%1000;if(th)o.push(w2(th>=20||th<20?th:th)+' Thousand');if(r)o.push(w3(r));return o.join(' ')+' Only'}
+ const tot=c=>fees[c].reduce((a,b)=>a+(+b||0),0);
+ function drawFees(){
+  $('fcFees').innerHTML='<table class="fc-tbl"><tr><th>New class</th>'+HEADS.map(h=>'<th>'+h+'</th>').join('')+'<th>Total</th></tr>'+
+   ORDER.slice(1).map(c=>'<tr><td><b>'+c+'</b></td>'+fees[c].map((v,i)=>'<td><input type="number" min="0" data-c="'+c+'" data-i="'+i+'" value="'+v+'"></td>').join('')+'<td id="fcT_'+c+'"><b>'+tot(c)+'</b></td></tr>').join('')+'</table>';
+  $('fcFees').querySelectorAll('input').forEach(e=>e.oninput=()=>{fees[e.dataset.c][+e.dataset.i]=+e.value||0;$('fcT_'+e.dataset.c).innerHTML='<b>'+tot(e.dataset.c)+'</b>';try{localStorage.setItem('tfhsFees',JSON.stringify(fees))}catch(x){}})}
+ function card(tag,no,name,cls,sec,roll,ses){
+  const f=fees[cls],t=tot(cls),amt=v=>v?Number(v).toFixed(2):'-';
+  return '<div class="fr-card"><div><span class="fr-tag">'+tag+'</span><div class="fr-head"><h1 class="fr-school">Taldangra Fulmati High School [H.S.]</h1><p class="fr-addr">P.O. Taldangra, District: Bankura, PIN: 722152<br>Ph No: 03243-265114</p></div>'+
+  '<div class="fr-meta"><span>No.- <span class="fr-no">'+esc(no)+'</span></span><div style="display:flex;width:200px;justify-content:flex-end"><span class="fr-lb">Date:</span><span class="fr-ul">&nbsp;</span></div></div>'+
+  '<div class="fr-row"><span class="fr-lb">Received from:</span><span class="fr-ul">'+esc(name)+'</span></div>'+
+  '<div class="fr-row3"><div class="fr-it" style="flex:2"><span class="fr-lb">Class:</span><span class="fr-ul">'+cls+'</span></div><div class="fr-it" style="flex:3"><span class="fr-lb">Sec/Stream:</span><span class="fr-ul">'+esc(sec)+'</span></div><div class="fr-it" style="flex:2"><span class="fr-lb">Roll No:</span><span class="fr-ul">'+esc(roll)+'</span></div></div>'+
+  '<div class="fr-row"><span class="fr-lb">for the session:</span><span class="fr-ul">'+esc(ses)+'</span></div>'+
+  '<table class="fr-fee"><thead><tr><th style="width:70%">Details</th><th class="fr-r" style="width:30%">Rs.</th></tr></thead><tbody>'+
+  HEADS.map((h,i)=>'<tr><td>'+(i+1)+'. '+h+'</td><td class="fr-r">'+amt(f[i])+'</td></tr>').join('')+
+  '<tr class="fr-tot"><td class="fr-r">TOTAL -</td><td class="fr-r">'+t.toFixed(2)+'</td></tr></tbody></table></div>'+
+  '<div><div class="fr-words"><strong>Total in words:</strong> '+words(t)+'</div><div class="fr-foot"><div class="fr-seal">SCHOOL SEAL</div><div class="fr-sig">Receiving Officer</div></div></div></div>'}
+ function gen(){
+  const ses=$('fcSes').value.trim(),c0=$('fcCls').value,s0=$('fcSec').value,a=$('fcFrom').value,b=$('fcTo').value,keep=$('fcKeep').checked,nn=+$('fcNew').value||0;
+  let rows=STUDENT_DB.filter(s=>{const c=String(s.cls).trim().toUpperCase();if(!NEXT[c])return false;if(c0&&c!==c0)return false;
+   const sec=String(s.sec||'').trim();if(s0==='__'?sec!=='':(s0&&sec.toUpperCase()!==s0))return false;
+   const r=parseInt(s.roll,10)||0;if(a!==''&&r<+a)return false;if(b!==''&&r>+b)return false;return true});
+  rows.sort((x,y)=>ORDER.indexOf(String(x.cls).toUpperCase())-ORDER.indexOf(String(y.cls).toUpperCase())||String(x.sec||'').localeCompare(String(y.sec||''))||(parseInt(x.roll,10)||0)-(parseInt(y.roll,10)||0));
+  const seen={};let html='',n=0;
+  const page=(no,name,cls,sec,roll)=>{html+='<div class="fee-page">'+card('COUNTERPART (SCHOOL COPY)',no,name,cls,sec,roll,ses)+card('ORIGINAL (STUDENT COPY)',no,name,cls,sec,roll,ses)+'</div>';n++};
+  rows.forEach(s=>{const cls=NEXT[String(s.cls).trim().toUpperCase()];const secRaw=String(s.sec||'').trim();
+   const secShow=(keep&&cls!=='XI'&&cls!=='XII')?secRaw:'';const sl=(secRaw.match(/[A-C]/i)||[''])[0].toUpperCase();
+   let no=ses+'_'+cls+(keep?sl:'')+s.roll;if(seen[no]){seen[no]++;no+='-'+seen[no]}else seen[no]=1;page(no,s.name,cls,secShow,s.roll)});
+  for(let i=1;i<=nn;i++)page(ses+'_VNEW'+i,'','V','','');
+  $('feeSheets').innerHTML=html;
+  $('fcMsg').textContent=n?('Generated '+n+' receipt sheet(s), 2 copies each ('+(n*2)+' receipts) for session '+ses+'. Press Print / Save PDF.'):'No students matched this filter.';
+  $('fcMsg').className=n?'':'bad'}
+ function print(){if(!$('feeSheets').innerHTML)gen();if(!$('feeSheets').innerHTML)return;document.body.classList.add('print-fee');const d=()=>{document.body.classList.remove('print-fee');window.removeEventListener('afterprint',d)};window.addEventListener('afterprint',d);window.print()}
+ const y=new Date().getFullYear();$('fcSes').value=(y+1)+'-'+String(y+2).slice(-2);drawFees();
+ return{gen,print,words}
 })();
 </script>
 </body>
