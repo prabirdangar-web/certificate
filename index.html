@@ -1794,13 +1794,15 @@ const WIFS = (function(){
         const d = gather();
         if (!d.wf_month) { status('Select the reporting month first.', true); return; }
         render();
+        store.last = d; store.months[d.wf_month] = d;
+        let localOk = true;
+        try { localStorage.setItem('wifsStore', JSON.stringify(store)); } catch (e) { localOk = false; }
         if (!configured) {
-            store.last = d; store.months[d.wf_month] = d;
-            try { localStorage.setItem('wifsStore', JSON.stringify(store)); status('Firebase key not set — saved in THIS BROWSER only.', true); }
-            catch (e) { status('Save failed.', true); }
+            if (!WIFS_FIREBASE_CONFIG.apiKey) status(localOk ? 'Firebase key not set — saved in THIS BROWSER only.' : 'Save failed.', !localOk);
+            else status(localOk ? 'Firebase library not loaded (check internet) — saved in THIS BROWSER only.' : 'Save failed.', true);
             return;
         }
-        if (!auth.currentUser) { status('Login first (box above), then press SAVE again.', true); $('wfLogin').style.display = 'flex'; return; }
+        if (!auth.currentUser) { status('Saved in this browser. Login (box above) and press SAVE again to save online.', true); $('wfLogin').style.display = 'flex'; return; }
         try {
             await db.collection('tfhs').doc('wifsReport').set({ last: d, months: { [d.wf_month]: d }, updated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             store.last = d; store.months[d.wf_month] = d;
@@ -1865,8 +1867,8 @@ const WIFS = (function(){
         $('wf_month').addEventListener('change', e => loadMonth(e.target.value));
         Object.keys(DEFAULTS).forEach(k => $(k).addEventListener('input', () => { if ($('wifsSheet').style.display === 'block') render(); }));
         if (configured) {
-            if (!firebase.apps.length) firebase.initializeApp(WIFS_FIREBASE_CONFIG);
-            db = firebase.firestore(); auth = firebase.auth();
+            const app = firebase.apps.find(a => a.name === 'tfdb') || firebase.initializeApp(WIFS_FIREBASE_CONFIG, 'tfdb');
+            db = app.firestore(); auth = app.auth();
             $('wfLogin').style.display = 'flex';
             let first = true;
             auth.onAuthStateChanged(u => { if (first) { first = false; load(); } if (u) { status('Logged in as ' + u.email); $('wfLogin').style.display = 'none'; } });
