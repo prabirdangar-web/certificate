@@ -880,7 +880,7 @@
 .rs-ctl button{border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer;background:#145828;color:#fff}.rs-ctl button.g{background:#e1e9e3;color:#145828}
 .rs{border-collapse:collapse;width:100%;margin-bottom:0}.rs td,.rs th{border:1.5px solid #000;text-align:center;padding:4px 2px;font-size:11pt;font-weight:400}
 .rs .tt{font-size:14pt;font-weight:700;padding:7px}.rs .hd{font-weight:700;font-size:11pt}.rs .lf{text-align:left;padding-left:4px}.rs .dt{background:#c9b995;font-style:italic;font-size:14pt}.rs .bl{font-weight:700;font-size:11pt}
-.rs-low{display:flex;justify-content:space-between;align-items:flex-start;margin-top:14px;gap:12px}.rs-low table{width:auto}.rs-sig{text-align:center;min-width:52mm;font-size:9pt}.rs-sig img{max-width:100%;height:auto}
+.rs-low{display:flex;justify-content:space-between;align-items:flex-start;margin-top:14px;gap:12px}.rs-low table{width:auto}.rs-low .rs-sb{position:relative;height:auto;min-height:0;width:62mm;flex:none;align-self:flex-end}.rs-low .rs-sb .sr{position:static;width:100%;right:auto;bottom:auto}.rs-sb.nos .ssig,.rs-sb.nos .sdate,.rs-sb.nos .seal{visibility:hidden}.rs-sb.nos .sr{padding-top:6mm}
 @page roll{size:A4 portrait;margin:8mm}
 @media screen{body[data-view=reports] #rollSheet.on{display:block}body.roll-on .dashboard-panel{display:none!important}body:not([data-view=reports]) #rollSheet{display:none!important}}
 @media print{body:not(.print-roll) #rollSheet{display:none!important}body.print-roll .page,body.print-roll .dashboard-panel,body.print-roll .wifs-panel,body.print-roll .wifs-sheet,body.print-roll .tf-side,body.print-roll .tf-top{display:none!important}
@@ -1823,8 +1823,8 @@ const ROLL=(function(){
  const COLS=[['V','V'],['VI','VI'],['VII','VII'],['VIII','VIII'],['IX','IX'],['X','X'],['XI(B)','XI','M'],['XI(G)','XI','F'],['XII(B)','XII','M'],['XII(G)','XII','F']];
  const BASE=['GENERAL','OBC','OBC-B','OBC-A','SC','ST'],isF=s=>/^(f|female|girl)/i.test(String(s).trim());
  const cn=c=>{c=String(c||'').trim().toUpperCase().replace(/\s+/g,'');return c==='GEN'?'GENERAL':(c||'NOT AVAILABLE')};
- let d0=(()=>{const t=new Date(),p=x=>String(x).padStart(2,'0');return t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate())})(),sig=true;
- const fd=v=>v.split('-').reverse().join('-');
+ let sig='with',d0=(()=>{const t=new Date(),p=x=>String(x).padStart(2,'0');return t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate())})();
+ const fd=v=>v.split('-').reverse().join('-'),fs=v=>{const a=v.split('-');return a[2]+'.'+a[1]+'.'+a[0].slice(2)};
  function render(){
   const rows=BASE.slice(),g={};STUDENT_DB.forEach(s=>{const k=cn(s.caste);if(rows.indexOf(k)<0)rows.push(k)});
   rows.forEach(r=>g[r]=COLS.map(()=>0));
@@ -1840,10 +1840,10 @@ const ROLL=(function(){
   const L=[['Class-V',n('V')],['Class-VI-VIII',n('VI')+n('VII')+n('VIII')],['Class-V-VIII',n('V')+n('VI')+n('VII')+n('VIII')],['Class-XI',n('XI')],['Class-HS/XII',n('XII')]];
   const lt='<table class="rs">'+L.map(x=>'<tr><td style="font-size:13pt;padding:5px 10px">'+x[0]+'</td><td style="font-size:14pt;padding:5px 14px">'+x[1]+'</td></tr>').join('')+'</table>';
   const rt='<table class="rs"><tr><td colspan="4" style="font-size:9pt">ROLL STRENGTH-'+yr+'</td></tr><tr><td>GIRLS</td><td>V–XII</td><td>'+girls+'</td><td class="bl">'+girls+'</td></tr><tr><td rowspan="2">BOYS</td><td>VI-XII</td><td>'+boysO+'</td><td rowspan="2" class="bl">'+(boysO+boysV)+'</td></tr><tr><td>V</td><td>'+boysV+'</td></tr><tr class="hd"><td colspan="2">TOTAL</td><td>'+all+'</td><td>'+all+'</td></tr></table>';
-  let sg='';if(sig){const sr=document.querySelector('#wifsSheet .sr');sg='<div class="rs-sig">'+(sr?sr.innerHTML:'<br><br><b>Headmaster</b>')+'</div>';}
-  $('rollSheet').innerHTML='<div class="rs-ctl"><b>Caste-wise Roll Strength</b> As on <input type="date" id="rsD" value="'+d0+'"> <label><input type="checkbox" id="rsS"'+(sig?' checked':'')+'> With signature &amp; seal</label><button type="button" onclick="ROLL.print()">🖨 Print A4</button><button class="g" type="button" onclick="ROLL.hide()">Close</button></div>'+t+'<div class="rs-low">'+lt+rt+sg+'</div>';
-  const sd=document.querySelector('#rollSheet .sdate');if(sd)sd.textContent=fd(d0);
-  $('rsD').onchange=e=>{d0=e.target.value||d0;render()};$('rsS').onchange=e=>{sig=e.target.checked;render()}}
+  const sr=document.querySelector('#wifsSheet .sr'),sg='<div class="sigbox rs-sb'+(sig==='without'?' nos':'')+'"><div class="sr">'+(sr?sr.innerHTML.replace(/ id="[^"]*"/g,''):'<br><br><div class="shm">Headmaster</div>')+'</div></div>';
+  $('rollSheet').innerHTML='<div class="rs-ctl"><b>Caste-wise Roll Strength</b> As on <input type="date" id="rsD" value="'+d0+'"> <label>Signature, stamp &amp; date <select id="rsS"><option value="with"'+(sig==='with'?' selected':'')+'>With</option><option value="without"'+(sig==='without'?' selected':'')+'>Without (blank space)</option></select></label><button type="button" onclick="ROLL.print()">🖨 Print A4</button><button class="g" type="button" onclick="ROLL.hide()">Close</button></div>'+t+'<div class="rs-low">'+lt+rt+sg+'</div>';
+  const sd=document.querySelector('#rollSheet .sdate');if(sd)sd.textContent=fs(d0);
+  $('rsD').onchange=e=>{d0=e.target.value||d0;render()};$('rsS').onchange=e=>{sig=e.target.value;render()}}
  return{show(){render();$('rollSheet').classList.add('on');document.body.classList.add('roll-on');window.scrollTo(0,0)},hide(){$('rollSheet').classList.remove('on');document.body.classList.remove('roll-on')},
   print(){render();document.body.classList.add('print-roll');const done=()=>{document.body.classList.remove('print-roll');window.removeEventListener('afterprint',done)};window.addEventListener('afterprint',done);window.print()}};
 })();
