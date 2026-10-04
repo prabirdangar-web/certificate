@@ -690,6 +690,10 @@
  body[data-view=reports] .dashboard-panel{max-width:1000px}
  body[data-view=reports] .dashboard-main-row,body[data-view=reports] .dashboard-reports,body[data-view=reports] .dashboard-reports .report-panel{position:static!important;width:100%!important;max-width:none!important;display:block}
  body[data-view=wifs] .dashboard-panel,body[data-view=wifs] .page,body[data-view=wifs] #dataView{display:none!important}
+  body[data-view=wifs] .wifs-panel{display:block!important;width:min(1100px,calc(100vw - 40px));max-width:none!important;margin:0 auto!important}
+  body[data-view=wifs] .wifs-panel summary{font-size:20px!important;padding:8px 0 10px!important}
+  body[data-view=wifs] .wf-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 14px}
+  body[data-view=wifs] .wf-bar{position:sticky;bottom:0;background:#fff;padding:10px 0 2px;border-top:1px solid #e1e8e2;z-index:4}
  body[data-view=data] .dashboard-panel,body[data-view=data] .page,body[data-view=data] .wifs-panel,body[data-view=data] .wifs-sheet{display:none!important}
  @media(max-width:800px){:root{--sw:0px}body{padding-left:8px!important}.tf-side{top:auto;bottom:0;width:auto;right:0;height:58px;flex-direction:row;padding:6px}.tf-side .br,.tf-side .gp,.tf-side .fo,.tf-side .l{display:none}.tf-top{left:0}.tf-chip{display:none}}
 }
@@ -703,7 +707,7 @@
 <header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span></div></header>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
 <div class="gp">DAILY</div><button data-v="cert" class="on"><span class="ic">📜</span><span class="l">Certificate</span></button>
-<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">💊</span><span class="l">WIFS Annex-3</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
+<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <div id="dataView">
@@ -1789,7 +1793,7 @@ const WIFS = (function(){
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Annex-3','Monthly report and A4 print'],data:['Data & Year','Student database by year, live from Firebase']};
+ const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],data:['Data & Year','Student database by year, live from Firebase']};
  const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
  function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
  function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
