@@ -891,6 +891,13 @@
 </style>
 <div id="rollSheet"></div>
 <style>
+/* Certificate page: prominent data-entry boxes */
+#class,#sec,#rollNo,#village{background:#FFC61A!important;color:#0d3b1c!important;font-weight:800!important;font-size:1.05em;border:2px solid #b78600!important;border-radius:8px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+#class:focus,#sec:focus,#rollNo:focus,#village:focus{outline:3px solid #145828;outline-offset:1px;background:#FFD23F!important}
+#class::placeholder,#sec::placeholder,#rollNo::placeholder,#village::placeholder{color:#6b5200;font-weight:600}
+#class option,#sec option{background:#fff;color:#0d3b1c}
+</style>
+<style>
 /* ===== WIFS: data entry becomes a left side panel, Annex-3 preview on the right ===== */
 @media screen and (min-width:1350px){
  body[data-view=wifs]{display:grid!important;grid-template-columns:460px minmax(0,1fr);column-gap:18px;align-items:start;justify-content:center}
