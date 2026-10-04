@@ -697,7 +697,6 @@
 #dataView{width:100%;max-width:1000px;font-family:'Segoe UI',Arial,sans-serif;color:#1d2b22;display:flex;flex-direction:column;gap:14px}
 .dv-c{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 3px 12px rgba(0,0,0,.08)}.dv-c h3{margin:0 0 10px;font-size:15px;color:#145828}
 .dv-r{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.dv-r select{border:1px solid #c9d6cc;border-radius:8px;padding:8px;font-size:14px}
-.dv-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.dv-k div{background:#f1f7f2;border-radius:12px;padding:12px}.dv-k b{display:block;font-size:22px;color:#0e3d1c}.dv-k span{font-size:11px;text-transform:uppercase;color:#5c6f61}
 .dv-t{width:100%;border-collapse:collapse;font-size:13px}.dv-t th{background:#145828;color:#fff;padding:6px}.dv-t td{padding:5px;border-bottom:1px solid #e6eee8;text-align:center}
 #dvMsg{font-size:13px;font-weight:600;color:#145828}#dvMsg.bad{color:#b00020}
 </style>
@@ -712,7 +711,7 @@
   <button class="dv-b" type="button" onclick="TFDB.load()">⬇ Load from Firebase</button><button class="dv-b" type="button" onclick="TFDB.upload()" style="background:#8a5600">⬆ Upload current DB to Firebase (admin)</button><button class="dv-b g" type="button" onclick="TFDB.builtin()">Use built-in (offline)</button></div>
   <p id="dvMsg" style="margin:10px 0 0">Source: built-in database (offline).</p></div>
  <div class="dv-c"><h3>Class-wise strength (current database)</h3><div id="dvCls"></div></div>
- <div class="dv-c"><h3>Linked live data (read-only, needs sign in)</h3><div class="dv-k"><div><b id="dvXi">–</b><span>Class XI students (Firebase)</span></div><div><b id="dvMd">–</b><span>MDM months saved</span></div><div><b id="dvMl">–</b><span>Latest MDM month</span></div></div><div class="dv-r" style="margin-top:10px"><button class="dv-b g" type="button" onclick="TFDB.linked()">↻ Refresh</button></div></div>
+
 </div>
 
     <!-- CLASS XI DATABASE UPDATED FROM New Microsoft Excel Worksheet.xlsx -->
@@ -1786,7 +1785,7 @@ const WIFS = (function(){
 })();
 </script>
 <script>
-/* ===== SIDEBAR + DATA & YEAR (Firebase: certDb/{year}, read-only: students, mdmMonths) ===== */
+/* ===== SIDEBAR + DATA & YEAR (Firebase: certDb/{year}) ===== */
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
@@ -1807,13 +1806,12 @@ const TFDB=(function(){
   try{const b=db.batch(),n=Math.ceil(STUDENT_DB.length/CH);for(let i=0;i<n;i++)b.set(db.collection('certDb').doc(year+'_'+i),{year,i,rows:STUDENT_DB.slice(i*CH,(i+1)*CH).map(s=>Object.assign({},s))});
    b.set(db.collection('certDb').doc(year),{year,count:STUDENT_DB.length,chunks:n,updatedBy:auth.currentUser.email,updated:firebase.firestore.FieldValue.serverTimestamp()});await b.commit();chips();msg('Uploaded '+STUDENT_DB.length+' students for '+year+' ✔')}catch(e){msg('Upload failed (admin only): '+(e.code||e.message),true)}}
  function builtin(){apply(BUILTIN.slice(),'built-in');msg('Source: built-in database (offline).')}
- async function linked(){if(!need())return;try{const a=await db.collection('students').get();$('dvXi').textContent=a.size;const m=await db.collection('mdmMonths').get();$('dvMd').textContent=m.size;$('dvMl').textContent=m.docs.map(d=>d.id).sort().pop()||'–'}catch(e){msg('Linked data: '+(e.code||e.message),true)}}
  function setView(v){document.body.setAttribute('data-view',v);document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('tfT').textContent=T[v][0];$('tfS').textContent=T[v][1];if(v==='data')summary();window.scrollTo(0,0)}
  const y=new Date().getFullYear();$('dvYear').innerHTML=[y-2,y-1,y,y+1].map(v=>'<option'+(v===y?' selected':'')+'>'+v+'</option>').join('');
  document.querySelector('.tf-side').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.v)setView(b.dataset.v);else if(b.id==='tfCol'){document.body.classList.toggle('tf-c');$('tfCol').querySelector('.ic').textContent=document.body.classList.contains('tf-c')?'»':'«'}else if(b.id==='tfSign')$('tfLogin').classList.toggle('show')});
  setView('cert');chips();summary();
  if(ok){const app=firebase.apps.find(a=>a.name==='tfdb')||firebase.initializeApp(CFG,'tfdb');db=app.firestore();auth=app.auth();auth.onAuthStateChanged(u=>{chips();if(u){$('tfLogin').classList.remove('show');$('tfLm').textContent='';msg('Signed in as '+u.email+'. Source: '+src+'.')}})}
- return{load,upload,builtin,linked,login(){if(!ok){$('tfLm').textContent='Firebase not loaded';return}auth.signInWithEmailAndPassword($('tfE').value.trim(),$('tfP').value).catch(e=>$('tfLm').textContent=e.code||e.message)},logout(){if(auth)auth.signOut().then(()=>$('tfLogin').classList.remove('show'))}};
+ return{load,upload,builtin,login(){if(!ok){$('tfLm').textContent='Firebase not loaded';return}auth.signInWithEmailAndPassword($('tfE').value.trim(),$('tfP').value).catch(e=>$('tfLm').textContent=e.code||e.message)},logout(){if(auth)auth.signOut().then(()=>$('tfLogin').classList.remove('show'))}};
 })();
 </script>
 <script>
