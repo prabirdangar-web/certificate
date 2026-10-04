@@ -651,44 +651,210 @@
  body.print-wifs .wifs-sheet{display:block!important;box-shadow:none;margin:0}
  body.print-wifs{padding:0}
 }
+
+/* ================= APP SHELL (sidebar dashboard) ================= */
+:root{--sb-w:244px;--sb-wc:66px;--ink:#1c2a21;--muted:#66756b;--line:#dde5de;--brand:#145828;--brand-d:#0c3a1b;--gold:#d4b18a;--bg:#f2f5f0}
+html,body{height:auto}
+body{display:block!important;padding:0!important;margin:0!important;gap:0!important;background:var(--bg)!important;color:var(--ink);font-family:"Segoe UI",Inter,system-ui,-apple-system,Roboto,Arial,sans-serif}
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sb-w);flex:0 0 var(--sb-w);background:linear-gradient(180deg,#10462a 0%,#0a2f1a 100%);color:#d6e6da;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:60;transition:width .18s ease;box-shadow:2px 0 14px rgba(0,0,0,.12)}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:16px 15px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{flex:0 0 38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#d4b18a,#b98c5a);display:grid;place-items:center;color:#0c3a1b}
+.sb-logo svg{width:22px;height:22px}
+.sb-title{line-height:1.15;white-space:nowrap;overflow:hidden}
+.sb-title b{display:block;font-size:15px;color:#fff;letter-spacing:.4px}
+.sb-title small{font-size:10.5px;color:#9fbca9;letter-spacing:.3px}
+.sb-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.sb-label{font-size:10px;letter-spacing:1.2px;color:#7fa08b;padding:8px 10px 4px;text-transform:uppercase;white-space:nowrap}
+.nav-item{display:flex;align-items:center;gap:13px;width:100%;border:0;background:transparent;color:#cfe2d4;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;text-align:left;position:relative;white-space:nowrap;transition:background .15s,color .15s}
+.nav-item svg{flex:0 0 21px;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:rgba(212,177,138,.18);color:#fff}
+.nav-item.active:before{content:"";position:absolute;left:-10px;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:var(--gold)}
+.nav-item.active svg{color:var(--gold)}
+.sb-foot{padding:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:4px}
+.sb-foot .nav-item{font-weight:500;font-size:13px}
+.sb-user{font-size:11px;color:#9fbca9;padding:0 12px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app.collapsed .sidebar{width:var(--sb-wc);flex-basis:var(--sb-wc)}
+.app.collapsed .sb-title,.app.collapsed .nav-item span,.app.collapsed .sb-label,.app.collapsed .sb-user{display:none}
+.app.collapsed .nav-item{justify-content:center;padding:12px 0}
+.app.collapsed .sb-brand{justify-content:center;padding:16px 0 14px}
+.app.collapsed #collapseBtn svg{transform:rotate(180deg)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.tb-menu{display:none;border:1px solid var(--line);background:#fff;border-radius:9px;width:38px;height:38px;cursor:pointer;color:var(--brand);padding:0}
+.tb-menu svg,.chip svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tb-title{flex:1;min-width:0;line-height:1.2}
+.tb-title h1{margin:0;font-size:18px;color:var(--brand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-title small{color:var(--muted);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip svg{width:15px;height:15px;color:var(--brand)}
+.chip:hover{border-color:var(--brand)}
+.content{padding:20px;flex:1}
+.view{display:none}
+.view.active{display:block;animation:vfade .18s ease}
+@keyframes vfade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+.scrim{display:none}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 3px rgba(16,40,24,.06);padding:18px;box-sizing:border-box}
+.card h3{margin:0 0 4px;font-size:15px;color:var(--brand);display:flex;align-items:center;gap:8px}
+.card h3 svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hint{font-size:12px;color:var(--muted);margin:2px 0 12px;line-height:1.45}
+/* certificate view */
+.cert-wrap{max-width:190mm;margin:0 auto}
+.cert-card{margin-bottom:16px}
+.cert-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#8a5600;cursor:pointer;user-select:none}
+.switch input{appearance:none;-webkit-appearance:none;width:34px;height:19px;border-radius:99px;background:#cdd6cf;position:relative;cursor:pointer;transition:background .15s;margin:0}
+.switch input:before{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.switch input:checked{background:#c98a1b}.switch input:checked:before{transform:translateX(15px)}
+.cert-find{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
+.cert-card .form-grid{gap:10px}
+.cert-card .form-group label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+.cert-card .form-control{border-radius:8px;border:1px solid #c9d4cb;padding:9px 10px;font-size:13px;background:#fff}
+.cert-card .form-control:focus{outline:2px solid rgba(20,88,40,.25);border-color:var(--brand)}
+.cert-card .form-control[readonly]{background:#f4f7f4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:9px;background:var(--brand);color:#fff;font-weight:700;font-size:13px;padding:10px 16px;cursor:pointer;white-space:nowrap}
+.btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn:hover{background:var(--brand-d)}
+.btn.ghost{background:#fff;color:var(--brand);border:1px solid #b8c8bb}.btn.ghost:hover{background:#eef5ef}
+.btn.warn{background:#b3261e}.btn.sm{padding:6px 10px;font-size:12px;border-radius:7px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+#lookupStatus{margin-top:10px!important;padding:8px 11px;border-radius:8px;background:#eef6ef;font-size:12.5px!important}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-title:after{content:"";flex:1;height:1px;background:var(--line)}
+details.more{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fafcfa}
+details.more>summary{cursor:pointer;list-style:none;padding:10px 0;font-size:13px;font-weight:700;color:var(--brand);display:flex;align-items:center;justify-content:space-between}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary:after{content:"＋";font-weight:400;color:var(--muted)}
+details.more[open]>summary:after{content:"－"}
+details.more .form-grid{padding:4px 0 14px}
+.cert-scroll{overflow-x:auto;padding:4px 0 10px}
+.cert-scroll .page{margin:0 auto}
+/* reports */
+#view-reports .report-panel{position:static!important;width:100%!important;display:block!important;margin:0!important;box-shadow:none;border:0;padding:0}
+#view-reports .report-buttons{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))!important;gap:8px}
+#view-reports .report-btn{min-height:38px;font-size:11.5px;border-radius:8px}
+#view-reports .report-output{max-height:none!important}
+/* wifs */
+#view-wifs .wifs-panel{max-width:960px;margin:0 auto 18px;box-shadow:none}
+#view-wifs .wifs-sheet{margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+/* data & year */
+.grid-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:16px;margin-bottom:16px}
+.yr-now{display:flex;align-items:baseline;gap:10px;margin:10px 0 12px}
+.yr-now b{font-size:38px;color:var(--brand);line-height:1}
+.yr-now span{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sel,.inp{border:1px solid #c9d4cb;border-radius:8px;padding:8px 10px;font-size:13px;background:#fff;min-width:0}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:#eef3ee;color:var(--brand);text-align:left;padding:8px 10px;font-size:11.5px;letter-spacing:.3px}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr.cur td{background:#f3faf4}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;background:#e6f1e8;color:var(--brand)}
+.pill.gray{background:#eceeec;color:#58655c}.pill.gold{background:#f7ecd9;color:#8a5600}
+.drop{border:2px dashed #b8c8bb;border-radius:12px;padding:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#fafcfa}
+.drop input[type=file]{font-size:13px;max-width:100%}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.stat{border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:#fff;min-width:92px}
+.stat b{display:block;font-size:20px;color:var(--brand)}.stat small{color:var(--muted);font-size:11px}
+.map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.map-grid label{font-size:11px;color:var(--muted);font-weight:600;display:block;margin-bottom:3px}
+.map-grid .sel{width:100%}
+.map-grid .miss .sel{border-color:#d9a;background:#fff6f6}
+.warnbox{background:#fff6e5;border:1px solid #ecd18e;color:#6b4a00;border-radius:9px;padding:9px 12px;font-size:12.5px;margin:10px 0;line-height:1.5}
+.warnbox.bad{background:#fdecec;border-color:#e6a5a1;color:#7d1a14}
+.okbox{background:#eaf6ec;border:1px solid #b7dcbc;color:#145828;border-radius:9px;padding:9px 12px;font-size:12.5px;margin:10px 0}
+.modes{display:grid;gap:10px;margin:14px 0}
+.mode{display:block;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:#fff}
+.mode:has(input:checked){border-color:var(--brand);background:#f3faf4}
+.mode b{font-size:14px;color:var(--ink)}.mode small{display:block;color:var(--muted);font-size:12px;margin:3px 0 8px 24px;line-height:1.4}
+.mode input[type=radio]{margin-right:8px;accent-color:var(--brand)}
+.mode .row{margin-left:24px}
+.tscroll{overflow-x:auto;max-height:260px;border:1px solid var(--line);border-radius:10px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#143d22;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:200;opacity:0;pointer-events:none;transition:all .2s;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.bad{background:#a3241c}
+.modal{position:fixed;inset:0;background:rgba(10,30,18,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:16px;width:min(380px,100%);padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.modal h3{margin:0 0 4px;color:var(--brand);font-size:17px}
+.modal .inp{width:100%;box-sizing:border-box;margin:5px 0 10px}
+@media(max-width:1000px){.grid-2{grid-template-columns:1fr}}
+@media(max-width:900px){
+ .sidebar{position:fixed;left:0;top:0;transform:translateX(-102%);width:var(--sb-w)!important;transition:transform .2s}
+ .app.open .sidebar{transform:none}
+ .app.collapsed .sb-title,.app.collapsed .nav-item span,.app.collapsed .sb-label,.app.collapsed .sb-user{display:revert}
+ .app.collapsed .nav-item{justify-content:flex-start;padding:11px 12px}
+ .scrim{position:fixed;inset:0;background:rgba(10,30,18,.5);z-index:55}
+ .app.open .scrim{display:block}
+ .tb-menu{display:grid;place-items:center}
+ #collapseBtn{display:none}
+ .content{padding:12px}
+ .topbar{padding:8px 12px}
+ .chip .lbl{display:none}
+}
+@media(max-width:620px){.cert-find{grid-template-columns:1fr 1fr}.cert-find .btn{grid-column:1/-1}.cert-card .form-grid[style]{grid-template-columns:1fr!important}}
+@media print{
+ .sidebar,.topbar,.scrim,.modal,.toast,.cert-card,.no-print{display:none!important}
+ body{background:#fff!important}
+ .app{display:block!important;min-height:0!important}.main{display:block!important;min-height:0!important}.content{padding:0!important}
+ html,body{height:auto!important;min-height:0!important}
+ .page{page-break-after:auto!important}
+ .view{display:none!important}.view.active{display:block!important;animation:none}
+ .cert-wrap{max-width:none!important}.cert-scroll{overflow:visible!important;padding:0!important}
+ body.print-wifs #view-wifs .wifs-panel{display:none!important}
+ body.print-wifs #view-wifs .wifs-sheet{margin:0!important}
+}
+/* keep app UI in the UI font (old certificate CSS must not leak into cards) */
+.app .card,.app .card *,.app .modal .box,.app .modal .box *,.app .topbar,.app .topbar *,.app .sidebar,.app .sidebar *{font-style:normal!important;font-family:"Segoe UI",Inter,system-ui,-apple-system,Roboto,Arial,sans-serif}
+.app .card .report-table,.app .card .report-table *{font-family:Arial,sans-serif}
+.app .cert-card .form-group label{font-weight:600!important;text-transform:none;letter-spacing:0}
+.app .card h3{font-weight:700}
+.app .card input,.app .card select,.app .card button,.app .card textarea{font-family:inherit!important}
+
+.app .card label{text-align:left!important;text-justify:auto}
+.mode .row{font-size:13px;font-weight:600}
+.cert-find{grid-template-columns:repeat(3,minmax(0,1fr)) auto}
+.cert-find .form-group,.cert-card .form-grid .form-group{min-width:0}
+.cert-card .form-control{width:100%;box-sizing:border-box;min-width:0}
+@media(max-width:620px){.cert-find{grid-template-columns:repeat(2,minmax(0,1fr))}.cert-find .btn{grid-column:1/-1}}
 </style>
 </head>
 <body>
-    <!-- CLASS XI DATABASE UPDATED FROM New Microsoft Excel Worksheet.xlsx -->
+<div class="app" id="app">
+ <aside class="sidebar" id="sidebar">
+  <div class="sb-brand"><div class="sb-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 10-10-5L2 10l10 5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></div><div class="sb-title"><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
+  <nav class="sb-nav">
+   <div class="sb-label">Daily</div>
+   <button class="nav-item active" data-view="cert" title="Certificate" onclick="UI.show('cert')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg><span>Certificate</span></button>
+   <div class="sb-label">On demand</div>
+   <button class="nav-item" data-view="reports" title="Student Reports" onclick="UI.show('reports')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V9"/><path d="M13 17V5"/><path d="M18 17v-6"/></svg><span>Student Reports</span></button>
+   <button class="nav-item" data-view="wifs" title="WIFS Annex-3" onclick="UI.show('wifs')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>WIFS Annex-3</span></button>
+   <button class="nav-item" data-view="data" title="Data &amp; Year" onclick="UI.show('data')"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Data &amp; Year</span></button>
+  </nav>
+  <div class="sb-foot">
+   <div class="sb-user" id="sbUser"></div>
+   <button class="nav-item" type="button" title="Sign in / out" onclick="APP.toggleAuth()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="navAuthLbl">Sign in</span></button>
+   <button class="nav-item" id="collapseBtn" type="button" title="Collapse menu" onclick="UI.collapse()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg><span>Collapse</span></button>
+  </div>
+ </aside>
+ <div class="scrim" onclick="UI.menu()"></div>
+ <div class="main">
+  <header class="topbar">
+   <button class="tb-menu" type="button" aria-label="Menu" onclick="UI.menu()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+   <div class="tb-title"><h1 id="tbTitle">Certificate</h1><small id="tbSub"></small></div>
+   <button class="chip" type="button" title="Academic year — click to manage" onclick="UI.show('data')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="lbl" id="tbYearLbl">Year 2026</span></button>
+   <button class="chip" type="button" title="Account" onclick="APP.toggleAuth()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="lbl" id="tbUserLbl">Sign in</span></button>
+  </header>
+  <main class="content">
 
-    <div class="dashboard-panel">
-        <h2>Admission Control &amp; Verification Dashboard</h2>
-
-        <div class="lookup-box" style="background:#eef8ef;border:1px solid #9bb29d;padding:10px;border-radius:6px;margin-bottom:10px;">
-            <div class="dashboard-main-row"><div class="dashboard-data-entry"><div style="font-size:12px;font-weight:bold;color:#145828;margin-bottom:6px;">
-                ENTER CLASS + SECTION + ROLL — STUDENT DATA WILL AUTO-FETCH
-            </div></div><div class="dashboard-reports"><div class="report-panel">
-            <div style="font-size:12px;font-weight:bold;color:#145828;">
-                STUDENT DATABASE REPORT — CLASS / SEX / CASTE
-            </div>
-            <div style="font-size:10px;color:#555;margin-top:3px;">
-                Reports use the complete STUDENT_DB and class sequence V, VI, VII, VIII, IX, X, XI, XII. Class XI caste is from the new Excel dataset;
-                Classes V–X and XII retain the previous STUDENT_DB records. Caste is shown where it exists; otherwise NOT AVAILABLE is displayed.
-            </div>
-            <div class="report-buttons">
-                <button class="report-btn" onclick="generateDetailedClassReport()">CLASS-WISE DETAILED REPORT</button>
-<button class="report-btn" onclick="generateStudentReport('classSexCaste')">FULL V–XII</button>
-                <button class="report-btn" onclick="generateStudentReport('sex')">SEX-WISE REPORT</button>
-                <button class="report-btn" onclick="generateStudentReport('caste')">CASTE-WISE REPORT</button>
-                <button class="report-btn" onclick="generateStudentReport('classSex')">CLASS + SEX</button>
-                <button class="report-btn" onclick="generateStudentReport('classCaste')">CLASS + CASTE</button>
-                <button class="report-btn" onclick="generateClassSexCasteCountReport()">CLASS + SEX + CASTE-WISE COUNT</button>
-                <button class="report-btn secondary" onclick="printStudentReport()">PRINT REPORT</button>
-                <button class="report-btn secondary" onclick="exportStudentReportCSV()">EXPORT CSV</button>
-            </div>
-            <div id="reportOutput" class="report-output"></div>
-        </div></div></div>
-            <div style="display:flex;align-items:center;gap:10px;margin:6px 0 8px 0;padding:7px 10px;background:#fff8d9;border:1px solid #d9c56d;border-radius:5px;">
-                <input type="checkbox" id="manualMode" onchange="setManualMode(this.checked)">
-                <label for="manualMode" style="font-size:12px;font-weight:bold;color:#8a5600;cursor:pointer;">MANUAL ENTRY MODE — make all student fields editable</label>
-            </div>
-            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
-                <div class="form-group">
+<section class="view active" id="view-cert">
+ <div class="cert-wrap">
+  <div class="card cert-card no-print">
+    <div class="cert-top">
+      <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> Find student</h3>
+      <label class="switch" title="Make all student fields editable"><input type="checkbox" id="manualMode" onchange="setManualMode(this.checked)"> Manual entry mode</label>
+    </div>
+    <div class="cert-find">
+      <div class="form-group">
                     <label>Class</label>
                     <select id="class" class="form-control" onchange="lookupStudent()">
                         <option value="">-- Select Class --</option>
@@ -697,8 +863,7 @@
                         <option value="IX">IX</option><option value="X">X</option>
                         <option value="XI">XI</option><option value="XII">XII</option>
                     </select>
-                </div>
-                <div class="form-group">
+                </div><div class="form-group">
                     <label>Section</label>
                     <select id="sec" class="form-control" onchange="lookupStudent()">
                         <option value="">-- Select Section --</option>
@@ -707,111 +872,71 @@
                         <option value="ARTS(A)">ARTS(A)</option>
                         <option value="SANTALI(C)">SANTALI(C)</option>
                     </select>
-                </div>
-                <div class="form-group">
+                </div><div class="form-group">
                     <label>Roll No.</label>
                     <input type="number" id="rollNo" class="form-control" min="1" placeholder="Enter Roll No." oninput="showRollTyping()" onkeydown="if(event.key==='Enter'){event.preventDefault(); lookupStudent();}" onblur="lookupStudent()">
                 </div>
-            </div>
-            <div id="lookupStatus" style="margin-top:7px;font-size:12px;font-weight:bold;color:#145828;">
+      <button class="btn" type="button" onclick="window.print()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg> Print A4</button>
+    </div>
+    <div id="lookupStatus" style="margin-top:7px;font-size:12px;font-weight:bold;color:#145828;">
                 Select Class, Section and enter Roll No.
             </div>
-        </div>
-
-        <div class="form-grid">
-            <div class="form-group">
+    <div class="sec-title">Address on certificate</div>
+    <div class="form-grid"><div class="form-group">
+                <label>Village (type or select — auto-fills the rest)</label>
+                <input type="text" id="village" class="form-control" list="dlVillage" value="Taldangra" autocomplete="off" oninput="forceCapitalization(this); autofillFromVillage(); syncData();" onchange="autofillFromVillage(); syncData();">
+                <datalist id="dlVillage"></datalist>
+            </div><div class="form-group">
+                <label>Post Office (P.O.)</label>
+                <input type="text" id="po" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
+            </div><div class="form-group">
+                <label>Police Station (P.S.)</label>
+                <input type="text" id="ps" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
+            </div><div class="form-group">
+                <label>District</label>
+                <input type="text" id="dist" class="form-control" value="Bankura" oninput="forceCapitalization(this); syncData();">
+            </div><div class="form-group">
+                <label>PIN Code</label>
+                <input type="text" id="pin" class="form-control" value="722152" oninput="syncData()">
+            </div></div>
+    <details class="more" id="detailsBox"><summary>Student details (auto-filled from database)</summary>
+      <div class="form-grid"><div class="form-group">
                 <label>Student Name (Auto)</label>
                 <input type="text" id="studentName" class="form-control" readonly>
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Sex (Auto)</label>
                 <select id="sex" class="form-control" disabled>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </select>
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Caste / Social Category (Auto)</label>
                 <input type="text" id="caste" class="form-control" readonly>
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Session (Year)</label>
                 <input type="text" id="session" class="form-control" value="2026" oninput="syncData()">
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Father's Name (Auto)</label>
                 <input type="text" id="fatherName" class="form-control" readonly>
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Mother's Name (Auto)</label>
                 <input type="text" id="motherName" class="form-control" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Village — Address (Type/Select, Auto-fills PO/PS/Dist/PIN)</label>
-                <input type="text" id="village" class="form-control" list="dlVillage" value="Taldangra" autocomplete="off" oninput="forceCapitalization(this); autofillFromVillage(); syncData();" onchange="autofillFromVillage(); syncData();">
-                <datalist id="dlVillage"></datalist>
-            </div>
-            <div class="form-group">
-                <label>P.O. — Address (Manual / Auto)</label>
-                <input type="text" id="po" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
-            </div>
-            <div class="form-group">
-                <label>P.S. — Address (Manual / Auto)</label>
-                <input type="text" id="ps" class="form-control" value="Taldangra" oninput="forceCapitalization(this); syncData();">
-            </div>
-            <div class="form-group">
-                <label>District — Address (Manual / Auto)</label>
-                <input type="text" id="dist" class="form-control" value="Bankura" oninput="forceCapitalization(this); syncData();">
-            </div>
-            <div class="form-group">
-                <label>PIN Code — Address (Manual / Auto)</label>
-                <input type="text" id="pin" class="form-control" value="722152" oninput="syncData()">
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Date of Birth (Auto)</label>
                 <input type="date" id="dob" class="form-control" readonly>
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Banglar Siksha ID / Student Code (Auto, 14 Digit)</label>
                 <input type="text" id="sikshaId" class="form-control" readonly>
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Mobile No. (Auto from DB)</label>
                 <input type="text" id="mobileNo" class="form-control" maxlength="10" inputmode="numeric" readonly oninput="this.value=this.value.replace(/\D/g,'').slice(0,10); syncData();">
-            </div>
-            <div class="form-group">
+            </div><div class="form-group">
                 <label>Auto Computed Memo</label>
                 <input type="text" id="memoNo" class="form-control auto-memo" readonly>
-            </div>
-            <button class="print-btn" onclick="window.print()">Print A4 Page Sheet</button>
-
-        
-
-        </div>
-    </div>
-
-    
-    <details class="wifs-panel" id="wifsPanel" open>
-        <summary style="cursor:pointer;font-size:18px;font-weight:bold;color:#145828">WIFS Monthly Report — Annex-3 (Format 3)</summary>
-        <div class="wf-grid"><div class="wf-grp">Report header</div><div class="wf-fg"><label for="wf_month">Reporting Month & Year</label><input id="wf_month" type="month" value="2026-09"></div><div class="wf-fg"><label for="wf_type">Type of School (specify)</label><input id="wf_type" type="text" value="GOVT SPONSORED"></div><div class="wf-fg"><label for="wf_nodal">Nodal teacher / Principal</label><input id="wf_nodal" type="text" value="1)Kanti Malla  ; 2)Tuhin Subhra Patra"></div><div class="wf-fg"><label for="wf_classes">Classes in school</label><input id="wf_classes" type="text" value="6th, 7th, 8th, 9th, 10th,11th, 12th"></div><div class="wf-grp">I. IFA consumption</div><div class="wf-fg"><label for="wf_tg">Total students 6th-12th — Girls (auto from DB, editable)</label><input id="wf_tg" type="number" value="230" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_tb">Total students 6th-12th — Boys (auto from DB, editable)</label><input id="wf_tb" type="number" value="1009" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ig">Students taking ≥4 IFA — Girls</label><input id="wf_ig" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ib">Students taking ≥4 IFA — Boys</label><input id="wf_ib" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_sg">Teachers/staff taking ≥4 IFA — Girls (Female)</label><input id="wf_sg" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_sb">Teachers/staff taking ≥4 IFA — Boys (Male)</label><input id="wf_sb" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">II. Albendazole (Feb / Aug)</div><div class="wf-fg"><label for="wf_ag">Students taking Albendazole — Girls</label><input id="wf_ag" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ab">Students taking Albendazole — Boys</label><input id="wf_ab" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">III. Moderate / severe anaemia</div><div class="wf-fg"><label for="wf_idg">Identified — Girls</label><input id="wf_idg" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_idb">Identified — Boys</label><input id="wf_idb" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_rfg">Referred — Girls</label><input id="wf_rfg" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_rfb">Referred — Boys</label><input id="wf_rfb" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">IV / V. Nutrition-health education & adverse effects</div><div class="wf-fg"><label for="wf_nhp">NHE sessions planned</label><input id="wf_nhp" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_nhc">NHE sessions conducted</label><input id="wf_nhc" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_adv">Students with adverse effects after IFA</label><input id="wf_adv" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_advref">Students referred to health facility</label><input id="wf_advref" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">VI. Stock — IFA tablets</div><div class="wf-fg"><label for="wf_io">IFA Opening stock</label><input id="wf_io" type="number" value="33" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ir">IFA Received in month</label><input id="wf_ir" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_iu">IFA Utilized (blank = auto: students×4)</label><input id="wf_iu" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_in">IFA Stock needed (if any)</label><input id="wf_in" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">VI. Stock — Albendazole tablets</div><div class="wf-fg"><label for="wf_ao">Albendazole Opening stock</label><input id="wf_ao" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ar">Albendazole Received</label><input id="wf_ar" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_au">Albendazole Utilized</label><input id="wf_au" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_aexp">Albendazole Balance / Expiry text</label><input id="wf_aexp" type="text" value="Exp Date-03/2028"></div><div class="wf-fg"><label for="wf_an">Albendazole Stock needed (if any)</label><input id="wf_an" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">Signature</div><div class="wf-fg"><label for="wf_sigmode">Signature on report</label><select id="wf_sigmode"><option value="with">With signature</option><option value="without">Without signature (hides date & seal too)</option></select></div><div class="wf-fg"><label for="wf_datemode">Date mode</label><select id="wf_datemode"><option value="auto">Auto (today)</option><option value="manual">Manual</option></select></div><div class="wf-fg"><label for="wf_date">Date above Headmaster (used when mode = Manual)</label><input id="wf_date" type="text" value="27.07.26"></div></div>
-        <div class="wf-login" id="wfLogin">
-            <b style="font-size:12px;color:#8a5600">Login to save:</b>
-            <input type="email" id="wfEmail" placeholder="Email" autocomplete="username">
-            <input type="password" id="wfPass" placeholder="Password" autocomplete="current-password">
-            <button class="wf-btn gray" type="button" onclick="WIFS.login()">Login</button>
-            <button class="wf-btn gray" type="button" onclick="WIFS.logout()">Logout</button>
-        </div>
-        <div class="wf-bar">
-            <button class="wf-btn" type="button" onclick="WIFS.generate()">GENERATE REPORT</button>
-            <button class="wf-btn gray" type="button" onclick="WIFS.fetchTotals(true)">FETCH STUDENT TOTALS FROM DB</button>
-            <button class="wf-btn alt" type="button" onclick="WIFS.save()">SAVE (ONLINE)</button>
-            <button class="wf-btn gray" type="button" onclick="WIFS.print()">PRINT ANNEX-3</button>
-            <button class="wf-btn" id="wfShareBtn" type="button" style="display:none;background:#25D366;color:#073b1b" onclick="WIFS.share()">SHARE ON WHATSAPP</button>
-            <span id="wfStatus"></span>
-        </div>
+            </div></div>
     </details>
-<div class="wifs-sheet" id="wifsSheet"><table class="wifs-tbl"><colgroup><col style="width:11.846%"><col style="width:13.068%"><col style="width:10.256%"><col style="width:7.812%"><col style="width:10.744%"><col style="width:5.496%"><col style="width:8.667%"><col style="width:4.521%"><col style="width:4.880%"><col style="width:5.983%"><col style="width:3.171%"><col style="width:5.863%"><col style="width:7.692%"></colgroup><tr style="height:28.1pt"><td colspan="13" class="ttl tan">FORMAT 3 - MONTHLY SCHOOL REPORT.</td></tr><tr style="height:49.6pt"><td colspan="3" class="peach lb big">Name of School:<br>TALDANGRA FULMATI HIGH SCHOOL(H.S.)</td><td colspan="3" class="peach cc">Village/Town/City: <br>TALDANGRA</td><td colspan="3" class="peach cc">Block: <br>TALDANGRA</td><td colspan="4" class="cc dist">District:BANKURA</td></tr><tr style="height:34.2pt"><td colspan="6" class="tan lb">Type of School: Govt./Govt. Aided/Residential school/others,Specify………………<span id="s_type"></span></td><td colspan="7" class="tan lb sm">Name of the Nodal teacher/Principal:<br><span id="s_nodal"></span></td></tr><tr style="height:25.7pt"><td colspan="3" class="peach cc mlab">Reporting Month and Year:</td><td colspan="3" class="peach cc mon" id="s_month"></td><td colspan="7" class="peach lb sm">Classes in school:(pls tick) <br><span id="s_classes"></span></td></tr><tr style="height:18.1pt"><td colspan="6" class="lb sec">I. IFA CONSUMPTION</td><td colspan="2" class="cc hd">Girls</td><td colspan="3" class="cc hd">Boys</td><td colspan="2" class="cc hd"><i>Total</i></td></tr><tr style="height:12.2pt"><td colspan="6" rowspan="3" class="lb">Total no. students in classes 6th -12th</td><td colspan="2" rowspan="3" class="num" id="s_tg"></td><td colspan="3" rowspan="3" class="num" id="s_tb"></td><td colspan="2" rowspan="3" class="num" id="s_tt"></td></tr><tr style="height:12.2pt"></tr><tr style="height:11.3pt"></tr><tr style="height:22.8pt"><td colspan="6" class="lb">No. of Students in 6th-12th classes consuming at least 4 IFA tablets in this month </td><td colspan="2" class="num red" id="s_ig"></td><td colspan="3" class="num red" id="s_ib"></td><td colspan="2" class="num" id="s_it"></td></tr><tr style="height:18.7pt"><td colspan="6" class="lb">Coverage %</td><td colspan="2" class="num" id="s_cg"></td><td colspan="3" class="num" id="s_cb"></td><td colspan="2" class="num" id="s_ct"></td></tr><tr style="height:24.0pt"><td colspan="6" class="lb">Total no. of teacher and other staffs consuming at least 4  IFA tablets in this month </td><td colspan="2" class="num sm2" id="s_sg"></td><td colspan="3" class="num sm2" id="s_sb"></td><td colspan="2" class="num sm2" id="s_st"></td></tr><tr style="height:16.4pt"><td colspan="6" class="lb">II. Albendazole Consumption (In February /August ) </td><td colspan="2" class="cc hd2">Girls</td><td colspan="3" class="cc hd2">Boys</td><td colspan="2" class="cc hd2">Total</td></tr><tr style="height:19.6pt"><td colspan="6" class="lb">No. of Students in 6th-12th classes consuming Albendazole tablets </td><td colspan="2" class="num sm2" id="s_ag"></td><td colspan="3" class="num sm2" id="s_ab"></td><td colspan="2" class="num sm2" id="s_at"></td></tr><tr style="height:12.3pt"><td colspan="6" class="lb">Coverage %</td><td colspan="2" class="num sm2" id="s_acg"></td><td colspan="3" class="num sm2" id="s_acb"></td><td colspan="2" class="num sm2" id="s_act"></td></tr><tr style="height:16.4pt"><td colspan="4" rowspan="3" class="lb">III. students with moderate/severe anaemia(Based on physical check up only)</td><td colspan="2"></td><td colspan="2" class="cc hd2">Girls</td><td colspan="3" class="cc hd2">Boys</td><td colspan="2" class="cc hd2">Total</td></tr><tr style="height:12.3pt"><td colspan="2" class="lb">Identified</td><td colspan="2" class="num sm2" id="s_idg"></td><td colspan="3" class="num sm2" id="s_idb"></td><td colspan="2" class="num sm2" id="s_idt"></td></tr><tr style="height:12.9pt"><td colspan="2" class="lb">Referred</td><td colspan="2" class="num sm2" id="s_rfg"></td><td colspan="3" class="num sm2" id="s_rfb"></td><td colspan="2" class="num sm2" id="s_rft"></td></tr><tr style="height:11.7pt"><td colspan="13" class="lb">IV. Nutrition and Health Education</td></tr><tr style="height:11.7pt"><td colspan="6" class="lb">IV a. Total No. of Nutrition Health Education sessions planned in the reporting month</td><td colspan="7" class="num sm2" id="s_nhp"></td></tr><tr style="height:22.5pt"><td colspan="6" class="lb">IV b. Total Nutrition Health Education sessions conducted by in the reporting month</td><td colspan="7" class="num sm2" id="s_nhc"></td></tr><tr style="height:12.3pt"><td colspan="13" class="lb sec2">V. Adverse effects </td></tr><tr style="height:11.7pt"><td colspan="6" class="lb">No. of students who experience adverse effects following IFA consumption</td><td colspan="7" class="num sm2" id="s_adv"></td></tr><tr style="height:26.6pt"><td colspan="6" class="lb">No. of students who were referred to health facility for management of adverse effects </td><td colspan="7" class="num sm2" id="s_advref"></td></tr><tr style="height:32.3pt"><td rowspan="2" class="tan lb">VI. Stock Details</td><td rowspan="2" class="tan cc b9">Opening Stock</td><td colspan="3" rowspan="2" class="tan cc b9">Stock Received in the month (if any)</td><td colspan="3" rowspan="2" class="tan cc b9">Stock Utilized in the month</td><td colspan="4" rowspan="2" class="tan lb b9">Balance Stock with <br>expiry date</td><td rowspan="2" class="tan cc b8">Stock needed (if any)</td></tr><tr style="height:12.9pt"></tr><tr style="height:12.9pt"><td rowspan="2" class="lb">IFA tablets</td><td rowspan="2" class="num" id="s_io"></td><td colspan="3" rowspan="2" class="num" id="s_ir"></td><td colspan="3" rowspan="2" class="num" id="s_iu"></td><td colspan="4" rowspan="2" class="num rt" id="s_ib2"></td><td rowspan="2" class="num" id="s_in"></td></tr><tr style="height:20.6pt"></tr><tr style="height:11.3pt"><td rowspan="2" class="lb">Albendazole <br>tablets</td><td rowspan="2" class="num" id="s_ao"></td><td colspan="3" rowspan="2" class="num" id="s_ar"></td><td colspan="3" rowspan="2" class="num" id="s_au"></td><td colspan="4" rowspan="2" class="num exp" id="s_ab2"></td><td rowspan="2" class="num" id="s_an"></td></tr><tr style="height:22.0pt"></tr><tr style="height:138.7pt"><td colspan="13" class="sigcell"><div class="sigbox"><div class="sl">Nodal Teacher 1</div><div class="sr"><img class="ssig" alt="" src="data:image/png;base64,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"><div class="sdate" id="s_date"></div><div class="seal"><b>Headmaster</b>Taldangra Fulmati High School (H.S.)<br>P.O.- Taldangra, Dist.- Bankura</div><div class="shm">Headmaster</div></div></div></td></tr></table></div>
+  </div>
+  <div class="cert-scroll">
 <div class="page">
         <div class="watermark">তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</div>
         
@@ -896,6 +1021,98 @@
             </div>
         </div>
     </div>
+
+
+  </div>
+ </div>
+</section>
+
+<section class="view" id="view-reports">
+ <div class="card"><h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V9"/><path d="M13 17V5"/><path d="M18 17v-6"/></svg> Student database reports</h3>
+ <p class="hint">Counts are generated from the active academic year. Use Print / CSV to export.</p>
+ <div class="report-panel">
+            <div style="font-size:12px;font-weight:bold;color:#145828;">
+                Choose a report
+            </div>
+            <div style="font-size:10px;color:#555;margin-top:3px;">
+                <span id="rptNote"></span></div>
+            <div class="report-buttons">
+                <button class="report-btn" onclick="generateDetailedClassReport()">CLASS-WISE DETAILED REPORT</button>
+<button class="report-btn" onclick="generateStudentReport('classSexCaste')">FULL V–XII</button>
+                <button class="report-btn" onclick="generateStudentReport('sex')">SEX-WISE REPORT</button>
+                <button class="report-btn" onclick="generateStudentReport('caste')">CASTE-WISE REPORT</button>
+                <button class="report-btn" onclick="generateStudentReport('classSex')">CLASS + SEX</button>
+                <button class="report-btn" onclick="generateStudentReport('classCaste')">CLASS + CASTE</button>
+                <button class="report-btn" onclick="generateClassSexCasteCountReport()">CLASS + SEX + CASTE-WISE COUNT</button>
+                <button class="report-btn secondary" onclick="printStudentReport()">PRINT REPORT</button>
+                <button class="report-btn secondary" onclick="exportStudentReportCSV()">EXPORT CSV</button>
+            </div>
+            <div id="reportOutput" class="report-output"></div>
+        </div>
+ </div>
+</section>
+<section class="view" id="view-wifs">
+<div class="wifs-panel card" id="wifsPanel">
+        <div class="wf-grid"><div class="wf-grp">Report header</div><div class="wf-fg"><label for="wf_month">Reporting Month & Year</label><input id="wf_month" type="month" value="2026-09"></div><div class="wf-fg"><label for="wf_type">Type of School (specify)</label><input id="wf_type" type="text" value="GOVT SPONSORED"></div><div class="wf-fg"><label for="wf_nodal">Nodal teacher / Principal</label><input id="wf_nodal" type="text" value="1)Kanti Malla  ; 2)Tuhin Subhra Patra"></div><div class="wf-fg"><label for="wf_classes">Classes in school</label><input id="wf_classes" type="text" value="6th, 7th, 8th, 9th, 10th,11th, 12th"></div><div class="wf-grp">I. IFA consumption</div><div class="wf-fg"><label for="wf_tg">Total students 6th-12th — Girls (auto from DB, editable)</label><input id="wf_tg" type="number" value="230" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_tb">Total students 6th-12th — Boys (auto from DB, editable)</label><input id="wf_tb" type="number" value="1009" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ig">Students taking ≥4 IFA — Girls</label><input id="wf_ig" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ib">Students taking ≥4 IFA — Boys</label><input id="wf_ib" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_sg">Teachers/staff taking ≥4 IFA — Girls (Female)</label><input id="wf_sg" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_sb">Teachers/staff taking ≥4 IFA — Boys (Male)</label><input id="wf_sb" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">II. Albendazole (Feb / Aug)</div><div class="wf-fg"><label for="wf_ag">Students taking Albendazole — Girls</label><input id="wf_ag" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ab">Students taking Albendazole — Boys</label><input id="wf_ab" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">III. Moderate / severe anaemia</div><div class="wf-fg"><label for="wf_idg">Identified — Girls</label><input id="wf_idg" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_idb">Identified — Boys</label><input id="wf_idb" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_rfg">Referred — Girls</label><input id="wf_rfg" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_rfb">Referred — Boys</label><input id="wf_rfb" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">IV / V. Nutrition-health education & adverse effects</div><div class="wf-fg"><label for="wf_nhp">NHE sessions planned</label><input id="wf_nhp" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_nhc">NHE sessions conducted</label><input id="wf_nhc" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_adv">Students with adverse effects after IFA</label><input id="wf_adv" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_advref">Students referred to health facility</label><input id="wf_advref" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">VI. Stock — IFA tablets</div><div class="wf-fg"><label for="wf_io">IFA Opening stock</label><input id="wf_io" type="number" value="33" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ir">IFA Received in month</label><input id="wf_ir" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_iu">IFA Utilized (blank = auto: students×4)</label><input id="wf_iu" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_in">IFA Stock needed (if any)</label><input id="wf_in" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">VI. Stock — Albendazole tablets</div><div class="wf-fg"><label for="wf_ao">Albendazole Opening stock</label><input id="wf_ao" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_ar">Albendazole Received</label><input id="wf_ar" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_au">Albendazole Utilized</label><input id="wf_au" type="number" value="0" min="0" step="1" inputmode="numeric"></div><div class="wf-fg"><label for="wf_aexp">Albendazole Balance / Expiry text</label><input id="wf_aexp" type="text" value="Exp Date-03/2028"></div><div class="wf-fg"><label for="wf_an">Albendazole Stock needed (if any)</label><input id="wf_an" type="number" value="" min="0" step="1" inputmode="numeric"></div><div class="wf-grp">Signature</div><div class="wf-fg"><label for="wf_sigmode">Signature on report</label><select id="wf_sigmode"><option value="with">With signature</option><option value="without">Without signature (hides date & seal too)</option></select></div><div class="wf-fg"><label for="wf_datemode">Date mode</label><select id="wf_datemode"><option value="auto">Auto (today)</option><option value="manual">Manual</option></select></div><div class="wf-fg"><label for="wf_date">Date above Headmaster (used when mode = Manual)</label><input id="wf_date" type="text" value="27.07.26"></div></div>
+        <div class="wf-bar">
+            <button class="wf-btn" type="button" onclick="WIFS.generate()">GENERATE REPORT</button>
+            <button class="wf-btn gray" type="button" onclick="WIFS.fetchTotals(true)">FETCH STUDENT TOTALS FROM DB</button>
+            <button class="wf-btn alt" type="button" onclick="WIFS.save()">SAVE (ONLINE)</button>
+            <button class="wf-btn gray" type="button" onclick="WIFS.print()">PRINT ANNEX-3</button>
+            <button class="wf-btn" id="wfShareBtn" type="button" style="display:none;background:#25D366;color:#073b1b" onclick="WIFS.share()">SHARE ON WHATSAPP</button>
+            <span id="wfStatus"></span>
+        </div>
+    </div>
+<div class="wifs-sheet" id="wifsSheet"><table class="wifs-tbl"><colgroup><col style="width:11.846%"><col style="width:13.068%"><col style="width:10.256%"><col style="width:7.812%"><col style="width:10.744%"><col style="width:5.496%"><col style="width:8.667%"><col style="width:4.521%"><col style="width:4.880%"><col style="width:5.983%"><col style="width:3.171%"><col style="width:5.863%"><col style="width:7.692%"></colgroup><tr style="height:28.1pt"><td colspan="13" class="ttl tan">FORMAT 3 - MONTHLY SCHOOL REPORT.</td></tr><tr style="height:49.6pt"><td colspan="3" class="peach lb big">Name of School:<br>TALDANGRA FULMATI HIGH SCHOOL(H.S.)</td><td colspan="3" class="peach cc">Village/Town/City: <br>TALDANGRA</td><td colspan="3" class="peach cc">Block: <br>TALDANGRA</td><td colspan="4" class="cc dist">District:BANKURA</td></tr><tr style="height:34.2pt"><td colspan="6" class="tan lb">Type of School: Govt./Govt. Aided/Residential school/others,Specify………………<span id="s_type"></span></td><td colspan="7" class="tan lb sm">Name of the Nodal teacher/Principal:<br><span id="s_nodal"></span></td></tr><tr style="height:25.7pt"><td colspan="3" class="peach cc mlab">Reporting Month and Year:</td><td colspan="3" class="peach cc mon" id="s_month"></td><td colspan="7" class="peach lb sm">Classes in school:(pls tick) <br><span id="s_classes"></span></td></tr><tr style="height:18.1pt"><td colspan="6" class="lb sec">I. IFA CONSUMPTION</td><td colspan="2" class="cc hd">Girls</td><td colspan="3" class="cc hd">Boys</td><td colspan="2" class="cc hd"><i>Total</i></td></tr><tr style="height:12.2pt"><td colspan="6" rowspan="3" class="lb">Total no. students in classes 6th -12th</td><td colspan="2" rowspan="3" class="num" id="s_tg"></td><td colspan="3" rowspan="3" class="num" id="s_tb"></td><td colspan="2" rowspan="3" class="num" id="s_tt"></td></tr><tr style="height:12.2pt"></tr><tr style="height:11.3pt"></tr><tr style="height:22.8pt"><td colspan="6" class="lb">No. of Students in 6th-12th classes consuming at least 4 IFA tablets in this month </td><td colspan="2" class="num red" id="s_ig"></td><td colspan="3" class="num red" id="s_ib"></td><td colspan="2" class="num" id="s_it"></td></tr><tr style="height:18.7pt"><td colspan="6" class="lb">Coverage %</td><td colspan="2" class="num" id="s_cg"></td><td colspan="3" class="num" id="s_cb"></td><td colspan="2" class="num" id="s_ct"></td></tr><tr style="height:24.0pt"><td colspan="6" class="lb">Total no. of teacher and other staffs consuming at least 4  IFA tablets in this month </td><td colspan="2" class="num sm2" id="s_sg"></td><td colspan="3" class="num sm2" id="s_sb"></td><td colspan="2" class="num sm2" id="s_st"></td></tr><tr style="height:16.4pt"><td colspan="6" class="lb">II. Albendazole Consumption (In February /August ) </td><td colspan="2" class="cc hd2">Girls</td><td colspan="3" class="cc hd2">Boys</td><td colspan="2" class="cc hd2">Total</td></tr><tr style="height:19.6pt"><td colspan="6" class="lb">No. of Students in 6th-12th classes consuming Albendazole tablets </td><td colspan="2" class="num sm2" id="s_ag"></td><td colspan="3" class="num sm2" id="s_ab"></td><td colspan="2" class="num sm2" id="s_at"></td></tr><tr style="height:12.3pt"><td colspan="6" class="lb">Coverage %</td><td colspan="2" class="num sm2" id="s_acg"></td><td colspan="3" class="num sm2" id="s_acb"></td><td colspan="2" class="num sm2" id="s_act"></td></tr><tr style="height:16.4pt"><td colspan="4" rowspan="3" class="lb">III. students with moderate/severe anaemia(Based on physical check up only)</td><td colspan="2"></td><td colspan="2" class="cc hd2">Girls</td><td colspan="3" class="cc hd2">Boys</td><td colspan="2" class="cc hd2">Total</td></tr><tr style="height:12.3pt"><td colspan="2" class="lb">Identified</td><td colspan="2" class="num sm2" id="s_idg"></td><td colspan="3" class="num sm2" id="s_idb"></td><td colspan="2" class="num sm2" id="s_idt"></td></tr><tr style="height:12.9pt"><td colspan="2" class="lb">Referred</td><td colspan="2" class="num sm2" id="s_rfg"></td><td colspan="3" class="num sm2" id="s_rfb"></td><td colspan="2" class="num sm2" id="s_rft"></td></tr><tr style="height:11.7pt"><td colspan="13" class="lb">IV. Nutrition and Health Education</td></tr><tr style="height:11.7pt"><td colspan="6" class="lb">IV a. Total No. of Nutrition Health Education sessions planned in the reporting month</td><td colspan="7" class="num sm2" id="s_nhp"></td></tr><tr style="height:22.5pt"><td colspan="6" class="lb">IV b. Total Nutrition Health Education sessions conducted by in the reporting month</td><td colspan="7" class="num sm2" id="s_nhc"></td></tr><tr style="height:12.3pt"><td colspan="13" class="lb sec2">V. Adverse effects </td></tr><tr style="height:11.7pt"><td colspan="6" class="lb">No. of students who experience adverse effects following IFA consumption</td><td colspan="7" class="num sm2" id="s_adv"></td></tr><tr style="height:26.6pt"><td colspan="6" class="lb">No. of students who were referred to health facility for management of adverse effects </td><td colspan="7" class="num sm2" id="s_advref"></td></tr><tr style="height:32.3pt"><td rowspan="2" class="tan lb">VI. Stock Details</td><td rowspan="2" class="tan cc b9">Opening Stock</td><td colspan="3" rowspan="2" class="tan cc b9">Stock Received in the month (if any)</td><td colspan="3" rowspan="2" class="tan cc b9">Stock Utilized in the month</td><td colspan="4" rowspan="2" class="tan lb b9">Balance Stock with <br>expiry date</td><td rowspan="2" class="tan cc b8">Stock needed (if any)</td></tr><tr style="height:12.9pt"></tr><tr style="height:12.9pt"><td rowspan="2" class="lb">IFA tablets</td><td rowspan="2" class="num" id="s_io"></td><td colspan="3" rowspan="2" class="num" id="s_ir"></td><td colspan="3" rowspan="2" class="num" id="s_iu"></td><td colspan="4" rowspan="2" class="num rt" id="s_ib2"></td><td rowspan="2" class="num" id="s_in"></td></tr><tr style="height:20.6pt"></tr><tr style="height:11.3pt"><td rowspan="2" class="lb">Albendazole <br>tablets</td><td rowspan="2" class="num" id="s_ao"></td><td colspan="3" rowspan="2" class="num" id="s_ar"></td><td colspan="3" rowspan="2" class="num" id="s_au"></td><td colspan="4" rowspan="2" class="num exp" id="s_ab2"></td><td rowspan="2" class="num" id="s_an"></td></tr><tr style="height:22.0pt"></tr><tr style="height:138.7pt"><td colspan="13" class="sigcell"><div class="sigbox"><div class="sl">Nodal Teacher 1</div><div class="sr"><img class="ssig" alt="" src="data:image/png;base64,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"><div class="sdate" id="s_date"></div><div class="seal"><b>Headmaster</b>Taldangra Fulmati High School (H.S.)<br>P.O.- Taldangra, Dist.- Bankura</div><div class="shm">Headmaster</div></div></div></td></tr></table></div>
+
+</section>
+
+<section class="view" id="view-data">
+ <div class="grid-2">
+  <div class="card">
+    <h3><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Active academic year</h3>
+    <div class="yr-now"><b id="yrNow">2026</b><span id="yrNowCount"></span></div>
+    <div class="row"><select class="sel" id="yrSelect"></select><span class="hint" style="margin:0">Switch to any saved year — certificates and reports use it.</span></div>
+    <div id="yrStorage" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <h3><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg> Saved years</h3>
+    <p class="hint">Every year you keep stays available. Use <b>Excel</b> to download a backup of any year.</p>
+    <div class="tscroll" style="max-height:none"><table class="tbl"><tr><th>Year</th><th>Students</th><th>Stored</th><th>Updated</th><th></th></tr><tbody id="yrTbody"></tbody></table></div>
+  </div>
+ </div>
+ <div class="card">
+  <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg> Import new student list from Excel</h3>
+  <p class="hint">For a new session (e.g. 2027) upload the updated class-wise list. Columns can be in any order: <b>Name, Sex, Father, Mother, Class, Section, Roll, DOB, Student Code, Mobile, Caste</b>. One sheet for all students, or one sheet per class (sheet name = class).</p>
+  <div class="drop"><input type="file" id="yrFile" accept=".xlsx,.xls,.csv"><button class="btn ghost sm" type="button" onclick="YEARS.template()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg> Blank template</button></div>
+  <div id="yrPreview" hidden>
+    <div id="yrPreviewBody"></div>
+    <div class="sec-title">What should happen to the old data?</div>
+    <div class="modes">
+      <label class="mode"><input type="radio" name="yrMode" value="new" checked><b>Keep all data — save as a NEW academic year</b>
+        <small>Old years stay untouched and can be switched back any time (year-wise records).</small>
+        <div class="row">Year <input class="inp" id="yrNewYear" type="number" min="2000" max="2100" style="width:100px"> <input class="inp" id="yrLabel" placeholder="Note (optional)" style="width:200px"></div></label>
+      <label class="mode"><input type="radio" name="yrMode" value="replace"><b>Replace — overwrite old data with this file</b>
+        <small>The selected year's student list is permanently replaced by the Excel data.</small>
+        <div class="row">Replace year <select class="sel" id="yrReplaceYear"></select></div></label>
+    </div>
+    <label class="switch" style="color:var(--ink)"><input type="checkbox" id="yrBackup" checked> Download a backup Excel of the old data before replacing</label>
+    <div class="row" style="margin-top:14px"><button class="btn" id="yrImportBtn" type="button" onclick="YEARS.doImport()">Import &amp; save</button></div>
+  </div>
+ </div>
+</section>
+
+  </main>
+ </div>
+</div>
+<div class="modal" id="loginModal" onclick="if(event.target===this)APP.closeLogin()"><div class="box">
+ <h3>Sign in</h3><div class="hint">Needed only to save, import or delete online data.</div>
+ <input class="inp" id="lgEmail" type="email" placeholder="Email" autocomplete="username">
+ <input class="inp" id="lgPass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')APP.login()">
+ <div id="lgMsg" class="hint" style="min-height:16px"></div>
+ <div class="row"><button class="btn" type="button" onclick="APP.login()">Sign in</button><button class="btn ghost" type="button" onclick="APP.closeLogin()">Cancel</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
 
     <script>
         // Embedded 2026 student database. Lookup key = CLASS | SECTION | ROLL.
@@ -1526,9 +1743,9 @@ function generateStudentReport(type) {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-/* ===== WIFS ANNEX-3 REPORT ===== */
+/* ===== SHARED FIREBASE + LOGIN + NAVIGATION ===== */
 /* Paste the SAME firebaseConfig used in your other tfhs-portal pages here (at least apiKey + appId). */
-const WIFS_FIREBASE_CONFIG = {
+const TFHS_FIREBASE_CONFIG = {
     apiKey: "",
     authDomain: "tfhs-portal.firebaseapp.com",
     projectId: "tfhs-portal",
@@ -1536,6 +1753,90 @@ const WIFS_FIREBASE_CONFIG = {
     messagingSenderId: "",
     appId: ""
 };
+const APP = (function () {
+    const cfg = TFHS_FIREBASE_CONFIG;
+    const configured = !!cfg.apiKey && typeof firebase !== 'undefined';
+    let db = null, auth = null, user = null, ready = false;
+    const cbs = [];
+    const $ = id => document.getElementById(id);
+    function fire() { ready = true; cbs.splice(0).forEach(f => { try { f(); } catch (e) { console.error(e); } }); }
+    function onReady(cb) { ready ? cb() : cbs.push(cb); }
+    function paint() {
+        const lbl = user ? 'Sign out' : 'Sign in';
+        const n = $('navAuthLbl'); if (n) n.textContent = lbl;
+        const u = $('sbUser'); if (u) u.textContent = user ? user.email : (configured ? 'Not signed in' : 'Offline mode');
+        const c = $('tbUserLbl'); if (c) c.textContent = user ? user.email.split('@')[0] : (configured ? 'Sign in' : 'Offline');
+    }
+    function openLogin(msg) {
+        if (!configured) { UI.toast('Firebase key not set in the file — data stays in this browser only.', true); return; }
+        if (user) return;
+        $('lgMsg').textContent = msg || '';
+        $('loginModal').classList.add('show'); setTimeout(() => $('lgEmail').focus(), 50);
+    }
+    function closeLogin() { $('loginModal').classList.remove('show'); }
+    function login() {
+        $('lgMsg').textContent = 'Signing in…';
+        auth.signInWithEmailAndPassword($('lgEmail').value.trim(), $('lgPass').value)
+            .then(() => { closeLogin(); $('lgPass').value = ''; UI.toast('Signed in.'); })
+            .catch(e => { $('lgMsg').textContent = 'Login failed: ' + (e.code || e.message); });
+    }
+    function logout() { if (auth) auth.signOut().then(() => UI.toast('Signed out.')); }
+    function toggleAuth() { user ? logout() : openLogin(); }
+    if (configured) {
+        if (!firebase.apps.length) firebase.initializeApp(cfg);
+        db = firebase.firestore(); auth = firebase.auth();
+        auth.onAuthStateChanged(u => { user = u; paint(); if (!ready) fire(); });
+    } else { setTimeout(() => { paint(); fire(); }, 0); }
+    document.addEventListener('DOMContentLoaded', paint); paint();
+    return { configured, get db() { return db; }, get auth() { return auth; }, get user() { return user; }, onReady, openLogin, closeLogin, login, logout, toggleAuth };
+})();
+
+const UI = (function () {
+    const $ = id => document.getElementById(id);
+    const V = {
+        cert:    ['Certificate', 'Find a student and print the A4 certificate'],
+        reports: ['Student Reports', 'Class, sex and caste wise counts'],
+        wifs:    ['WIFS Annex-3', 'Monthly school report — Format 3'],
+        data:    ['Data & Academic Year', 'Import Excel · replace data or keep year-wise records']
+    };
+    let cur = 'cert';
+    function show(v, noHash) {
+        if (!V[v]) v = 'cert'; cur = v;
+        document.querySelectorAll('.view').forEach(e => e.classList.toggle('active', e.id === 'view-' + v));
+        document.querySelectorAll('.nav-item[data-view]').forEach(e => e.classList.toggle('active', e.dataset.view === v));
+        $('tbTitle').textContent = V[v][0]; $('tbSub').textContent = V[v][1];
+        document.title = V[v][0] + ' — TFHS';
+        $('app').classList.remove('open');
+        if (!noHash) { try { history.replaceState(null, '', '#' + v); } catch (e) {} }
+        window.scrollTo(0, 0);
+    }
+    function menu() { $('app').classList.toggle('open'); }
+    function collapse() {
+        const a = $('app'); a.classList.toggle('collapsed');
+        try { localStorage.setItem('tfhsSbCollapsed', a.classList.contains('collapsed') ? '1' : '0'); } catch (e) {}
+    }
+    let tt = null;
+    function toast(msg, bad) {
+        const t = $('toast'); t.textContent = msg; t.className = 'toast show' + (bad ? ' bad' : '');
+        clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), bad ? 5200 : 3200);
+    }
+    function init() {
+        try { if (localStorage.getItem('tfhsSbCollapsed') === '1') $('app').classList.add('collapsed'); } catch (e) {}
+        const h = (location.hash || '').replace('#', '');
+        show(V[h] ? h : 'cert', true);
+        window.addEventListener('hashchange', () => show((location.hash || '').replace('#', ''), true));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { APP.closeLogin(); $('app').classList.remove('open'); } });
+        const mm = $('manualMode');
+        if (mm) mm.addEventListener('change', () => { const d = $('detailsBox'); if (d && mm.checked) d.open = true; });
+    }
+    init();
+    return { show, menu, collapse, toast, current: () => cur };
+})();
+</script>
+
+<script>
+/* ===== WIFS ANNEX-3 REPORT ===== */
+
 const WIFS = (function(){
     const DEFAULTS = {"wf_month": "2026-09", "wf_type": "GOVT SPONSORED", "wf_nodal": "1)Kanti Malla  ; 2)Tuhin Subhra Patra", "wf_classes": "6th, 7th, 8th, 9th, 10th,11th, 12th", "wf_tg": "230", "wf_tb": "1009", "wf_ig": "0", "wf_ib": "0", "wf_sg": "0", "wf_sb": "0", "wf_ag": "0", "wf_ab": "0", "wf_idg": "", "wf_idb": "", "wf_rfg": "", "wf_rfb": "", "wf_nhp": "", "wf_nhc": "", "wf_adv": "", "wf_advref": "", "wf_io": "33", "wf_ir": "0", "wf_iu": "", "wf_in": "", "wf_ao": "0", "wf_ar": "0", "wf_au": "0", "wf_aexp": "Exp Date-03/2028", "wf_an": "", "wf_sigmode": "with", "wf_datemode": "auto", "wf_date": "27.07.26"};
     const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1547,8 +1848,8 @@ const WIFS = (function(){
     const pct = (a, b) => b > 0 ? (a / b * 100).toFixed(2) : '0.00';
     const blank = v => has(v) ? String(num(v)) : '';
     const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const configured = !!WIFS_FIREBASE_CONFIG.apiKey && typeof firebase !== 'undefined';
-    let db = null, auth = null, store = { last: null, months: {} };
+    const configured = APP.configured;
+    let db = APP.db, auth = APP.auth, store = { last: null, months: {} };
 
     function status(msg, bad) { const s = $('wfStatus'); s.textContent = msg; s.style.color = bad ? '#b00020' : '#145828'; }
     function todayStr() { const n = new Date(), p = x => String(x).padStart(2, '0'); return p(n.getDate()) + '.' + p(n.getMonth() + 1) + '.' + String(n.getFullYear()).slice(-2); }
@@ -1634,7 +1935,7 @@ const WIFS = (function(){
             catch (e) { status('Save failed.', true); }
             return;
         }
-        if (!auth.currentUser) { status('Login first (box above), then press SAVE again.', true); $('wfLogin').style.display = 'flex'; return; }
+        if (!APP.user) { status('Please sign in (account button), then press SAVE again.', true); APP.openLogin('Sign in to save the WIFS report.'); return; }
         try {
             await db.collection('tfhs').doc('wifsReport').set({ last: d, months: { [d.wf_month]: d }, updated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             store.last = d; store.months[d.wf_month] = d;
@@ -1685,12 +1986,8 @@ const WIFS = (function(){
         window.addEventListener('afterprint', done);
         window.print();
     }
-    function login() {
-        if (!configured) { status('Firebase key not set in the file.', true); return; }
-        auth.signInWithEmailAndPassword($('wfEmail').value.trim(), $('wfPass').value)
-            .then(() => status('Logged in.')).catch(e => status('Login failed: ' + (e.code || e.message), true));
-    }
-    function logout() { if (auth) auth.signOut().then(() => status('Logged out.')); }
+    function login() { APP.openLogin(); }
+    function logout() { APP.logout(); }
 
     function init() {
         $('wf_sigmode').addEventListener('change', () => { if ($('wifsSheet').style.display === 'block') render(); });
@@ -1698,17 +1995,323 @@ const WIFS = (function(){
         syncDate();
         $('wf_month').addEventListener('change', e => loadMonth(e.target.value));
         Object.keys(DEFAULTS).forEach(k => $(k).addEventListener('input', () => { if ($('wifsSheet').style.display === 'block') render(); }));
-        if (configured) {
-            if (!firebase.apps.length) firebase.initializeApp(WIFS_FIREBASE_CONFIG);
-            db = firebase.firestore(); auth = firebase.auth();
-            $('wfLogin').style.display = 'flex';
-            let first = true;
-            auth.onAuthStateChanged(u => { if (first) { first = false; load(); } if (u) { status('Logged in as ' + u.email); $('wfLogin').style.display = 'none'; } });
-        } else load();
+        if (configured) { APP.onReady(() => load()); } else load();
     }
     init();
     return { generate, share, fetchTotals, save, print: printSheet, login, logout };
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ===== ACADEMIC YEAR DATA MANAGER (import Excel · replace · keep year-wise) ===== */
+const YEARS = (function () {
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const BUILTIN = '2026';
+    const builtinRows = STUDENT_DB.slice();
+    const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    const CHUNK = 400;
+    let meta = { years: {}, active: null };
+    let current = BUILTIN;
+    const cache = {};
+    let imp = null;                       // current import preview {wb, overrides, parsed}
+
+    /* ---------- storage (Firestore when key is set, else this browser) ---------- */
+    const online = () => APP.configured;
+    const col = () => APP.db.collection('tfhs');
+    async function getMeta() {
+        if (online()) { const s = await col().doc('studentYears').get(); return s.exists ? Object.assign({ years: {}, active: null }, s.data()) : { years: {}, active: null }; }
+        try { return JSON.parse(localStorage.getItem('tfhsYearsMeta')) || { years: {}, active: null }; } catch (e) { return { years: {}, active: null }; }
+    }
+    async function setMeta(m) {
+        if (online()) { await col().doc('studentYears').set(m); return; }
+        localStorage.setItem('tfhsYearsMeta', JSON.stringify(m));
+    }
+    async function getRows(y) {
+        if (cache[y]) return cache[y];
+        let rows = [];
+        if (online()) {
+            const n = (meta.years[y] || {}).chunks || 0;
+            const snaps = await Promise.all(Array.from({ length: n }, (_, i) => col().doc('students_' + y + '_' + i).get()));
+            snaps.forEach(s => { if (s.exists) rows = rows.concat(s.data().rows || []); });
+        } else { try { rows = JSON.parse(localStorage.getItem('tfhsStudents_' + y)) || []; } catch (e) { rows = []; } }
+        return cache[y] = rows;
+    }
+    async function setRows(y, rows) {
+        const oldN = (meta.years[y] || {}).chunks || 0;
+        const n = Math.max(1, Math.ceil(rows.length / CHUNK));
+        if (online()) {
+            const b = APP.db.batch();
+            for (let i = 0; i < n; i++) b.set(col().doc('students_' + y + '_' + i), { year: y, idx: i, rows: rows.slice(i * CHUNK, (i + 1) * CHUNK) });
+            for (let i = n; i < oldN; i++) b.delete(col().doc('students_' + y + '_' + i));
+            await b.commit();
+        } else localStorage.setItem('tfhsStudents_' + y, JSON.stringify(rows));
+        cache[y] = rows.slice();
+        return n;
+    }
+    async function delRows(y) {
+        const oldN = (meta.years[y] || {}).chunks || 0;
+        if (online()) { const b = APP.db.batch(); for (let i = 0; i < oldN; i++) b.delete(col().doc('students_' + y + '_' + i)); await b.commit(); }
+        else localStorage.removeItem('tfhsStudents_' + y);
+        delete cache[y];
+    }
+    const hasSaved = y => !!meta.years[y];
+    async function rowsFor(y) { return hasSaved(y) ? getRows(y) : (y === BUILTIN ? builtinRows : []); }
+    const allYears = () => Array.from(new Set([BUILTIN].concat(Object.keys(meta.years)))).sort().reverse();
+
+    /* ---------- apply a dataset to the running page ---------- */
+    function romanOrder(a, b) { const x = ROMAN.indexOf(a), y = ROMAN.indexOf(b); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y) || String(a).localeCompare(b); }
+    function refreshSelectors() {
+        const cs = $('class'), ss = $('sec'); if (!cs || !ss) return;
+        const keepC = cs.value, keepS = ss.value;
+        const classes = Array.from(new Set(STUDENT_DB.map(s => s.cls))).filter(Boolean).sort(romanOrder);
+        cs.innerHTML = '<option value="">-- Select Class --</option>' + classes.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+        const old = Array.from(ss.options).map(o => o.value).filter(Boolean);
+        const secs = Array.from(new Set(old.concat(STUDENT_DB.map(s => s.sec).filter(Boolean))));
+        ss.innerHTML = '<option value="">-- Select Section --</option>' + secs.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+        cs.value = classes.includes(keepC) ? keepC : ''; ss.value = secs.includes(keepS) ? keepS : '';
+    }
+    function applyData(rows, year) {
+        STUDENT_DB.length = 0; rows.forEach(r => STUDENT_DB.push(r));
+        Object.keys(STUDENT_INDEX).forEach(k => delete STUDENT_INDEX[k]);
+        STUDENT_DB.forEach(s => { STUDENT_INDEX[s.cls + '|' + s.sec + '|' + s.roll] = s; });
+        current = year;
+        ['studentName', 'fatherName', 'motherName', 'caste', 'dob', 'sikshaId', 'mobileNo', 'rollNo'].forEach(id => { const e = $(id); if (e) e.value = ''; });
+        const se = $('session'); if (se) se.value = year;
+        refreshSelectors();
+        const ro = $('reportOutput'); if (ro) ro.innerHTML = '';
+        try { setLookupStatus('Academic year ' + year + ' loaded — select Class, Section and enter Roll No.', true); } catch (e) {}
+        try { syncData(); } catch (e) {}
+        paintChips(); renderYears();
+    }
+    function paintChips() {
+        const c = $('tbYearLbl'); if (c) c.textContent = 'Year ' + current + ' · ' + STUDENT_DB.length + ' students';
+        const r = $('rptNote'); if (r) r.textContent = 'Reports use the active academic year (' + current + ') — ' + STUDENT_DB.length + ' students.';
+    }
+    async function use(y, silent) {
+        const rows = await rowsFor(y);
+        if (!rows.length && !(y === BUILTIN)) { UI.toast('No data found for ' + y, true); return; }
+        applyData(rows, y);
+        meta.active = y;
+        try { if (!online() || APP.user) await setMeta(meta); } catch (e) {}
+        if (!silent) UI.toast('Academic year ' + y + ' is now active (' + rows.length + ' students).');
+    }
+
+    /* ---------- Excel parsing ---------- */
+    const FIELDS = [
+        { k: 'name', t: 'Student Name', syn: ['name', 'studentname', 'studentsname', 'nameofthestudent', 'nameofstudent', 'candidatename', 'fullname'], has: ['studentname', 'nameofstudent'] },
+        { k: 'sex', t: 'Sex / Gender', syn: ['sex', 'gender'], has: ['gender', 'sex'] },
+        { k: 'father', t: "Father's Name", syn: ['father', 'fathername', 'fathersname', 'nameoffather'], has: ['father'] },
+        { k: 'mother', t: "Mother's Name", syn: ['mother', 'mothername', 'mothersname', 'nameofmother'], has: ['mother'] },
+        { k: 'cls', t: 'Class', syn: ['class', 'cls', 'std', 'standard', 'classname', 'studentclass'], has: ['class', 'std'] },
+        { k: 'sec', t: 'Section', syn: ['sec', 'section', 'secname'], has: ['section'] },
+        { k: 'roll', t: 'Roll No', syn: ['roll', 'rollno', 'rollnumber', 'classroll'], has: ['roll'] },
+        { k: 'dob', t: 'Date of Birth', syn: ['dob', 'dateofbirth', 'birthdate'], has: ['birth', 'dob'] },
+        { k: 'sikshaId', t: 'Student Code / Siksha ID', syn: ['studentcode', 'sikshaid', 'banglarsikshaid', 'studentid', 'bsid'], has: ['studentcode', 'sikshaid', 'siksha'] },
+        { k: 'mobile', t: 'Mobile No', syn: ['mobile', 'mobileno', 'phone', 'phoneno', 'contact', 'contactno', 'mobilenumber'], has: ['mobile', 'phone', 'contact'] },
+        { k: 'caste', t: 'Caste / Category', syn: ['caste', 'category', 'socialcategory', 'socialgroup', 'castecategory'], has: ['caste', 'category'] }
+    ];
+    const norm = s => String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, '');
+    const clean = v => String(v == null ? '' : v).replace(/\s+/g, ' ').trim().toUpperCase();
+    function mapHeaders(row, ov) {
+        ov = ov || {}; const norms = row.map(norm), map = {}, used = new Set();
+        Object.keys(ov).forEach(k => { if (ov[k] === '') { map[k] = undefined; return; } const i = norms.indexOf(norm(ov[k])); if (i >= 0) { map[k] = i; used.add(i); } });
+        FIELDS.forEach(f => { if (f.k in ov) return; const i = norms.findIndex((n, ix) => n && !used.has(ix) && f.syn.includes(n)); if (i >= 0) { map[f.k] = i; used.add(i); } });
+        FIELDS.forEach(f => { if (f.k in ov || map[f.k] !== undefined) return; const i = norms.findIndex((n, ix) => n && !used.has(ix) && f.has.some(s => n.includes(s))); if (i >= 0) { map[f.k] = i; used.add(i); } });
+        return map;
+    }
+    function normClass(v) {
+        let s = String(v == null ? '' : v).trim().toUpperCase(); if (!s) return '';
+        const d = s.match(/\d+/); if (d) { const n = parseInt(d[0], 10); return n >= 1 && n <= 12 ? ROMAN[n] : ''; }
+        s = s.replace(/CLASS|STANDARD|STD/g, '').replace(/[^A-Z]/g, '');
+        return ROMAN.indexOf(s) > 0 ? s : '';
+    }
+    function normRoll(v) { const n = parseInt(String(v == null ? '' : v).replace(/[^\d]/g, ''), 10); return n > 0 ? String(n) : ''; }
+    function normSex(v) { const s = String(v == null ? '' : v).trim().toUpperCase(); if (/^(F|G)/.test(s)) return 'Female'; if (/^(M|B)/.test(s)) return 'Male'; return ''; }
+    function normDob(v) {
+        if (v === '' || v == null) return '';
+        const p2 = n => String(n).padStart(2, '0');
+        if (v instanceof Date && !isNaN(v)) return v.getFullYear() + '-' + p2(v.getMonth() + 1) + '-' + p2(v.getDate());
+        if (typeof v === 'number') { const d = XLSX.SSF.parse_date_code(v); return d ? d.y + '-' + p2(d.m) + '-' + p2(d.d) : ''; }
+        const s = String(v).trim(); let m;
+        if ((m = s.match(/^(\d{1,2})[\/\-. ](\d{1,2})[\/\-. ](\d{4})$/))) { if (+m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31) return m[3] + '-' + p2(m[2]) + '-' + p2(m[1]); }
+        if ((m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/))) { if (+m[2] >= 1 && +m[2] <= 12) return m[1] + '-' + p2(m[2]) + '-' + p2(m[3]); }
+        return '';
+    }
+    const numStr = v => typeof v === 'number' ? Math.round(v).toLocaleString('fullwide', { useGrouping: false }) : String(v == null ? '' : v);
+    function parse(wb, ov) {
+        const rows = [], warn = [], seen = {}; let skipped = 0, noSex = 0, noDob = 0, noId = 0, dup = 0, firstHeaders = null, firstMap = null; const skipEx = [];
+        wb.SheetNames.forEach(sn => {
+            const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' });
+            let hr = -1, map = null;
+            for (let r = 0; r < Math.min(aoa.length, 25); r++) {
+                const m = mapHeaders(aoa[r].map(x => typeof x === 'string' ? x : String(x)), ov);
+                const n = Object.keys(m).filter(k => m[k] !== undefined).length;
+                if (m.name !== undefined && n >= 3) { hr = r; map = m; break; }
+            }
+            if (hr < 0) return;
+            if (!firstHeaders) { firstHeaders = aoa[hr].map(x => String(x)); firstMap = map; }
+            const sheetCls = map.cls === undefined ? normClass(sn) : '';
+            const g = (row, k) => map[k] === undefined ? '' : row[map[k]];
+            for (let r = hr + 1; r < aoa.length; r++) {
+                const row = aoa[r];
+                const name = clean(g(row, 'name')), cls = normClass(g(row, 'cls')) || sheetCls, roll = normRoll(g(row, 'roll'));
+                if (!name && !roll && !String(g(row, 'cls')).trim()) continue;
+                if (!name || !cls || !roll) { skipped++; if (skipEx.length < 6) skipEx.push(sn + ' row ' + (r + 1)); continue; }
+                const sex = normSex(g(row, 'sex')); if (!sex) noSex++;
+                const dob = normDob(g(row, 'dob')); if (!dob) noDob++;
+                const rawId = numStr(g(row, 'sikshaId')); const sid = rawId.replace(/\D/g, '') ? normalizeStudentId(rawId) : ''; if (!sid) noId++;
+                const o = {
+                    name, sex: sex || 'Male', father: clean(g(row, 'father')), mother: clean(g(row, 'mother')), cls, sec: clean(g(row, 'sec')), roll,
+                    dob, sikshaId: sid, mobile: String(numStr(g(row, 'mobile'))).replace(/\D/g, '').slice(-10), caste: clean(g(row, 'caste'))
+                };
+                const key = o.cls + '|' + o.sec + '|' + o.roll; if (seen[key]) dup++; seen[key] = 1;
+                rows.push(o);
+            }
+        });
+        if (skipped) warn.push(skipped + ' row(s) skipped — missing Name, Class or Roll (e.g. ' + skipEx.join(', ') + ').');
+        if (noSex) warn.push(noSex + ' row(s) have no/unknown Sex — treated as Male. Check the Sex column mapping.');
+        if (dup) warn.push(dup + ' duplicate Class+Section+Roll combination(s) — only the last one is found by the certificate lookup.');
+        if (noDob) warn.push(noDob + ' row(s) have no valid Date of Birth.');
+        if (noId) warn.push(noId + ' row(s) have no Student Code.');
+        return { rows, warn, skipped, firstHeaders, firstMap, dup };
+    }
+
+    /* ---------- import UI ---------- */
+    function readFile(file) {
+        if (!file) return;
+        if (typeof XLSX === 'undefined') { UI.toast('Excel library not loaded — check internet connection.', true); return; }
+        const fr = new FileReader();
+        fr.onload = e => {
+            try {
+                const wb = XLSX.read(e.target.result, { type: 'array' });
+                imp = { wb, ov: {}, name: file.name }; renderPreview();
+            } catch (err) { UI.toast('Could not read file: ' + (err.message || err), true); }
+        };
+        fr.readAsArrayBuffer(file);
+    }
+    function renderPreview() {
+        const box = $('yrPreview'); if (!imp) { box.hidden = true; return; }
+        const p = imp.parsed = parse(imp.wb, imp.ov), rows = p.rows;
+        box.hidden = false;
+        const girls = rows.filter(r => r.sex === 'Female').length, boys = rows.length - girls;
+        const byCls = {}; rows.forEach(r => { byCls[r.cls] = (byCls[r.cls] || 0) + 1; });
+        const clsHtml = Object.keys(byCls).sort(romanOrder).map(c => '<div class="stat"><b>' + byCls[c] + '</b><small>Class ' + esc(c) + '</small></div>').join('');
+        const hdrs = p.firstHeaders || [];
+        const mapHtml = FIELDS.map(f => {
+            const idx = p.firstMap ? p.firstMap[f.k] : undefined;
+            const opts = '<option value="">— not in file —</option>' + hdrs.map((h, i) => h === '' ? '' : '<option value="' + esc(h) + '"' + (idx === i ? ' selected' : '') + '>' + esc(h) + '</option>').join('');
+            return '<div class="' + (idx === undefined ? 'miss' : '') + '"><label>' + esc(f.t) + '</label><select class="sel" data-f="' + f.k + '" onchange="YEARS.remap(this)">' + opts + '</select></div>';
+        }).join('');
+        const sample = rows.slice(0, 6).map(r => '<tr><td>' + esc(r.cls) + '-' + esc(r.sec) + '/' + esc(r.roll) + '</td><td>' + esc(r.name) + '</td><td>' + esc(r.sex) + '</td><td>' + esc(r.father) + '</td><td>' + esc(r.dob) + '</td><td>' + esc(r.sikshaId) + '</td><td>' + esc(r.caste) + '</td></tr>').join('');
+        let h = '<div class="sec-title">File: ' + esc(imp.name) + '</div>';
+        if (!p.firstHeaders) h += '<div class="warnbox bad">No header row with a <b>Name</b> column was found. Make sure the first rows contain headings such as Name, Class, Section, Roll.</div>';
+        h += '<div class="stats"><div class="stat"><b>' + rows.length + '</b><small>students found</small></div><div class="stat"><b>' + girls + '</b><small>girls</small></div><div class="stat"><b>' + boys + '</b><small>boys</small></div>' + clsHtml + '</div>';
+        h += p.warn.map(w => '<div class="warnbox">⚠ ' + esc(w) + '</div>').join('');
+        h += '<div class="sec-title">Column matching (change if wrong)</div><div class="map-grid">' + mapHtml + '</div>';
+        if (sample) h += '<div class="sec-title">First rows</div><div class="tscroll"><table class="tbl"><tr><th>Class-Sec/Roll</th><th>Name</th><th>Sex</th><th>Father</th><th>DOB</th><th>Student Code</th><th>Caste</th></tr>' + sample + '</table></div>';
+        $('yrPreviewBody').innerHTML = h;
+        $('yrImportBtn').disabled = !rows.length;
+        const ny = $('yrNewYear'); if (ny && !ny.dataset.touched) { const ys = allYears().map(Number).filter(Boolean); ny.value = (ys.length ? Math.max.apply(null, ys) : parseInt(BUILTIN, 10)) + 1; }
+        const rs = $('yrReplaceYear'); rs.innerHTML = allYears().map(y => '<option value="' + y + '"' + (y === current ? ' selected' : '') + '>' + y + (hasSaved(y) ? '' : ' (built-in)') + '</option>').join('');
+    }
+    function remap(sel) { if (!imp) return; imp.ov[sel.dataset.f] = sel.value; renderPreview(); }
+
+    function toSheetRows(rows) {
+        return rows.map(r => ({
+            'Student Name': r.name, 'Sex': r.sex, "Father's Name": r.father, "Mother's Name": r.mother, 'Class': r.cls, 'Section': r.sec,
+            'Roll No': Number(r.roll), 'Date of Birth': r.dob ? r.dob.split('-').reverse().join('-') : '', 'Student Code': r.sikshaId, 'Mobile': r.mobile, 'Caste': r.caste
+        }));
+    }
+    function download(rows, file) {
+        if (typeof XLSX === 'undefined') { UI.toast('Excel library not loaded.', true); return; }
+        const ws = XLSX.utils.json_to_sheet(toSheetRows(rows)); const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Students'); XLSX.writeFile(wb, file);
+    }
+    function template() {
+        if (typeof XLSX === 'undefined') { UI.toast('Excel library not loaded.', true); return; }
+        const ws = XLSX.utils.aoa_to_sheet([['Student Name', 'Sex', "Father's Name", "Mother's Name", 'Class', 'Section', 'Roll No', 'Date of Birth', 'Student Code', 'Mobile', 'Caste'],
+            ['SAMPLE STUDENT', 'Male', 'FATHER NAME', 'MOTHER NAME', 'VI', 'A', 1, '15-08-2015', '04340021000005', '9000000000', 'GENERAL']]);
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students'); XLSX.writeFile(wb, 'TFHS_student_import_template.xlsx');
+    }
+    async function doImport() {
+        if (!imp || !imp.parsed || !imp.parsed.rows.length) { UI.toast('Choose an Excel file first.', true); return; }
+        const rows = imp.parsed.rows.map(r => Object.assign({}, r));
+        const mode = document.querySelector('input[name="yrMode"]:checked').value;
+        let y = mode === 'new' ? String(parseInt($('yrNewYear').value, 10)) : $('yrReplaceYear').value;
+        if (!/^\d{4}$/.test(y)) { UI.toast('Enter a valid 4-digit year.', true); return; }
+        const exists = hasSaved(y) || y === BUILTIN;
+        if (online() && !APP.user) { APP.openLogin('Sign in to save the new data, then press Import again.'); return; }
+        const oldRows = exists ? await rowsFor(y) : [];
+        const msg = mode === 'replace'
+            ? 'REPLACE all ' + oldRows.length + ' existing students of ' + y + ' with ' + rows.length + ' students from the Excel file?\n\nThis cannot be undone' + ($('yrBackup').checked ? ' (a backup Excel will be downloaded first).' : '.')
+            : (exists ? 'Year ' + y + ' already has data (' + oldRows.length + ' students). Replace it with the ' + rows.length + ' students from this file?' : 'Save ' + rows.length + ' students as academic year ' + y + '? Existing years are kept.');
+        if (!confirm(msg)) return;
+        if (exists && oldRows.length && $('yrBackup').checked) download(oldRows, 'TFHS_students_' + y + '_BACKUP.xlsx');
+        const btn = $('yrImportBtn'); btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+            const chunks = await setRows(y, rows);
+            meta.years[y] = { count: rows.length, chunks, updated: Date.now(), label: ($('yrLabel').value || '').trim() };
+            meta.active = y; await setMeta(meta);
+            applyData(rows, y);
+            UI.toast('Saved ' + rows.length + ' students for ' + y + '. Year ' + y + ' is now active.');
+            imp = null; $('yrFile').value = ''; $('yrPreview').hidden = true;
+        } catch (e) { UI.toast('Save failed: ' + (e.code || e.message || e), true); }
+        btn.disabled = false; btn.textContent = 'Import & save';
+    }
+    async function del(y) {
+        if (!hasSaved(y)) return;
+        if (online() && !APP.user) { APP.openLogin('Sign in to delete saved data.'); return; }
+        if (!confirm('Delete the saved data of academic year ' + y + '?' + (y === BUILTIN ? '\n\nThe built-in 2026 list inside the file will be used again.' : '') + '\n\nThis cannot be undone.')) return;
+        try {
+            await delRows(y); delete meta.years[y];
+            if (meta.active === y) meta.active = null;
+            await setMeta(meta);
+            if (current === y) { const next = y === BUILTIN ? BUILTIN : (allYears().find(x => x !== y) || BUILTIN); await use(next, true); }
+            renderYears(); UI.toast('Year ' + y + ' deleted.');
+        } catch (e) { UI.toast('Delete failed: ' + (e.code || e.message), true); }
+    }
+    async function backup(y) { const r = await rowsFor(y); if (!r.length) { UI.toast('No data for ' + y, true); return; } download(r, 'TFHS_students_' + y + '.xlsx'); }
+
+    function renderYears() {
+        const ys = allYears(); const sel = $('yrSelect'); if (!sel) return;
+        sel.innerHTML = ys.map(y => '<option value="' + y + '"' + (y === current ? ' selected' : '') + '>' + y + '</option>').join('');
+        $('yrNow').textContent = current; $('yrNowCount').textContent = STUDENT_DB.length + ' students';
+        $('yrTbody').innerHTML = ys.map(y => {
+            const m = meta.years[y]; const cnt = m ? m.count : (y === BUILTIN ? builtinRows.length : 0);
+            const src = m ? '<span class="pill">Saved' + (online() ? ' online' : ' in browser') + '</span>' : '<span class="pill gray">Built-in</span>';
+            const upd = m && m.updated ? new Date(m.updated).toLocaleDateString('en-GB') : '—';
+            return '<tr class="' + (y === current ? 'cur' : '') + '"><td><b>' + y + '</b>' + (y === current ? ' <span class="pill gold">Active</span>' : '') + (m && m.label ? '<br><small>' + esc(m.label) + '</small>' : '') + '</td><td>' + cnt + '</td><td>' + src + '</td><td>' + upd + '</td><td class="row">' +
+                (y === current ? '' : '<button class="btn sm" onclick="YEARS.use(\'' + y + '\')">Use</button>') +
+                '<button class="btn sm ghost" onclick="YEARS.backup(\'' + y + '\')">Excel</button>' +
+                (m ? '<button class="btn sm ghost" style="color:#b3261e;border-color:#e3b4b0" onclick="YEARS.del(\'' + y + '\')">Delete</button>' : '') + '</td></tr>';
+        }).join('');
+        const st = $('yrStorage');
+        st.className = online() ? 'okbox' : 'warnbox';
+        st.innerHTML = online() ? '☁ Year data is saved <b>online</b> (Firestore <code>tfhs/studentYears</code> + <code>tfhs/students_YEAR_n</code>). Sign in to import, replace or delete.'
+            : '⚠ Firebase key is not set in the file, so year data is saved in <b>this browser only</b>. Paste your firebase <code>apiKey</code> into <code>TFHS_FIREBASE_CONFIG</code> to save online.';
+    }
+
+    function init() {
+        const f = $('yrFile'); if (f) f.addEventListener('change', e => readFile(e.target.files[0]));
+        const ny = $('yrNewYear'); if (ny) ny.addEventListener('input', () => { ny.dataset.touched = '1'; document.querySelector('input[name="yrMode"][value="new"]').checked = true; });
+        const rs = $('yrReplaceYear'); if (rs) rs.addEventListener('change', () => { document.querySelector('input[name="yrMode"][value="replace"]').checked = true; });
+        const ys = $('yrSelect'); if (ys) ys.addEventListener('change', () => use(ys.value));
+        renderYears(); paintChips(); refreshSelectors();
+        APP.onReady(async () => {
+            try {
+                meta = await getMeta();
+                const act = meta.active;
+                if (act && act !== current && (hasSaved(act) || act === BUILTIN)) await use(act, true);
+                else if (hasSaved(current)) await use(current, true);
+            } catch (e) { UI.toast('Could not read saved years: ' + (e.code || e.message), true); }
+            renderYears(); paintChips();
+        });
+    }
+    init();
+    return { use, del, backup, remap, doImport, template, current: () => current };
+})();
+</script>
+
 </body>
 </html>
