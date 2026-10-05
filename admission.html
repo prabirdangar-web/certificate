@@ -38,6 +38,9 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
 .docs{font-size:13px;margin:0;padding-left:18px;color:#34473b}
 .ack{text-align:center}.ack .ref{display:inline-block;margin:10px 0;background:var(--y);color:var(--g2);font-size:22px;font-weight:900;letter-spacing:1px;padding:8px 18px;border-radius:12px;border:2px solid #b78600}
 .ack table{margin:12px auto;border-collapse:collapse;text-align:left;font-size:13.5px}.ack td{padding:3px 10px;border-bottom:1px solid #e6eee8}
+.bad{outline:3px solid #b00020!important;border-color:#b00020!important}
+.ro{background:#eef3ee}
+.cnt{font-weight:800;font-size:13px;margin:4px 0 10px}.cnt.ok{color:#145828}.cnt.no{color:#b00020}
 @media print{body{background:#fff}.no-print{display:none!important}.card{box-shadow:none;border:1px solid #999}.hero{background:#fff;color:#000;border:1px solid #000}.hero .ses{border:1px solid #000;background:#fff}}
 </style>
 </head>
@@ -46,38 +49,37 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
  <div class="hero">
   <h1>Taldangra Fulmati High School [H.S.]</h1>
   <p>P.O. Taldangra, District: Bankura, PIN: 722152 &nbsp;|&nbsp; Ph: 03243-265114</p>
-  <span class="ses" id="ses">Admission application — Classes V to XI</span>
+  <span class="ses" id="ses">Admission application — Classes V to X</span>
  </div>
-
  <form id="f" autocomplete="off" novalidate>
  <div class="card"><h2><b>1</b> Admission sought</h2>
   <div class="grid">
-   <label>Class applying for<select id="cls" class="key" required><option value="">— select —</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option></select></label>
-   <label>Medium of instruction<select id="medium"><option>Bengali</option><option>English</option><option>Other</option></select></label>
-   <label class="full hide" id="wStream">Stream (Class XI)<select id="stream"><option value="">— select —</option><option>Arts</option><option>Science</option><option>Commerce</option></select></label>
-   <label class="full hide" id="wSubj">Elective subjects preferred (Class XI)<textarea id="subj" rows="2" placeholder="e.g. Bengali, English compulsory; electives: History, Geography, Political Science"></textarea></label>
+   <label>Class applying for<select id="cls" class="key req"></select></label>
+   <label>Medium of instruction<select id="medium" class="req"></select></label>
   </div>
  </div>
 
- <div class="card"><h2><b>2</b> Student details</h2>
+ <div class="card"><h2><b>2</b> Student details <small style="font-weight:500;color:var(--mut)">(fields marked * are compulsory)</small></h2>
   <div class="grid">
-   <label class="full">Student's full name (as in birth certificate)<input id="name" class="key" required maxlength="80"></label>
+   <label class="full">Student's full name (as in birth certificate)<input id="name" class="key req" maxlength="80"></label>
    <label class="full">Name in Bengali <small>(optional)</small><input id="nameBn" maxlength="80"></label>
-   <label>Sex<select id="sex"><option>Male</option><option>Female</option></select></label>
-   <label>Date of birth<input id="dob" type="date" required></label>
+   <label>Sex<select id="sex" class="req"></select></label>
+   <label>Date of birth<input id="dob" type="date" class="req"></label>
    <div class="full note" id="age"></div>
    <label>Place of birth <small>(village / town, district)</small><input id="pob" maxlength="80"></label>
-   <label>Nationality<input id="nationality" value="Indian"></label>
-   <label>Religion<select id="religion"><option>Hindu</option><option>Muslim</option><option>Christian</option><option>Buddhist</option><option>Sikh</option><option>Jain</option><option>Other</option></select></label>
-   <label>Mother tongue<input id="tongue" value="Bengali"></label>
+   <label>Nationality<select id="nationality" class="req"></select></label>
+   <label class="hide" id="wNat">Nationality — specify<input id="nationalityO" maxlength="40"></label>
+   <label>Religion<select id="religion" class="req"></select></label>
+   <label>Mother tongue<select id="tongue" class="req"></select></label>
+   <label class="hide" id="wTon">Mother tongue — specify<input id="tongueO" maxlength="40"></label>
    <label>Caste / category<select id="caste"><option>GENERAL</option><option>OBC-A</option><option>OBC-B</option><option>SC</option><option>ST</option></select></label>
    <label>Caste certificate no. <small>(if SC / ST / OBC)</small><input id="casteCert" maxlength="40"></label>
    <label>Blood group <small>(optional)</small><select id="blood"><option value="">—</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></label>
-   <label>Banglar Siksha ID / Student code <small>(if available)</small><input id="sikshaId" maxlength="20" inputmode="numeric"></label>
-   <label>Student's Aadhaar no. <small>(optional, 12 digits)</small><input id="aadhaar" maxlength="12" inputmode="numeric"></label>
+   <label>Banglar Siksha Portal ID <small>(14 digits)</small><input id="sikshaId" class="key req" maxlength="14" inputmode="numeric" placeholder="14 digits"></label>
+   <label>Student's Aadhaar no. <small>(12 digits)</small><input id="aadhaar" class="key req" maxlength="12" inputmode="numeric" placeholder="12 digits"></label>
    <label class="hide" id="wKanya">Kanyashree (K-ID / application no.) <small>(girls, if any)</small><input id="kanya" maxlength="30"></label>
    <label>Differently abled?<select id="disab"><option>No</option><option>Yes</option></select></label>
-   <label class="hide" id="wDisab">Type of disability &amp; % <small>(UDID no. if any)</small><input id="disabType" maxlength="80"></label>
+   <label class="hide" id="wDisab">Type of disability and percentage <small>(UDID no. if any)</small><input id="disabType" maxlength="80"></label>
    <label>Family below poverty line (BPL / AAY)?<select id="bpl"><option>No</option><option>Yes</option></select></label>
    <label class="hide" id="wBpl">BPL / ration card no.<input id="bplNo" maxlength="30"></label>
   </div>
@@ -85,17 +87,17 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
 
  <div class="card"><h2><b>3</b> Parents / guardian</h2>
   <div class="grid">
-   <label>Father's name<input id="father" class="key" required maxlength="80"></label>
-   <label>Father's occupation<input id="fatherOcc" maxlength="60"></label>
+   <label>Father's name<input id="father" class="key req" maxlength="80"></label>
+   <label>Father's occupation <small>(choose NA if none)</small><select id="fatherOcc" class="req"></select></label>
    <label>Father's education<input id="fatherEdu" maxlength="40"></label>
-   <label>Father's mobile<input id="fatherMob" inputmode="numeric" maxlength="10"></label>
+   <label>Father's mobile <small>(optional)</small><input id="fatherMob" inputmode="numeric" maxlength="10"></label>
    <label>Mother's name<input id="mother" maxlength="80"></label>
-   <label>Mother's occupation<input id="motherOcc" maxlength="60"></label>
+   <label>Mother's occupation <small>(choose NA if none)</small><select id="motherOcc" class="req"></select></label>
    <label>Mother's education<input id="motherEdu" maxlength="40"></label>
-   <label>Mother's mobile<input id="motherMob" inputmode="numeric" maxlength="10"></label>
+   <label>Mother's mobile <small>(optional)</small><input id="motherMob" inputmode="numeric" maxlength="10"></label>
    <label>Guardian's name <small>(only if different from parents)</small><input id="guardian" maxlength="80"></label>
-   <label>Relation with student<input id="guardianRel" maxlength="30"></label>
-   <label>Primary contact mobile <small>(school will call / SMS here)</small><input id="mobile" class="key" required inputmode="numeric" maxlength="10" placeholder="10 digits"></label>
+   <label>Primary contact mobile <small>(school will call / SMS here)</small><input id="mobile" class="key req" inputmode="numeric" maxlength="10" placeholder="10 digits"></label>
+   <label>Relation of primary contact person with student<select id="guardianRel" class="req"></select></label>
    <label>WhatsApp no. <small>(if different)</small><input id="whatsapp" inputmode="numeric" maxlength="10"></label>
    <label>Annual family income<select id="income"><option value="">— select —</option><option>Below ₹1,00,000</option><option>₹1,00,000 – ₹2,50,000</option><option>₹2,50,000 – ₹5,00,000</option><option>Above ₹5,00,000</option></select></label>
    <label>Email <small>(optional)</small><input id="email" type="email" maxlength="80"></label>
@@ -103,32 +105,33 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
  </div>
 
  <div class="card"><h2><b>4</b> Address</h2>
+  <p class="note">Type the village / town exactly as in the certificate. If it is in the school's list, the other boxes fill automatically; otherwise fill them yourself. All are compulsory.</p>
   <div class="grid">
-   <label>Village / Town<input id="village" class="key" required maxlength="60"></label>
-   <label>Post Office<input id="po" maxlength="60" value="Taldangra"></label>
-   <label>Police Station<input id="ps" maxlength="60" value="Taldangra"></label>
-   <label>Block<input id="block" maxlength="60" value="Taldangra"></label>
-   <label>District<input id="dist" maxlength="40" value="Bankura"></label>
-   <label>PIN code<input id="pin" inputmode="numeric" maxlength="6" value="722152"></label>
-   <label>State<input id="state" value="West Bengal"></label>
-   <label>Distance from school (km) / how student comes<select id="transport"><option>Walk</option><option>Cycle</option><option>Bus / Van</option><option>Other</option></select></label>
+   <label>Village / Town<input id="village" class="key req" maxlength="60" list="vl"></label><datalist id="vl"></datalist>
+   <label>Post Office<input id="po" class="req" maxlength="60"></label>
+   <label>Police Station<input id="ps" class="req" maxlength="60"></label>
+   <label>Block<input id="block" class="req" maxlength="60"></label>
+   <label>District<input id="dist" class="req" maxlength="40"></label>
+   <label>PIN code<input id="pin" class="req" inputmode="numeric" maxlength="6"></label>
+   <label>State<input id="state" class="req" value="West Bengal"></label>
+   <label>How student comes to school<select id="transport"><option>Walk</option><option>Cycle</option><option>Bus / Van</option><option>Other</option></select></label>
    <label class="chk full"><input type="checkbox" id="permSame" checked> Permanent address is same as above</label>
    <label class="full hide" id="wPerm">Permanent address<textarea id="permAddr" rows="2" maxlength="200"></textarea></label>
   </div>
  </div>
 
- <div class="card"><h2><b>5</b> Previous school</h2>
+ <div class="card"><h2><b>5</b> Previous school <small style="font-weight:500;color:var(--mut)">(all compulsory)</small></h2>
   <p class="note">For Class V write the primary school; for other classes the last school attended.</p>
   <div class="grid">
-   <label class="full">Name of last school<input id="prevSchool" maxlength="100"></label>
-   <label class="full">Address of last school<input id="prevAddr" maxlength="120"></label>
-   <label>Last class passed<input id="prevClass" maxlength="20" placeholder="e.g. IV, VIII"></label>
-   <label>Board / type<select id="prevBoard"><option value="">—</option><option>WBBPE (Primary)</option><option>WBBSE</option><option>WBCHSE</option><option>CBSE</option><option>ICSE</option><option>Madrasah</option><option>Private / Other</option></select></label>
-   <label>Year of passing<input id="prevYear" inputmode="numeric" maxlength="4"></label>
-   <label>Marks / percentage obtained<input id="prevMarks" maxlength="20"></label>
-   <label>Transfer Certificate (TC) no.<input id="tcNo" maxlength="30"></label>
-   <label>TC date<input id="tcDate" type="date"></label>
-   <label class="full">Brother / sister already studying in this school? <small>(name &amp; class)</small><input id="sibling" maxlength="100"></label>
+   <label class="full">Name of last school<input id="prevSchool" class="req" maxlength="100"></label>
+   <label class="full">Address of last school<input id="prevAddr" class="req" maxlength="120"></label>
+   <label>Last class passed<input id="prevClass" class="req" maxlength="20" placeholder="e.g. IV, VIII"></label>
+   <label>Board / type<select id="prevBoard" class="req"><option value="">— select —</option><option>WBBPE (Primary)</option><option>WBBSE</option><option>WBCHSE</option><option>CBSE</option><option>ICSE</option><option>Madrasah</option><option>Private / Other</option></select></label>
+   <label>Year of passing<input id="prevYear" class="req" inputmode="numeric" maxlength="4"></label>
+   <label>Marks / percentage obtained<input id="prevMarks" class="req" maxlength="20"></label>
+   <label>Transfer Certificate (TC) no.<input id="tcNo" class="req" maxlength="30"></label>
+   <label>TC date<input id="tcDate" class="req" type="date"></label>
+   <label class="full">Brother / sister already studying in this school? <small>(name &amp; class, optional)</small><input id="sibling" maxlength="100"></label>
   </div>
  </div>
 
@@ -145,7 +148,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
  <div class="card"><h2><b>7</b> Photo &amp; declaration</h2>
   <div class="photo">
    <img id="pv" alt="photo preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='92' height='116'%3E%3Crect width='92' height='116' fill='%23f4f7f4'/%3E%3Ctext x='46' y='62' font-size='11' text-anchor='middle' fill='%23888'%3EPhoto%3C/text%3E%3C/svg%3E">
-   <label style="flex:1;min-width:200px">Passport-size photo of student <small>(optional – JPG/PNG, auto-resized)</small><input id="photo" type="file" accept="image/*"></label>
+   <label style="flex:1;min-width:200px">Passport-size photo of student <small>(compulsory – JPG/PNG, auto-resized)</small><input id="photo" type="file" accept="image/*"></label>
   </div>
   <p class="note">Bring these originals when called for verification:</p>
   <ul class="docs"><li>Birth certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
@@ -157,71 +160,172 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
  </form>
  <div id="done"></div>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
+const XI=false;
 const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
+/* ===== Village list: add rows as  {v:'Village',po:'..',ps:'..',block:'..',dist:'Bankura',pin:'......',state:'West Bengal'} ===== */
+const VILLAGES=[
+ {v:'Taldangra',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'}
+];
 const $=id=>document.getElementById(id);
 const qs=new URLSearchParams(location.search),YEAR=+qs.get('y')||new Date().getFullYear()+1;
 const SES=YEAR+'-'+String(YEAR+1).slice(-2);
-$('ses').textContent='Admission application — Classes V to XI — Session '+SES;
-document.title='Admission Application '+SES+' — TFHS';
+$('ses').textContent=(XI?'Admission application — Class XI':'Admission application — Classes V to X')+' — Session '+SES;
+document.title='Admission Application '+(XI?'XI ':'')+SES+' — TFHS';
 let db=null;try{if(typeof firebase!=='undefined'){const a=firebase.apps.find(x=>x.name==='adm')||firebase.initializeApp(CFG,'adm');db=a.firestore()}}catch(e){}
 let photo='';
 const up=s=>String(s||'').trim().replace(/\s+/g,' ').toUpperCase();
 const val=id=>String($(id).value||'').trim();
-/* conditional fields */
+function fill(id,arr){$(id).innerHTML='<option value="">— select —</option>'+arr.map(x=>'<option>'+x+'</option>').join('')}
+fill('sex',['Male','Female','Other']);
+fill('nationality',['Indian','Other']);
+fill('religion',['Hindu','Muslim','Christian','Buddhist','Sikh','Jain','Other']);
+fill('tongue',['Bengali','Santali','Hindi','Urdu','Nepali','Odia','English','Other']);
+const OCC=['NA','Farmer / Agriculture','Agricultural labourer','Daily wage labourer','Migrant worker','Business / Shop','Private service','Government service','Teacher','Driver','Artisan / Craftsman / Tailor','Retired / Pensioner','Homemaker / Housewife','Unemployed','Deceased','Other'];
+fill('fatherOcc',OCC);fill('motherOcc',OCC);
+fill('guardianRel',['Father','Mother','Guardian','Brother','Sister','Grandfather','Grandmother','Uncle','Aunt','Other']);
+fill('medium',XI?['Bengali','Santali']:['Bengali','English','Other']);
+if(!XI)fill('cls',['V','VI','VII','VIII','IX','X']);
+$('vl').innerHTML=VILLAGES.map(x=>'<option value="'+x.v+'">').join('');
 function cond(){
- $('wStream').classList.toggle('hide',$('cls').value!=='XI');$('wSubj').classList.toggle('hide',$('cls').value!=='XI');
  $('wKanya').classList.toggle('hide',$('sex').value!=='Female');
  $('wDisab').classList.toggle('hide',$('disab').value!=='Yes');
  $('wBpl').classList.toggle('hide',$('bpl').value!=='Yes');
  $('wPerm').classList.toggle('hide',$('permSame').checked);
+ $('wNat').classList.toggle('hide',$('nationality').value!=='Other');
+ $('wTon').classList.toggle('hide',$('tongue').value!=='Other');
  const d=$('dob').value;if(d){const b=new Date(d),n=new Date(),a=n.getFullYear()-b.getFullYear()-((n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))?1:0);$('age').textContent='Age today: '+a+' years';}else $('age').textContent=''}
-['cls','sex','disab','bpl','permSame','dob'].forEach(i=>$(i).addEventListener('change',cond));cond();
-/* photo: resize to <=300px, jpeg */
+['sex','disab','bpl','permSame','dob','nationality','tongue'].forEach(i=>$(i).addEventListener('change',cond));cond();
+function villageFill(){const k=val('village').toLowerCase();const m=VILLAGES.find(x=>x.v.toLowerCase()===k);
+ if(m){['po','ps','block','dist','pin','state'].forEach(f=>$(f).value=m[f])}}
+$('village').addEventListener('input',villageFill);$('village').addEventListener('change',villageFill);
 $('photo').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
- r.onload=()=>{const im=new Image();im.onload=()=>{const m=300,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);photo=c.toDataURL('image/jpeg',.8);$('pv').src=photo};im.onerror=()=>{$('err').textContent='Could not read that image.'};im.src=r.result};r.readAsDataURL(f)});
-const IDS=['cls','medium','stream','subj','name','nameBn','sex','dob','pob','nationality','religion','tongue','caste','casteCert','blood','sikshaId','aadhaar','kanya','disab','disabType','bpl','bplNo','father','fatherOcc','fatherEdu','fatherMob','mother','motherOcc','motherEdu','motherMob','guardian','guardianRel','mobile','whatsapp','income','email','village','po','ps','block','dist','pin','state','transport','permAddr','prevSchool','prevAddr','prevClass','prevBoard','prevYear','prevMarks','tcNo','tcDate','sibling','accName','bank','accNo','ifsc'];
+ r.onload=()=>{const im=new Image();im.onload=()=>{const m=300,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);photo=c.toDataURL('image/jpeg',.8);$('pv').src=photo;$('photo').classList.remove('bad')};im.onerror=()=>{$('err').textContent='Could not read that image.'};im.src=r.result};r.readAsDataURL(f)});
+/* Aadhaar checksum (Verhoeff) */
+const VD=[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
+const VP=[[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
+function aadhaarOK(s){if(!/^[2-9]\d{11}$/.test(s))return false;let c=0;s.split('').reverse().forEach((ch,i)=>{c=VD[c][VP[i%8][+ch]]});return c===0}
+/* ===== Class XI: Madhyamik marks, stream, subjects ===== */
+const CORE=['Physics','Chemistry','Mathematics','Biology','Computer Science'];
+const COMMON=['Mathematics','History','Philosophy','Political Science','Sanskrit','Geography'];
+/* Madhyamik subject needing >=33 for each elective (null = no marks rule) */
+const ELIG={'Physics':'PS','Chemistry':'PS','Biology':'LS','Computer Science':'MA','Mathematics':'MA','History':'HI','Geography':'GE','Philosophy':null,'Political Science':null,'Sanskrit':null};
+const MKN={MA:'Mathematics',PS:'Physical Science',LS:'Life Science',HI:'History',GE:'Geography'};
+const SLOTS=['el1','el2','el3','opt'];
+function mk(c){const v=val('mp'+c);return /^\d+$/.test(v)?+v:null}
+function okSub(s){const c=ELIG[s];if(!c)return true;const m=mk(c);return m!==null&&m>=33}
+function poolFor(slot){const st=val('stream');if(!st)return [];
+ if(slot==='opt')return st==='Science'?CORE.concat(COMMON.filter(x=>CORE.indexOf(x)<0)):COMMON;
+ return st==='Science'?CORE:COMMON}
+function slotsNeeded(){return val('stream')==='Vocational'?['el1','el2']:['el1','el2','el3']}
+function drawSubj(){
+ const st=val('stream');$('wTrade').classList.toggle('hide',st!=='Vocational');$('wEl3').classList.toggle('hide',st==='Vocational');
+ $('lang1').value=val('medium')==='Santali'?'Santali':'Bengali';
+ SLOTS.forEach(s=>{const sel=$(s),cur=sel.value;
+  const taken=SLOTS.filter(x=>x!==s&&!(x==='el3'&&st==='Vocational')).map(x=>$(x).value).filter(Boolean);
+  let h='<option value="">'+(s==='opt'?'— none —':'— select —')+'</option>';
+  poolFor(s).forEach(x=>{if(taken.indexOf(x)>=0)return;const ok=okSub(x);h+='<option value="'+x+'"'+(ok?'':' disabled')+'>'+x+(ok?'':' — needs 33 in '+MKN[ELIG[x]])+'</option>'});
+  sel.innerHTML=h;sel.disabled=!st;if(cur&&poolFor(s).indexOf(cur)>=0&&okSub(cur)&&taken.indexOf(cur)<0)sel.value=cur});
+ const base=2+slotsNeeded().filter(s=>val(s)).length+(st==='Vocational'&&val('trade')?1:0);
+ const n=base+(val('opt')?1:0);
+ const c=$('cnt');c.className='cnt '+(base>=5?'ok':'no');
+ c.textContent=!st?'Select a stream first.':('Subjects chosen: '+n+' (minimum 5 = 2 languages + 3 electives'+(st==='Vocational'?'; trade counts as one':'')+')'+(base>=5?' ✔':' — choose the remaining subjects to enable Submit'));
+ $('btn').disabled=base<5}
+function pct(){const v=val('mpMarks');$('mpPct').value=/^\d+$/.test(v)&&+v<=700?(+v/7).toFixed(2)+' %':''}
+if(XI){
+ fill('stream',['Science','Arts','Vocational']);
+ const y=new Date().getFullYear();fill('mpYear',[y,y-1,y-2,y-3,y-4,y-5]);
+ $('stream').addEventListener('change',()=>{SLOTS.forEach(s=>$(s).value='');drawSubj()});
+ $('medium').addEventListener('change',()=>{if(!val('tongue')){$('tongue').value=val('medium')==='Santali'?'Santali':'Bengali';cond()}drawSubj()});
+ ['mpMA','mpPS','mpLS','mpHI','mpGE','trade'].forEach(i=>$(i).addEventListener('input',drawSubj));
+ $('mpMarks').addEventListener('input',pct);SLOTS.forEach(s=>$(s).addEventListener('change',drawSubj));
+ drawSubj()}
+const BASE=['cls','medium','name','nameBn','sex','dob','pob','nationality','religion','tongue','caste','casteCert','blood','sikshaId','aadhaar','kanya','disab','disabType','bpl','bplNo','father','fatherOcc','fatherEdu','fatherMob','mother','motherOcc','motherEdu','motherMob','guardian','guardianRel','mobile','whatsapp','income','email','village','po','ps','block','dist','pin','state','transport','permAddr','prevSchool','prevAddr','prevClass','prevBoard','prevYear','prevMarks','tcNo','tcDate','sibling','accName','bank','accNo','ifsc'];
+const XIIDS=['stream','lang1','lang2','el1','el2','el3','opt','trade','mpRoll','mpYear','mpMarks','mpPct','mpMA','mpPS','mpLS','mpHI','mpGE','subj'];
+const IDS=XI?BASE.concat(XIIDS.filter(x=>x!=='subj')):BASE;
 function check(){
- const e=[];
- if(!val('cls'))e.push('Select the class you are applying for.');
- if($('cls').value==='XI'&&!val('stream'))e.push('Select a stream for Class XI.');
- if(val('name').length<3)e.push('Enter the student\'s full name.');
- if(!val('dob'))e.push('Enter date of birth.');
- if(val('father').length<2)e.push('Enter father\'s name.');
- if(!/^\d{10}$/.test(val('mobile')))e.push('Primary contact mobile must be 10 digits.');
- ['fatherMob','motherMob','whatsapp'].forEach(i=>{if(val(i)&&!/^\d{10}$/.test(val(i)))e.push('Mobile number in "'+i.replace(/([A-Z])/g,' $1').toLowerCase()+'" must be 10 digits.')});
- if(val('aadhaar')&&!/^\d{12}$/.test(val('aadhaar')))e.push('Aadhaar must be 12 digits (or leave it blank).');
- if(val('pin')&&!/^\d{6}$/.test(val('pin')))e.push('PIN code must be 6 digits.');
- if(val('ifsc')&&!/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/.test(val('ifsc')))e.push('IFSC code looks wrong (example: SBIN0001234).');
- if(val('accNo')&&!/^\d{6,20}$/.test(val('accNo')))e.push('Bank account number should be digits only.');
- if(val('email')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email')))e.push('Email address looks wrong.');
- if(!val('village'))e.push('Enter village / town.');
- if(!$('decl').checked)e.push('Please tick the declaration.');
+ const e=[],bad=[];const E=(id,m)=>{e.push(m);bad.push(id)};
+ document.querySelectorAll('.bad').forEach(x=>x.classList.remove('bad'));
+ if(!val('cls'))E('cls','Select the class you are applying for.');
+ if(!val('medium'))E('medium','Select medium of instruction.');
+ if(val('name').length<3)E('name','Enter the student\'s full name.');
+ if(!val('sex'))E('sex','Select sex.');
+ if(!val('dob'))E('dob','Enter date of birth.');
+ else{const a=(Date.now()-new Date(val('dob')))/31557600000;if(a<4||a>30)E('dob','Date of birth looks wrong — please check.')}
+ if(!val('nationality'))E('nationality','Select nationality.');
+ else if(val('nationality')==='Other'&&val('nationalityO').length<2)E('nationalityO','Specify nationality.');
+ if(!val('religion'))E('religion','Select religion.');
+ if(!val('tongue'))E('tongue','Select mother tongue.');
+ else if(val('tongue')==='Other'&&val('tongueO').length<2)E('tongueO','Specify mother tongue.');
+ if(!/^\d{14}$/.test(val('sikshaId')))E('sikshaId','Banglar Siksha Portal ID must be exactly 14 digits.');
+ if(!/^\d{12}$/.test(val('aadhaar')))E('aadhaar','Student\'s Aadhaar must be exactly 12 digits.');
+ else if(!aadhaarOK(val('aadhaar')))E('aadhaar','This Aadhaar number is not valid — please re-check each digit.');
+ if(val('father').length<2)E('father','Enter father\'s name.');
+ if(!val('fatherOcc'))E('fatherOcc','Select father\'s occupation (NA if none).');
+ if(!val('motherOcc'))E('motherOcc','Select mother\'s occupation (NA if none).');
+ if(!/^[6-9]\d{9}$/.test(val('mobile')))E('mobile','Primary contact mobile must be a valid 10-digit number.');
+ if(!val('guardianRel'))E('guardianRel','Select the relation of the primary contact person with the student.');
+ ['fatherMob','motherMob','whatsapp'].forEach(i=>{if(val(i)&&!/^[6-9]\d{9}$/.test(val(i)))E(i,'Mobile number in "'+i.replace(/([A-Z])/g,' $1').toLowerCase()+'" must be a valid 10-digit number.')});
+ if(val('ifsc')&&!/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/.test(val('ifsc')))E('ifsc','IFSC code looks wrong (example: SBIN0001234).');
+ if(val('accNo')&&!/^\d{6,20}$/.test(val('accNo')))E('accNo','Bank account number should be digits only.');
+ if(val('email')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email')))E('email','Email address looks wrong.');
+ [['village','village / town'],['po','post office'],['ps','police station'],['block','block'],['dist','district'],['state','state']].forEach(p=>{if(val(p[0]).length<2)E(p[0],'Enter '+p[1]+'.')});
+ if(!/^\d{6}$/.test(val('pin')))E('pin','PIN code must be 6 digits.');
+ if(!$('permSame').checked&&val('permAddr').length<5)E('permAddr','Enter the permanent address.');
+ [['prevSchool','name of last school'],['prevAddr','address of last school'],['prevClass','last class passed'],['prevMarks','marks / percentage'],['tcNo','TC number']].forEach(p=>{if(!val(p[0]))E(p[0],'Previous school: enter '+p[1]+'.')});
+ if(!val('prevBoard'))E('prevBoard','Previous school: select board / type.');
+ if(!/^(19|20)\d\d$/.test(val('prevYear')))E('prevYear','Previous school: enter a 4-digit year of passing.');
+ if(!val('tcDate'))E('tcDate','Previous school: enter TC date.');
+ if(XI){
+  if(!val('stream'))E('stream','Select a stream.');
+  if(!val('mpRoll'))E('mpRoll','Enter Madhyamik roll & number.');
+  if(!val('mpYear'))E('mpYear','Select Madhyamik year of passing.');
+  if(!/^\d+$/.test(val('mpMarks'))||+val('mpMarks')>700||+val('mpMarks')<1)E('mpMarks','Madhyamik total marks must be between 1 and 700.');
+  ['MA','PS','LS','HI','GE'].forEach(c=>{const v=val('mp'+c);if(!/^\d+$/.test(v)||+v>100)E('mp'+c,'Enter Madhyamik marks of '+MKN[c]+' (0 to 100).')});
+  if(val('stream')){
+   slotsNeeded().forEach((s,i)=>{if(!val(s))E(s,'Choose elective '+(i+1)+'.')});
+   if(val('stream')==='Vocational'&&!val('trade'))E('trade','Enter the vocational trade / course.');
+   SLOTS.forEach(s=>{const v=val(s);if(v&&!okSub(v))E(s,v+' needs at least 33 in Madhyamik '+MKN[ELIG[v]]+'.')});
+   const ch=SLOTS.filter(s=>!(s==='el3'&&val('stream')==='Vocational')).map(val).filter(Boolean);
+   if(new Set(ch).size!==ch.length)E('el1','The same subject is chosen twice.');
+   if(val('stream')==='Science'&&['el1','el2','el3'].filter(s=>CORE.indexOf(val(s))>=0).length<3)E('el1','Science: choose at least 3 from Physics, Chemistry, Mathematics, Biology, Computer Science.');
+  }}
+ if(!photo)E('photo','Upload the student\'s passport-size photo.');
+ if(!$('decl').checked)E('decl','Please tick the declaration.');
+ bad.forEach(i=>{const x=$(i);if(x)x.classList.add('bad')});
  return e}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.querySelectorAll('input,select,textarea').forEach(x=>{x.addEventListener('input',()=>x.classList.remove('bad'));x.addEventListener('change',()=>x.classList.remove('bad'))});
 $('f').addEventListener('submit',async ev=>{
  ev.preventDefault();$('err').textContent='';
  if($('hp').value)return;
- const er=check();if(er.length){$('err').textContent='Please fix:\n• '+er.join('\n• ');window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});return}
+ const er=check();if(er.length){$('err').textContent='Please fix:\n• '+er.join('\n• ');const b=document.querySelector('.bad');if(b)b.scrollIntoView({behavior:'smooth',block:'center'});return}
  if(!db){$('err').textContent='Cannot connect to the school server. Check your internet and try again.';return}
  const d={year:YEAR,status:'pending'};IDS.forEach(i=>{d[i]=val(i)});
+ if(d.nationality==='Other')d.nationality=up(val('nationalityO'));
+ if(d.tongue==='Other')d.tongue=up(val('tongueO'));
  ['name','father','mother','guardian','accName'].forEach(k=>d[k]=up(d[k]));d.ifsc=up(d.ifsc);
+ if(XI){d.cls='XI';d.mpPct=(+d.mpMarks/7).toFixed(2);
+  d.subj='Language 1: '+d.lang1+'; Language 2: '+d.lang2+'; Electives: '+['el1','el2','el3'].map(s=>d[s]).filter(Boolean).join(', ')+(d.stream==='Vocational'?'; Trade: '+d.trade:'')+(d.opt?'; Optional: '+d.opt:'')}
  d.permSame=$('permSame').checked;if(d.permSame)d.permAddr='';
  d.photo=photo;d.decl=true;
  d.ref='TF'+String(YEAR).slice(-2)+'-'+Math.random().toString(36).slice(2,7).toUpperCase()+Date.now().toString(36).slice(-3).toUpperCase();
  d.ts=firebase.firestore.FieldValue.serverTimestamp();
  $('btn').disabled=true;$('btn').textContent='Submitting…';
- try{await db.collection('admApps').add(d);
+ try{
+  /* one document per Portal ID + session: a 2nd attempt is an "update", which the public rules refuse */
+  await db.collection('admApps').doc('P'+d.sikshaId+'_'+YEAR).set(d);
   $('f').classList.add('hide');
   $('done').innerHTML='<div class="card ack"><h2 style="justify-content:center">✔ Application received</h2><div>Your application reference number</div><div class="ref">'+esc(d.ref)+'</div>'+
-   '<table><tr><td>Student</td><td><b>'+esc(d.name)+'</b></td></tr><tr><td>Class applied</td><td>'+esc(d.cls)+(d.stream?' ('+esc(d.stream)+')':'')+'</td></tr><tr><td>Date of birth</td><td>'+esc(d.dob)+'</td></tr><tr><td>Father</td><td>'+esc(d.father)+'</td></tr><tr><td>Contact</td><td>'+esc(d.mobile)+'</td></tr><tr><td>Session</td><td>'+SES+'</td></tr></table>'+
+   '<table><tr><td>Student</td><td><b>'+esc(d.name)+'</b></td></tr><tr><td>Class applied</td><td>'+esc(d.cls)+(d.stream?' ('+esc(d.stream)+')':'')+'</td></tr><tr><td>Portal ID</td><td>'+esc(d.sikshaId)+'</td></tr><tr><td>Date of birth</td><td>'+esc(d.dob)+'</td></tr><tr><td>Father</td><td>'+esc(d.father)+'</td></tr><tr><td>Contact</td><td>'+esc(d.mobile)+'</td></tr><tr><td>Session</td><td>'+SES+'</td></tr></table>'+
    '<p style="font-size:13.5px">Please keep this reference number. The school will <b>verify</b> your application (staff) and then it will be <b>approved</b> (Headmaster / Admin). You will be called on <b>'+esc(d.mobile)+'</b> to bring the original documents.</p>'+
    '<p class="no-print"><button class="sec" onclick="window.print()">🖨 Print / Save acknowledgement</button></p></div>';
   window.scrollTo(0,0)}
- catch(e){$('btn').disabled=false;$('btn').textContent='Submit application';$('err').textContent='Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.'}
+ catch(e){$('btn').disabled=false;$('btn').textContent='Submit application';
+  if(e.code==='permission-denied'){$('sikshaId').classList.add('bad');$('err').textContent='An application with Banglar Siksha Portal ID '+d.sikshaId+' has already been submitted for session '+SES+'. A duplicate application is not allowed.\nIf you think this is a mistake, please contact the school.'}
+  else $('err').textContent='Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.'}
 });
 </script>
 </body>
