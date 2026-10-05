@@ -707,7 +707,8 @@
 <header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span></div></header>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
 <div class="gp">DAILY</div><button data-v="cert" class="on"><span class="ic">📜</span><span class="l">Certificate</span></button>
-<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
+<div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button>
+<button data-v="adm"><span class="ic">🎓</span><span class="l">Admission</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <div id="dataView">
@@ -959,28 +960,34 @@
  body.print-fee .page,body.print-fee .dashboard-panel,body.print-fee .wifs-panel,body.print-fee .wifs-sheet,body.print-fee #rollSheet,body.print-fee #dataView{display:none!important}
  body.print-fee #feeView{display:block!important}
  body.print-fee .fee-ctl{display:none!important}
+ body.print-fee #admView,body.print-fee #applyView{display:none!important}
  body.print-fee #feeSheets{zoom:1}
  body.print-fee .fee-page{border:none;margin:0;height:209mm}
 }
 </style>
 <div id="feeView">
- <div class="dv-c fee-ctl"><h3>Next-year admission fee receipts — class-wise (promoted to next class)</h3>
+ <div class="dv-c fee-ctl"><h3>Admission fee receipts — class-wise (next year or this year, plus new admission)</h3>
   <div class="fc-grid">
-   <label>New session <input id="fcSes" type="text"></label>
-   <label>Currently studying in <select id="fcCls"><option value="">All (V → XI)</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option></select></label>
+   <label>Receipt for <select id="fcMode" onchange="FEE.mode()"><option value="next">Next year — promote to next class</option><option value="same">This year (2026) — same class</option><option value="adm">Admission list — final class / section / roll</option></select></label>
+   <label>Session <input id="fcSes" type="text"></label>
+   <label>Roll No. on receipt <select id="fcRoll"><option value="blank">Leave blank (write by hand)</option><option value="old">Use current roll no.</option></select></label>
+   <label>Currently studying in <select id="fcCls"><option value="">All (V → XI)</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
    <label>Section (current) <select id="fcSec"><option value="">All</option><option>A</option><option>B</option><option>C</option><option value="__">No section</option></select></label>
    <label>Roll from <input id="fcFrom" type="number" min="0"></label>
    <label>Roll to <input id="fcTo" type="number" min="0"></label>
-   <label>Blank Class V receipts (new admission) <input id="fcNew" type="number" min="0" value="0"></label>
+   <label>New admission — class <select id="fcNewCls"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
+   <label>New admission — how many blank receipts <input id="fcNew" type="number" min="0" value="0"></label>
+   <label style="grid-column:1/-1">New admission — student names (optional, one per line; overrides the count) <textarea id="fcNames" rows="3" style="padding:7px;border:1px solid #c9d6cc;border-radius:8px;font-size:13px;font-family:inherit"></textarea></label>
    <label class="fc-chk"><input id="fcKeep" type="checkbox" checked> Keep current section on receipt</label>
+   <label class="fc-chk"><input id="fcOnlyNew" type="checkbox"> Only new admission receipts (skip existing students)</label>
   </div>
   <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
    <button class="dv-b" type="button" onclick="FEE.gen()">Generate receipts</button>
    <button class="dv-b" type="button" style="background:#8a5600" onclick="FEE.print()">🖨 Print A4 landscape / Save PDF</button>
   </div>
-  <p id="fcMsg">Class XII students are leaving, so they get no receipt. Pick a class and press Generate.</p>
+  <p id="fcMsg">Next year: Class XII students are leaving, so they get no receipt. Pick a class and press Generate.</p>
  </div>
- <div class="dv-c fee-ctl"><h3>Fee structure by new class (Rs.) — editable, saved in this browser</h3><div id="fcFees"></div></div>
+ <div class="dv-c fee-ctl"><h3>Fee structure by class on receipt (Rs.) — editable, saved in this browser</h3><div id="fcFees"></div></div>
  <div class="fee-wrap"><div id="feeSheets"></div></div>
 </div>
 
@@ -1890,7 +1897,7 @@ const WIFS = (function(){
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],data:['Data & Year','Student database by year, live from Firebase']};
+ const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase']};
  const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
  function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
  function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
@@ -1947,7 +1954,130 @@ const ROLL=(function(){
   print(){render();document.body.classList.add('print-roll');const done=()=>{document.body.classList.remove('print-roll');window.removeEventListener('afterprint',done)};window.addEventListener('afterprint',done);window.print()}};
 })();
 </script>
-                <script>
+                <style>
+/* ===== ADMISSION ===== */
+#admView,#applyView{display:none;font-family:'Segoe UI',Arial,sans-serif;color:#1d2b22}
+@media screen{
+ body[data-view=adm] #admView{display:flex;width:100%;max-width:1200px;flex-direction:column;gap:14px}
+ body[data-view=adm] .dashboard-panel,body[data-view=adm] .page,body[data-view=adm] .wifs-panel,body[data-view=adm] .wifs-sheet,body[data-view=adm] #dataView{display:none!important}
+}
+@media print{#admView,#applyView{display:none!important}}
+.am-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.am-grid label{font-size:11px;font-weight:700;display:flex;flex-direction:column;gap:3px;color:#333}
+.am-grid input,.am-grid select{padding:7px;border:1px solid #c9d6cc;border-radius:8px;font-size:13px}
+.am-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.am-msg{font-size:13px;font-weight:600;color:#145828;margin:8px 0 0}.am-msg.bad{color:#b00020}
+.am-t{width:100%;border-collapse:collapse;font-size:12.5px}.am-t th{background:#145828;color:#fff;padding:6px;position:sticky;top:0}
+.am-t td{padding:3px 5px;border-bottom:1px solid #e6eee8;text-align:center}.am-t td.l{text-align:left}
+.am-t input[type=text],.am-t input[type=number],.am-t select{width:62px;padding:4px;border:2px solid #b78600;background:#FFF3C4;border-radius:6px;font-weight:800;color:#0d3b1c;text-align:center}
+.am-box{max-height:420px;overflow:auto;border:1px solid #e0e8e2;border-radius:8px;margin-top:8px}
+.am-yel{background:#FFC61A!important;color:#0d3b1c!important;font-weight:800!important;border:2px solid #b78600!important}
+.am-ok{background:#e6f4ea;border-left:4px solid #145828;padding:8px 12px;border-radius:6px;margin-top:8px;font-size:13px}
+.am-link{font-family:monospace;background:#f3f6f3;padding:7px 9px;border-radius:8px;word-break:break-all;font-size:12px;flex:1;min-width:220px}
+details.am-d{margin-top:10px;font-size:12px}details.am-d pre{background:#10231a;color:#d6ffe0;padding:10px;border-radius:8px;overflow:auto;font-size:11.5px}
+/* public application form */
+body.apply-mode{padding:0!important;display:block!important;background:#eef3ee}
+body.apply-mode>*:not(#applyView):not(script):not(style):not(link){display:none!important}
+body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:16px}
+.ap-card{background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.12);padding:18px 20px;border-top:5px solid #145828}
+.ap-card h1{font-size:19px;color:#145828;margin:0 0 2px}.ap-card p.s{margin:0 0 14px;color:#555;font-size:13px}
+.ap-card label{display:flex;flex-direction:column;font-size:12px;font-weight:700;gap:3px;margin-bottom:10px}
+.ap-card input,.ap-card select,.ap-card textarea{padding:9px;border:1px solid #c9d6cc;border-radius:8px;font-size:14px;font-family:inherit}
+.ap-two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}@media(max-width:520px){.ap-two{grid-template-columns:1fr}}
+.ap-card button{width:100%;padding:12px;border:0;border-radius:10px;background:#145828;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.ap-hp{position:absolute;left:-9999px}
+</style>
+<div id="admView">
+ <div class="dv-c"><h3>Admission — session setup</h3>
+  <div class="am-grid">
+   <label>Admission year (new session starts in) <select id="amYear" onchange="ADM.refresh()"></select></label>
+   <label>Session on receipts <input id="amSes" readonly></label>
+  </div>
+  <div class="am-row">
+   <button class="dv-b" type="button" onclick="ADM.refresh()">⟳ Load placed students</button>
+   <button class="dv-b" type="button" style="background:#8a5600" onclick="ADM.publish()">⬆ Publish to Data &amp; Year (certificates)</button>
+   <button class="dv-b g" type="button" onclick="ADM.toReceipts()">🧾 Fee receipts for this list</button>
+  </div>
+  <p id="amMsg" class="am-msg">Sign in (sidebar) as class teacher / admin to save. Everything saved here goes to one shared online database.</p>
+  <div id="amSum"></div>
+ </div>
+ <div class="dv-c"><h3>1 · Promote old students — class teacher sets section &amp; roll</h3>
+  <div class="am-grid">
+   <label>Studying now in class <select id="amFrom"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option></select></label>
+   <label>Current section <select id="amFSec"><option value="">All</option><option>A</option><option>B</option><option>C</option><option value="__">No section</option></select></label>
+   <label>Roll order for auto roll <select id="amOrd"><option value="old">Keep old roll order</option><option value="name">Name A → Z</option></select></label>
+  </div>
+  <div class="am-row">
+   <button class="dv-b" type="button" onclick="ADM.loadProm()">Load students of this class</button>
+   <button class="dv-b g" type="button" onclick="ADM.autoRoll()">Auto roll no.</button>
+   <button class="dv-b" type="button" style="background:#8a5600" onclick="ADM.savePromo()">💾 Save placement</button>
+  </div>
+  <div id="amProm" class="am-box" style="display:none"></div>
+  <p id="amPMsg" class="am-msg"></p>
+ </div>
+ <div class="dv-c"><h3>2 · New admission — one by one (roll no. is automatic)</h3>
+  <div class="am-grid">
+   <label>Student name <input id="naName" class="am-yel" autocomplete="off"></label>
+   <label>Sex <select id="naSex"><option>Male</option><option>Female</option></select></label>
+   <label>Admit to class <select id="naCls" class="am-yel" onchange="ADM.preview()"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
+   <label>Section <select id="naSec" class="am-yel" onchange="ADM.preview()"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
+   <label>Roll no. (auto) <input id="naRoll" class="am-yel" readonly></label>
+   <label>Father's name <input id="naFat"></label>
+   <label>Mother's name <input id="naMot"></label>
+   <label>Date of birth <input id="naDob" type="date"></label>
+   <label>Mobile <input id="naMob" inputmode="numeric" maxlength="10"></label>
+   <label>Caste <select id="naCaste"><option>GENERAL</option><option>OBC-A</option><option>OBC-B</option><option>SC</option><option>ST</option></select></label>
+   <label>Banglar Siksha ID (if any) <input id="naSik"></label>
+   <label>Village <input id="naVil" value="Taldangra"></label>
+  </div>
+  <div class="am-row"><button class="dv-b" type="button" onclick="ADM.addNew()">➕ Admit &amp; assign roll no.</button></div>
+  <div id="naLast"></div>
+ </div>
+ <div class="dv-c"><h3>3 · Online application form (share link)</h3>
+  <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button></div>
+  <p class="am-msg" id="amAMsg">Parents / new students open the link on their phone, fill the form and submit. It comes here as “pending” — pick class &amp; section and press Admit: roll no. is given automatically.</p>
+  <div id="amApps" class="am-box" style="display:none"></div>
+  <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules)</b></summary>
+   <p>In Firebase console → Firestore → Rules, add these blocks inside <code>match /databases/{database}/documents {</code>:</p>
+<pre>match /admApps/{id} {
+  allow create: if request.resource.data.name is string
+                && request.resource.data.name.size() &lt; 120
+                && request.resource.data.status == 'pending';
+  allow read, update, delete: if request.auth != null;
+}
+match /admStudents/{id} { allow read, write: if request.auth != null; }
+match /admCounters/{id} { allow read, write: if request.auth != null; }</pre></details>
+ </div>
+ <div class="dv-c"><h3>Placed students (this admission year)</h3>
+  <div class="am-grid"><label>Class <select id="plCls" onchange="ADM.drawPlaced()"><option value="">All</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
+   <label>Section <select id="plSec" onchange="ADM.drawPlaced()"><option value="">All</option><option>A</option><option>B</option><option>C</option></select></label></div>
+  <div id="amPlaced" class="am-box"></div>
+ </div>
+</div>
+<div id="applyView">
+ <div class="ap-card">
+  <h1>Taldangra Fulmati High School [H.S.]</h1>
+  <p class="s" id="apSub">Admission application form</p>
+  <form id="apForm" onsubmit="return ADM.apply(event)">
+   <label>Student's full name *<input id="apName" required maxlength="80" autocomplete="off"></label>
+   <div class="ap-two"><label>Sex *<select id="apSex"><option>Male</option><option>Female</option></select></label>
+   <label>Date of birth *<input id="apDob" type="date" required></label></div>
+   <div class="ap-two"><label>Class applying for *<select id="apCls"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option></select></label>
+   <label>Caste / category<select id="apCaste"><option>GENERAL</option><option>OBC-A</option><option>OBC-B</option><option>SC</option><option>ST</option></select></label></div>
+   <label>Father's name *<input id="apFat" required maxlength="80"></label>
+   <label>Mother's name<input id="apMot" maxlength="80"></label>
+   <div class="ap-two"><label>Guardian's mobile *<input id="apMob" required inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10 digits"></label>
+   <label>Village *<input id="apVil" required maxlength="60"></label></div>
+   <label>Previous school &amp; class<input id="apPrev" maxlength="100"></label>
+   <label>Banglar Siksha ID (if known)<input id="apSik" maxlength="20"></label>
+   <input class="ap-hp" id="apHp" tabindex="-1" autocomplete="off">
+   <button type="submit" id="apBtn">Submit application</button>
+   <p id="apMsg" class="am-msg"></p>
+  </form>
+ </div>
+</div>
+
+<script>
 /* ===== NEXT-YEAR FEE RECEIPTS (class-wise, promoted to next class) ===== */
 const FEE=(function(){
  const $=id=>document.getElementById(id);
@@ -1964,8 +2094,8 @@ const FEE=(function(){
  function words(n){n=Math.round(n);if(!n)return 'Zero Only';let o=[];const th=Math.floor(n/1000),r=n%1000;if(th)o.push(w2(th>=20||th<20?th:th)+' Thousand');if(r)o.push(w3(r));return o.join(' ')+' Only'}
  const tot=c=>fees[c].reduce((a,b)=>a+(+b||0),0);
  function drawFees(){
-  $('fcFees').innerHTML='<table class="fc-tbl"><tr><th>New class</th>'+HEADS.map(h=>'<th>'+h+'</th>').join('')+'<th>Total</th></tr>'+
-   ORDER.slice(1).map(c=>'<tr><td><b>'+c+'</b></td>'+fees[c].map((v,i)=>'<td><input type="number" min="0" data-c="'+c+'" data-i="'+i+'" value="'+v+'"></td>').join('')+'<td id="fcT_'+c+'"><b>'+tot(c)+'</b></td></tr>').join('')+'</table>';
+  $('fcFees').innerHTML='<table class="fc-tbl"><tr><th>Class</th>'+HEADS.map(h=>'<th>'+h+'</th>').join('')+'<th>Total</th></tr>'+
+   ORDER.map(c=>'<tr><td><b>'+c+'</b></td>'+fees[c].map((v,i)=>'<td><input type="number" min="0" data-c="'+c+'" data-i="'+i+'" value="'+v+'"></td>').join('')+'<td id="fcT_'+c+'"><b>'+tot(c)+'</b></td></tr>').join('')+'</table>';
   $('fcFees').querySelectorAll('input').forEach(e=>e.oninput=()=>{fees[e.dataset.c][+e.dataset.i]=+e.value||0;$('fcT_'+e.dataset.c).innerHTML='<b>'+tot(e.dataset.c)+'</b>';try{localStorage.setItem('tfhsFees',JSON.stringify(fees))}catch(x){}})}
  function card(tag,no,name,cls,sec,roll,ses){
   const f=fees[cls],t=tot(cls),amt=v=>v?Number(v).toFixed(2):'-';
@@ -1978,25 +2108,193 @@ const FEE=(function(){
   HEADS.map((h,i)=>'<tr><td>'+(i+1)+'. '+h+'</td><td class="fr-r">'+amt(f[i])+'</td></tr>').join('')+
   '<tr class="fr-tot"><td class="fr-r">TOTAL -</td><td class="fr-r">'+t.toFixed(2)+'</td></tr></tbody></table></div>'+
   '<div><div class="fr-words"><strong>Total in words:</strong> '+words(t)+'</div><div class="fr-foot"><div class="fr-seal">SCHOOL SEAL</div><div class="fr-sig">Receiving Officer</div></div></div></div>'}
+ function mode(){const y=new Date().getFullYear(),m=$('fcMode').value,same=m==='same';$('fcSes').value=m==='adm'&&window.ADM?ADM.ses(ADM.year()):(same?y+'-'+String(y+1).slice(-2):(y+1)+'-'+String(y+2).slice(-2))}
  function gen(){
-  const ses=$('fcSes').value.trim(),c0=$('fcCls').value,s0=$('fcSec').value,a=$('fcFrom').value,b=$('fcTo').value,keep=$('fcKeep').checked,nn=+$('fcNew').value||0;
-  let rows=STUDENT_DB.filter(s=>{const c=String(s.cls).trim().toUpperCase();if(!NEXT[c])return false;if(c0&&c!==c0)return false;
+  const md=$('fcMode').value,adm=md==='adm',same=md==='same'||adm,ses=$('fcSes').value.trim(),c0=$('fcCls').value,s0=$('fcSec').value,a=$('fcFrom').value,b=$('fcTo').value,keep=$('fcKeep').checked,useRoll=adm||$('fcRoll').value==='old',onlyNew=$('fcOnlyNew').checked;
+  const names=$('fcNames').value.split('\n').map(x=>x.trim()).filter(Boolean),nn=names.length||(+$('fcNew').value||0),nc=$('fcNewCls').value;
+  const tgt=c=>same?c:NEXT[c];
+  let rows=onlyNew?[]:(adm?ADM.rows():STUDENT_DB).filter(s=>{const c=String(s.cls).trim().toUpperCase();if(!ORDER.includes(c)||!tgt(c))return false;if(c0&&c!==c0)return false;
    const sec=String(s.sec||'').trim();if(s0==='__'?sec!=='':(s0&&sec.toUpperCase()!==s0))return false;
    const r=parseInt(s.roll,10)||0;if(a!==''&&r<+a)return false;if(b!==''&&r>+b)return false;return true});
   rows.sort((x,y)=>ORDER.indexOf(String(x.cls).toUpperCase())-ORDER.indexOf(String(y.cls).toUpperCase())||String(x.sec||'').localeCompare(String(y.sec||''))||(parseInt(x.roll,10)||0)-(parseInt(y.roll,10)||0));
-  const seen={};let html='',n=0;
+  const seen={},ser={};let html='',n=0;
   const page=(no,name,cls,sec,roll)=>{html+='<div class="fee-page">'+card('COUNTERPART (SCHOOL COPY)',no,name,cls,sec,roll,ses)+card('ORIGINAL (STUDENT COPY)',no,name,cls,sec,roll,ses)+'</div>';n++};
-  rows.forEach(s=>{const cls=NEXT[String(s.cls).trim().toUpperCase()];const secRaw=String(s.sec||'').trim();
-   const secShow=(keep&&cls!=='XI'&&cls!=='XII')?secRaw:'';const sl=(secRaw.match(/[A-C]/i)||[''])[0].toUpperCase();
-   let no=ses+'_'+cls+(keep?sl:'')+s.roll;if(seen[no]){seen[no]++;no+='-'+seen[no]}else seen[no]=1;page(no,s.name,cls,secShow,s.roll)});
-  for(let i=1;i<=nn;i++)page(ses+'_VNEW'+i,'','V','','');
+  rows.forEach(s=>{const cls=tgt(String(s.cls).trim().toUpperCase());const secRaw=String(s.sec||'').trim();
+   const secShow=(same||(keep&&cls!=='XI'&&cls!=='XII'))?secRaw:'';const sl=(secRaw.match(/[A-C]/i)||[''])[0].toUpperCase();
+   const k=cls+(keep?sl:'');ser[k]=(ser[k]||0)+1;
+   let no=ses+'_'+cls+(keep?sl:'')+(useRoll?s.roll:String(ser[k]).padStart(3,'0'));if(seen[no]){seen[no]++;no+='-'+seen[no]}else seen[no]=1;
+   page(no,s.name,cls,secShow,useRoll?s.roll:'')});
+  for(let i=1;i<=nn;i++)page(ses+'_'+nc+'NEW'+String(i).padStart(3,'0'),names[i-1]||'',nc,'','');
   $('feeSheets').innerHTML=html;
   $('fcMsg').textContent=n?('Generated '+n+' receipt sheet(s), 2 copies each ('+(n*2)+' receipts) for session '+ses+'. Press Print / Save PDF.'):'No students matched this filter.';
   $('fcMsg').className=n?'':'bad'}
+ function one(s,sesStr){const no=sesStr+'_'+s.cls+(s.sec||'')+s.roll;$('feeSheets').innerHTML='<div class="fee-page">'+card('COUNTERPART (SCHOOL COPY)',no,s.name,s.cls,s.sec||'',s.roll,sesStr)+card('ORIGINAL (STUDENT COPY)',no,s.name,s.cls,s.sec||'',s.roll,sesStr)+'</div>';print()}
  function print(){if(!$('feeSheets').innerHTML)gen();if(!$('feeSheets').innerHTML)return;document.body.classList.add('print-fee');const d=()=>{document.body.classList.remove('print-fee');window.removeEventListener('afterprint',d)};window.addEventListener('afterprint',d);window.print()}
- const y=new Date().getFullYear();$('fcSes').value=(y+1)+'-'+String(y+2).slice(-2);drawFees();
- return{gen,print,words}
+ mode();drawFees();
+ return{gen,print,words,mode,one}
 })();
 </script>
+<script>
+/* ===== ADMISSION: promote old students, admit new ones, online form, auto roll ===== */
+const ADM=(function(){
+ const $=id=>document.getElementById(id);
+ const CLS=['V','VI','VII','VIII','IX','X','XI','XII'],NEXT={V:'VI',VI:'VII',VII:'VIII',VIII:'IX',IX:'X',X:'XI',XI:'XII'};
+ const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const up=s=>String(s||'').trim().replace(/\s+/g,' ').toUpperCase();
+ let db=null,auth=null,placed=[],apps=[],prom=[],last=[];
+ const fb=typeof firebase!=='undefined';
+ try{if(fb){const a=firebase.apps.find(x=>x.name==='tfdb');if(a){db=a.firestore();auth=a.auth()}}}catch(e){}
+ const isApply=/[?&]apply=1/.test(location.search);
+ const param=k=>{const m=location.search.match(new RegExp('[?&]'+k+'=([^&]*)'));return m?decodeURIComponent(m[1]):''};
+ const yr=()=>+$('amYear').value||new Date().getFullYear()+1;
+ const ses=y=>y+'-'+String(y+1).slice(-2);
+ const secOf=s=>String(s.sec||'').trim().toUpperCase();
+ const ci=c=>CLS.indexOf(String(c).toUpperCase());
+ const sorter=(a,b)=>ci(a.cls)-ci(b.cls)||secOf(a).localeCompare(secOf(b))||(parseInt(a.roll,10)||0)-(parseInt(b.roll,10)||0);
+ function msg(m,bad,id){const e=$(id||'amMsg');e.textContent=m;e.className='am-msg'+(bad?' bad':'')}
+ function need(id){if(!db){msg('Firebase is not available (check internet).',true,id);return false}
+  if(!(auth&&auth.currentUser)){msg('Sign in first (sidebar → Sign in).',true,id);return false}return true}
+ const docId=(y,c,s,r)=>y+'_'+c+'_'+(s||'-')+'_'+r;
+ const cntId=(y,c,s)=>y+'_'+c+'_'+(s||'-');
+ const maxRoll=(c,s)=>placed.filter(p=>p.cls===c&&secOf(p)===(s||'')).reduce((m,p)=>Math.max(m,parseInt(p.roll,10)||0),0);
+
+ /* ---------- placed list ---------- */
+ async function refresh(quiet){
+  $('amSes').value=ses(yr());$('amLink').textContent=link();
+  if(!(db&&auth&&auth.currentUser)){if(!quiet)msg('Sign in (sidebar) to load the admission database.',true);return false}
+  try{const q=await db.collection('admStudents').where('year','==',yr()).get();
+   placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);
+   summary();drawPlaced();preview();if(!quiet)msg('Loaded '+placed.length+' placed students for '+ses(yr())+'.');return true}
+  catch(e){msg('Load failed: '+(e.code||e.message),true);return false}}
+ function summary(){
+  const g={};placed.forEach(p=>{const k=p.cls+(secOf(p)?'-'+secOf(p):'');g[k]=g[k]||{n:0,max:0,pro:0,nw:0};g[k].n++;g[k].max=Math.max(g[k].max,parseInt(p.roll,10)||0);if(p.type==='new')g[k].nw++;else g[k].pro++});
+  const ks=Object.keys(g).sort((a,b)=>ci(a.split('-')[0])-ci(b.split('-')[0])||a.localeCompare(b));
+  $('amSum').innerHTML=ks.length?'<div class="am-box"><table class="am-t"><tr><th>Class-Sec</th><th>Promoted</th><th>New</th><th>Total</th><th>Last roll</th><th>Next roll</th></tr>'+ks.map(k=>'<tr><td><b>'+k+'</b></td><td>'+g[k].pro+'</td><td>'+g[k].nw+'</td><td>'+g[k].n+'</td><td>'+g[k].max+'</td><td><b>'+(g[k].max+1)+'</b></td></tr>').join('')+'</table></div>':'<p class="am-msg">No student placed for this year yet. Start with step 1 (promote old students).</p>'}
+ function drawPlaced(){
+  const c=$('plCls').value,s=$('plSec').value;const rows=placed.filter(p=>(!c||p.cls===c)&&(!s||secOf(p)===s));
+  $('amPlaced').innerHTML=rows.length?'<table class="am-t"><tr><th>Class</th><th>Sec</th><th>Roll</th><th>Name</th><th>Type</th><th>Father</th><th>Mobile</th><th></th></tr>'+rows.map(p=>'<tr><td>'+p.cls+'</td><td>'+esc(secOf(p))+'</td><td><b>'+esc(p.roll)+'</b></td><td class="l">'+esc(p.name)+'</td><td>'+(p.type==='new'?'New':'Promoted')+'</td><td class="l">'+esc(p.father)+'</td><td>'+esc(p.mobile)+'</td><td><button class="dv-b g" onclick="ADM.receipt(\''+p._id+'\')">🧾</button> <button class="dv-b g" style="color:#b00020" onclick="ADM.del(\''+p._id+'\')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">Nothing to show.</p>'}
+ async function del(id){if(!need())return;const p=placed.find(x=>x._id===id);if(!p||!confirm('Remove '+p.name+' ('+p.cls+' '+secOf(p)+' roll '+p.roll+') from the admission list?'))return;
+  try{await db.collection('admStudents').doc(id).delete();placed=placed.filter(x=>x._id!==id);summary();drawPlaced();msg('Removed.')}catch(e){msg('Failed: '+(e.code||e.message),true)}}
+
+ /* ---------- 1. promote ---------- */
+ async function loadProm(){
+  await refresh(true);
+  const c=$('amFrom').value,s=$('amFSec').value;
+  const done={};placed.forEach(p=>{if(p.from)done[p.from]=p});
+  prom=STUDENT_DB.filter(x=>String(x.cls).trim().toUpperCase()===c&&(s===''||(s==='__'?!String(x.sec||'').trim():String(x.sec||'').trim().toUpperCase()===s)))
+   .sort((a,b)=>secOf(a).localeCompare(secOf(b))||(parseInt(a.roll,10)||0)-(parseInt(b.roll,10)||0))
+   .map(x=>{const k=c+'|'+secOf(x)+'|'+x.roll;return{src:x,key:k,done:done[k]||null,on:!done[k],sec:secOf(x),roll:done[k]?done[k].roll:''}});
+  drawProm();
+  msg(prom.length?(prom.length+' students of class '+c+' loaded. Untick anyone who is not promoted (TC / detained). Set section, press “Auto roll no.”, check, then Save.'):'No students of class '+c+' in the loaded database.',!prom.length,'amPMsg')}
+ function drawProm(){
+  const nc=NEXT[$('amFrom').value]||'—';const box=$('amProm');box.style.display='block';
+  box.innerHTML='<table class="am-t"><tr><th>✓</th><th>#</th><th>Name</th><th>Old sec</th><th>Old roll</th><th>→ Class</th><th>New sec</th><th>New roll</th></tr>'+prom.map((r,i)=>
+   '<tr'+(r.done?' style="opacity:.55"':'')+'><td><input type="checkbox" '+(r.on?'checked':'')+(r.done?' disabled':'')+' onchange="ADM._p('+i+',\'on\',this.checked)"></td><td>'+(i+1)+'</td><td class="l">'+esc(r.src.name)+(r.done?' <i>(already placed)</i>':'')+'</td><td>'+esc(secOf(r.src))+'</td><td>'+esc(r.src.roll)+'</td><td><b>'+nc+'</b></td>'+
+   '<td><input type="text" maxlength="2" value="'+esc(r.sec)+'" '+(r.done?'disabled':'')+' oninput="this.value=this.value.toUpperCase();ADM._p('+i+',\'sec\',this.value)"></td>'+
+   '<td><input type="number" min="1" value="'+esc(r.roll)+'" '+(r.done?'disabled':'')+' onchange="ADM._p('+i+',\'roll\',this.value)"></td></tr>').join('')+'</table>'}
+ function _p(i,k,v){prom[i][k]=v}
+ function autoRoll(){
+  if(!prom.length){msg('Load students first.',true,'amPMsg');return}
+  const byName=$('amOrd').value==='name',nc=NEXT[$('amFrom').value];if(!nc)return;
+  const g={};prom.forEach((r,i)=>{if(!r.on||r.done)return;(g[r.sec]=g[r.sec]||[]).push(i)});
+  Object.keys(g).forEach(sec=>{let idx=g[sec].slice();if(byName)idx.sort((a,b)=>prom[a].src.name.localeCompare(prom[b].src.name));
+   let n=maxRoll(nc,sec);idx.forEach(i=>{prom[i].roll=String(++n)})});
+  drawProm();msg('Roll numbers filled (continuing after any already placed in that class-section). You can still edit any box.',false,'amPMsg')}
+ async function savePromo(){
+  if(!need('amPMsg'))return;const nc=NEXT[$('amFrom').value];if(!nc){msg('Class XII has no next class.',true,'amPMsg');return}
+  await refresh(true);const sel=prom.filter(r=>r.on&&!r.done);
+  if(!sel.length){msg('Nothing selected.',true,'amPMsg');return}
+  const seen={},existing={};placed.forEach(p=>existing[p.cls+'|'+secOf(p)+'|'+parseInt(p.roll,10)]=1);
+  for(const r of sel){const rn=parseInt(r.roll,10);
+   if(!(rn>0)){msg('Roll no. missing for '+r.src.name+'. Press “Auto roll no.” or type it.',true,'amPMsg');return}
+   const k=nc+'|'+r.sec+'|'+rn;
+   if(seen[k]||existing[k]){msg('Duplicate roll '+rn+' in '+nc+(r.sec?'-'+r.sec:'')+' ('+r.src.name+'). Fix and save again.',true,'amPMsg');return}seen[k]=1}
+  if(!confirm('Save '+sel.length+' students into class '+nc+' for '+ses(yr())+'?'))return;
+  try{const y=yr();let b=db.batch(),n=0;const mx={};
+   for(const r of sel){const x=r.src,rn=parseInt(r.roll,10),d={year:y,type:'promoted',from:r.key,name:up(x.name),sex:x.sex,father:up(x.father),mother:up(x.mother),cls:nc,sec:r.sec,roll:String(rn),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',by:auth.currentUser.email,ts:firebase.firestore.FieldValue.serverTimestamp()};
+    b.set(db.collection('admStudents').doc(docId(y,nc,r.sec,rn)),d);const ck=nc+'|'+r.sec;mx[ck]=Math.max(mx[ck]||0,rn);
+    if(++n%400===0){await b.commit();b=db.batch()}}
+   await b.commit();
+   for(const ck of Object.keys(mx)){const [c,s]=ck.split('|'),ref=db.collection('admCounters').doc(cntId(y,c,s));
+    await db.runTransaction(async tx=>{const sn=await tx.get(ref);tx.set(ref,{year:y,cls:c,sec:s,last:Math.max(sn.exists?sn.data().last||0:0,mx[ck])})})}
+   msg('Saved '+sel.length+' students to class '+nc+' ✔',false,'amPMsg');await refresh(true);await loadProm()}
+  catch(e){msg('Save failed: '+(e.code||e.message),true,'amPMsg')}}
+
+ /* ---------- 2. new admission ---------- */
+ function preview(){const c=$('naCls').value,s=$('naSec').value;$('naRoll').value=(db&&auth&&auth.currentUser)?String(maxRoll(c,s)+1):'sign in'}
+ async function allocate(d){ /* atomic next roll: counter + free-slot check */
+  const y=d.year,c=d.cls,s=d.sec,cref=db.collection('admCounters').doc(cntId(y,c,s));
+  return db.runTransaction(async tx=>{const cs=await tx.get(cref);let r=Math.max((cs.exists?cs.data().last||0:0),maxRoll(c,s))+1,ref,tries=0;
+   for(;;){ref=db.collection('admStudents').doc(docId(y,c,s,r));const sn=await tx.get(ref);if(!sn.exists)break;r++;if(++tries>40)throw new Error('could not find free roll')}
+   const full=Object.assign({},d,{roll:String(r),ts:firebase.firestore.FieldValue.serverTimestamp()});
+   tx.set(ref,full);tx.set(cref,{year:y,cls:c,sec:s,last:r});return{id:ref.id,roll:r}})}
+ async function addNew(){
+  if(!need())return;await refresh(true);
+  const name=up($('naName').value);if(!name){msg('Enter student name.',true);return}
+  const mob=$('naMob').value.trim();if(mob&&!/^\d{10}$/.test(mob)){msg('Mobile must be 10 digits.',true);return}
+  const d={year:yr(),type:'new',name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,sec:$('naSec').value,dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),by:auth.currentUser.email};
+  try{const r=await allocate(d);const s=Object.assign({_id:r.id},d,{roll:String(r.roll)});placed.push(s);placed.sort(sorter);summary();drawPlaced();
+   $('naLast').innerHTML='<div class="am-ok">✔ <b>'+esc(name)+'</b> admitted to Class <b>'+d.cls+(d.sec?'-'+d.sec:'')+'</b>, Roll No. <b>'+r.roll+'</b> &nbsp; <button class="dv-b" onclick="ADM.receipt(\''+r.id+'\')">🖨 Print fee receipt</button></div>';
+   ['naName','naFat','naMot','naDob','naMob','naSik'].forEach(i=>$(i).value='');preview();msg('Admitted '+name+' — roll '+r.roll+'.')}
+  catch(e){msg('Failed: '+(e.code||e.message),true)}}
+ function receipt(id){const p=placed.find(x=>x._id===id);if(!p)return;FEE.one(p,ses(p.year||yr()))}
+ function toReceipts(){document.querySelector('.tf-side button[data-v=fees]').click();const m=$('fcMode');m.value='adm';FEE.mode();$('fcSes').value=ses(yr());$('fcMsg').textContent='Source: admission list ('+ses(yr())+'). Pick class/section and press Generate.'}
+
+ /* ---------- 3. online applications ---------- */
+ function link(){return location.href.split('#')[0].split('?')[0]+'?apply=1&y='+yr()}
+ function copyLink(){const t=link();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($('amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
+ async function loadApps(){
+  if(!need('amAMsg'))return;await refresh(true);
+  try{const q=await db.collection('admApps').where('status','==','pending').get();
+   apps=q.docs.map(d=>Object.assign({_id:d.id,_cls:'',_sec:'A'},d.data())).filter(a=>!a.year||a.year===yr()).sort((a,b)=>(a.ts&&a.ts.seconds||0)-(b.ts&&b.ts.seconds||0));
+   apps.forEach(a=>a._cls=a.cls);drawApps();msg(apps.length+' pending application(s).',false,'amAMsg')}
+  catch(e){msg('Load failed: '+(e.code||e.message),true,'amAMsg')}}
+ function drawApps(){const b=$('amApps');b.style.display='block';
+  b.innerHTML=apps.length?'<table class="am-t"><tr><th>Name</th><th>Sex</th><th>DOB</th><th>Father</th><th>Mobile</th><th>Village</th><th>Prev. school</th><th>Class</th><th>Sec</th><th></th></tr>'+apps.map((a,i)=>'<tr><td class="l"><b>'+esc(a.name)+'</b></td><td>'+esc(a.sex)+'</td><td>'+esc(a.dob)+'</td><td class="l">'+esc(a.father)+'</td><td>'+esc(a.mobile)+'</td><td>'+esc(a.village)+'</td><td class="l">'+esc(a.prev)+'</td>'+
+   '<td><select onchange="ADM._a('+i+',\'_cls\',this.value)">'+CLS.map(c=>'<option'+(c===a._cls?' selected':'')+'>'+c+'</option>').join('')+'</select></td>'+
+   '<td><select onchange="ADM._a('+i+',\'_sec\',this.value)"><option>A</option><option>B</option><option>C</option><option value="">—</option></select></td>'+
+   '<td><button class="dv-b" onclick="ADM.admit('+i+')">Admit</button> <button class="dv-b g" style="color:#b00020" onclick="ADM.reject('+i+')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No pending applications.</p>'}
+ function _a(i,k,v){apps[i][k]=v}
+ async function admit(i){
+  if(!need('amAMsg'))return;const a=apps[i];await refresh(true);
+  const d={year:yr(),type:'new',appId:a._id,name:up(a.name),sex:a.sex,father:up(a.father),mother:up(a.mother),cls:a._cls,sec:a._sec,dob:a.dob||'',sikshaId:a.sikshaId||'',mobile:a.mobile||'',caste:a.caste||'',village:a.village||'',prev:a.prev||'',by:auth.currentUser.email};
+  try{const r=await allocate(d);await db.collection('admApps').doc(a._id).update({status:'admitted',cls:d.cls,sec:d.sec,roll:String(r.roll)});
+   placed.push(Object.assign({_id:r.id},d,{roll:String(r.roll)}));placed.sort(sorter);summary();drawPlaced();apps.splice(i,1);drawApps();
+   $('amAMsg').innerHTML='✔ Admitted <b>'+esc(d.name)+'</b> to '+d.cls+(d.sec?'-'+d.sec:'')+', Roll <b>'+r.roll+'</b> &nbsp;<button class="dv-b" onclick="ADM.receipt(\''+r.id+'\')">🖨 Receipt</button>';$('amAMsg').className='am-msg'}
+  catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+ async function reject(i){if(!need('amAMsg'))return;const a=apps[i];if(!confirm('Reject application of '+a.name+'?'))return;
+  try{await db.collection('admApps').doc(a._id).update({status:'rejected'});apps.splice(i,1);drawApps()}catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+
+ /* public form (no login) */
+ async function apply(ev){ev.preventDefault();
+  if($('apHp').value)return false;
+  if(!db){msg('Form could not connect. Check internet and try again.',true,'apMsg');return false}
+  const mob=$('apMob').value.trim();if(!/^\d{10}$/.test(mob)){msg('Mobile must be 10 digits.',true,'apMsg');return false}
+  const d={year:+param('y')||new Date().getFullYear()+1,status:'pending',name:up($('apName').value),sex:$('apSex').value,dob:$('apDob').value,cls:$('apCls').value,caste:$('apCaste').value,father:up($('apFat').value),mother:up($('apMot').value),mobile:mob,village:$('apVil').value.trim(),prev:$('apPrev').value.trim(),sikshaId:$('apSik').value.trim(),ts:firebase.firestore.FieldValue.serverTimestamp()};
+  $('apBtn').disabled=true;
+  try{await db.collection('admApps').add(d);$('apForm').innerHTML='<div class="am-ok" style="font-size:15px">✔ Thank you! The application for <b>'+esc(d.name)+'</b> (Class '+d.cls+') has been received. The school will contact you on '+esc(mob)+'.</div>'}
+  catch(e){$('apBtn').disabled=false;msg('Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.',true,'apMsg')}
+  return false}
+
+ /* ---------- publish to Data & Year ---------- */
+ async function publish(){
+  if(!need())return;if(!await refresh(true))return;if(!placed.length){msg('Nothing to publish.',true);return}
+  const y=String(yr());if(!confirm('Publish '+placed.length+' students as the certificate database for '+y+'?\nThis REPLACES the online copy of '+y+' in Data & Year.'))return;
+  const rows=placed.map(p=>({name:p.name,sex:p.sex,father:p.father,mother:p.mother,cls:p.cls,sec:p.sec||'',roll:String(p.roll),dob:p.dob||'',sikshaId:p.sikshaId||'',mobile:p.mobile||'',caste:p.caste||''}));
+  try{const CH=300,n=Math.ceil(rows.length/CH),b=db.batch();for(let i=0;i<n;i++)b.set(db.collection('certDb').doc(y+'_'+i),{year:y,i,rows:rows.slice(i*CH,(i+1)*CH)});
+   b.set(db.collection('certDb').doc(y),{year:y,count:rows.length,chunks:n,updatedBy:auth.currentUser.email,updated:firebase.firestore.FieldValue.serverTimestamp()});await b.commit();
+   msg('Published '+rows.length+' students as database '+y+' ✔  (open Data & Year → choose '+y+' → Load from Firebase)')}
+  catch(e){msg('Publish failed: '+(e.code||e.message),true)}}
+
+ /* ---------- init ---------- */
+ const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
+ $('amSes').value=ses(yr());$('amLink').textContent=link();
+ const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{refresh(true)});
+ if(isApply){document.body.classList.add('apply-mode');document.title='Admission Application — TFHS';const ay=+param('y')||y0+1;$('apSub').textContent='Admission application form — session '+ses(ay)}
+ if(auth)auth.onAuthStateChanged(u=>{if(u&&document.body.dataset.view==='adm')refresh(true)});
+ return{refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,admit,reject,apply,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+})();
+</script>
+
 </body>
 </html>
