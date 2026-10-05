@@ -2035,6 +2035,7 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
  </div>
  <div class="dv-c"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
   <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><a class="dv-b g" id="amOpen" target="_blank" style="text-decoration:none">Open form ↗</a></div>
+  <div class="am-row" style="margin-top:6px"><span class="am-link" id="amLinkXI"></span><button class="dv-b" type="button" onclick="ADM.copyLink(true)">Copy Class XI link</button><a class="dv-b g" id="amOpenXI" target="_blank" style="text-decoration:none">Open XI form ↗</a></div>
   <p class="am-msg" id="amAMsg">Share this separate link with parents. Each application needs <b>1. staff verification</b> and <b>2. admin approval</b>; only then can it be admitted (class, section, auto roll no.).</p>
   <div class="am-row"><label style="font-size:11px;font-weight:700">Show <select id="apFilt" onchange="ADM.drawApps()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="open">Open (pending / verified / approved)</option><option value="pending">Waiting for staff verification</option><option value="verified">Waiting for admin approval</option><option value="approved">Approved — ready to admit</option><option value="admitted">Admitted</option><option value="rejected">Rejected</option><option value="all">All</option></select></label>
    <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button><span id="amRole" class="am-msg" style="margin:0"></span></div>
@@ -2162,7 +2163,7 @@ const ADM=(function(){
 
  /* ---------- placed list ---------- */
  async function refresh(quiet){
-  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amOpen').href=link();
+  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amOpen').href=link();$('amLinkXI').textContent=link(true);$('amOpenXI').href=link(true);
   if(!(db&&auth&&auth.currentUser)){if(!quiet)msg('Sign in (sidebar) to load the admission database.',true);return false}
   try{const q=await db.collection('admStudents').where('year','==',yr()).get();
    placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);
@@ -2258,8 +2259,8 @@ const ADM=(function(){
   ['Bank (scholarship)',[['accName','Account holder'],['bank','Bank & branch'],['accNo','A/C no.'],['ifsc','IFSC']]]];
  const when=t=>t?new Date(t).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'';
  const stText={pending:'Waiting for staff verification',verified:'Verified by staff — waiting for admin',approved:'Approved — ready to admit',admitted:'Admitted',rejected:'Rejected'};
- function link(){return new URL('admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()}
- function copyLink(){const t=link();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($('amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
+ function link(xi){return new URL(xi?'admission-xi.html':'admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()}
+ function copyLink(xi){const t=link(xi);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html and admission-xi.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($(xi?'amLinkXI':'amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
  async function loadApps(){
   if(!need('amAMsg'))return;await roleP;await refresh(true);
   try{const q=await db.collection('admApps').where('year','==',yr()).get();
@@ -2324,7 +2325,7 @@ const ADM=(function(){
 
  /* ---------- init ---------- */
  const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
- $('amSes').value=ses(yr());$('amLink').textContent=link();
+ $('amSes').value=ses(yr());$('amLink').textContent=link();$('amLinkXI').textContent=link(true);
  const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{refresh(true)});
  if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
  $('amOpen').href=link();
