@@ -2040,16 +2040,38 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
    <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button><span id="amRole" class="am-msg" style="margin:0"></span></div>
   <div id="amApps" class="am-box" style="display:none"></div>
   <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules)</b></summary>
-   <p><b>If your staff logins already have read/write on everything</b> (old rules stay exactly as they are), add only this one block. It lets the public admission form <u>submit</u> an application without login; nothing else changes:</p>
-<pre>match /admApps/{id} {
-  allow create: if request.resource.data.status == 'pending'
-    &amp;&amp; request.resource.data.name is string &amp;&amp; request.resource.data.name.size() &lt; 120
-    &amp;&amp; request.resource.data.keys().size() &lt; 90
-    &amp;&amp; request.resource.data.get('photo','').size() &lt; 150000
-    &amp;&amp; !('staffOk' in request.resource.data) &amp;&amp; !('adminOk' in request.resource.data);
-}</pre>
-   <p>Put it inside <code>match /databases/{database}/documents { … }</code>, beside your existing rule, then Publish. Rules are additive, so existing access keeps working. Your existing staff rule already covers reading and updating applications, <code>admStudents</code> and <code>admCounters</code>.</p>
-   <p><small>Note: because staff already have full write, “only admin can approve” is enforced by this page (admin e-mails in <code>const ADMINS</code> below), not by Firestore. To make Firestore enforce it too, the broad staff rule would have to exclude <code>admApps</code> updates for non-admins.</small></p></details>
+   <p>Your current rules are kept as they are. Add this block (already included in the ready-made <b>firestore.rules</b> file) inside <code>match /databases/{database}/documents { … }</code> after the certDb block, then Publish. It uses your existing <code>isAdmin()</code> / <code>isMarksStaff()</code> (roles in <code>users/{uid}</code>):</p>
+<pre>// ================= ADMISSION (promotion, new admission, online form) — SEPARATE RULE =================
+    // Public online form (admission.html) can only CREATE a "pending" application, no login needed.
+    // Staff (staff/teacher) verify; only admin approves; admit needs admin approval to exist first.
+    match /admApps/{id} {
+      allow create: if request.resource.data.status == 'pending'
+        &amp;&amp; request.resource.data.name is string &amp;&amp; request.resource.data.name.size() &lt; 120
+        &amp;&amp; request.resource.data.keys().size() &lt; 90
+        &amp;&amp; request.resource.data.get('photo', '').size() &lt; 150000
+        &amp;&amp; !('staffOk' in request.resource.data) &amp;&amp; !('adminOk' in request.resource.data);
+      allow read: if isAdmin() || isMarksStaff();
+      allow update: if isAdmin()
+        || (isMarksStaff()
+            &amp;&amp; request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['staffOk', 'staffNote', 'status', 'rejectReason', 'admitted'])
+            &amp;&amp; request.resource.data.status != 'approved'
+            &amp;&amp; (request.resource.data.status != 'admitted' || 'adminOk' in resource.data));
+      allow delete: if isAdmin();
+    }
+    // Placed students (promoted + new) and roll-number counters, per admission year
+    match /admStudents/{id} {
+      allow read: if isAdmin() || isMarksStaff();
+      allow create, update: if isAdmin() || isMarksStaff();
+      allow delete: if isAdmin();
+    }
+    match /admCounters/{id} {
+      allow read: if isAdmin() || isMarksStaff();
+      allow create, update: if isAdmin() || isMarksStaff();
+      allow delete: if isAdmin();
+    }
+    // =================================================================================================</pre>
+   <p><small>Roles: <b>admin</b> approves and can delete; <b>staff / teacher</b> verify, admit and place students. “Publish to Data &amp; Year” writes <code>certDb</code>, which your rules allow for admin only.</small></p></details>
  </div>
  <div class="dv-c"><h3>Placed students (this admission year)</h3>
   <div class="am-grid"><label>Class <select id="plCls" onchange="ADM.drawPlaced()"><option value="">All</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
@@ -2221,9 +2243,10 @@ const ADM=(function(){
  function toReceipts(){document.querySelector('.tf-side button[data-v=fees]').click();const m=$('fcMode');m.value='adm';FEE.mode();$('fcSes').value=ses(yr());$('fcMsg').textContent='Source: admission list ('+ses(yr())+'). Pick class/section and press Generate.'}
 
  /* ---------- 3. online applications: staff verify -> admin approve -> admit ---------- */
- const ADMINS=['prabir.dangar@gmail.com','ganeschandradangar@gmail.com']; /* admin logins: edit here AND in Firestore rules */
+ const ADMINS=['prabir.dangar@gmail.com']; /* fallback only if the users/{uid} role document cannot be read */
  const meMail=()=>String(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase();
- const isAdmin=()=>ADMINS.indexOf(meMail())>=0;
+ let role=null,roleP=Promise.resolve(); /* role comes from users/{uid}.role in Firestore (admin / staff / teacher) */
+ const isAdmin=()=>role==='admin'||(role==='?'&&ADMINS.indexOf(meMail())>=0);
  const A=id=>apps.find(x=>x._id===id);
  const SKIP=/^_|^(status|ts|staffOk|adminOk|staffNote|adminNote|rejectReason|admitted|decl)$/;
  const GROUPS=[['Admission',[['cls','Class'],['stream','Stream'],['medium','Medium'],['subj','Elective subjects']]],
@@ -2237,10 +2260,10 @@ const ADM=(function(){
  function link(){return new URL('admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()}
  function copyLink(){const t=link();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($('amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
  async function loadApps(){
-  if(!need('amAMsg'))return;await refresh(true);
+  if(!need('amAMsg'))return;await roleP;await refresh(true);
   try{const q=await db.collection('admApps').where('year','==',yr()).get();
    apps=q.docs.map(d=>{const a=Object.assign({_id:d.id},d.data());a._cls=a.cls;a._sec='A';return a}).sort((x,y)=>(x.ts&&x.ts.seconds||0)-(y.ts&&y.ts.seconds||0));
-   $('amRole').textContent='You are signed in as '+(isAdmin()?'ADMIN':'STAFF')+' ('+meMail()+')';drawApps();msg(apps.length+' application(s) for '+ses(yr())+'.',false,'amAMsg')}
+   $('amRole').textContent='You are signed in as '+(isAdmin()?'ADMIN':'STAFF')+' ('+meMail()+(role&&role!=='?'?', role: '+role:'')+')';drawApps();msg(apps.length+' application(s) for '+ses(yr())+'.',false,'amAMsg')}
   catch(e){msg('Load failed: '+(e.code||e.message),true,'amAMsg')}}
  function drawApps(){const b=$('amApps');b.style.display='block';const f=$('apFilt').value;
   const list=apps.filter(a=>f==='all'||(f==='open'?['pending','verified','approved'].indexOf(a.status)>=0:a.status===f));
@@ -2304,7 +2327,7 @@ const ADM=(function(){
  const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{refresh(true)});
  if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
  $('amOpen').href=link();
- if(auth)auth.onAuthStateChanged(u=>{if(u&&document.body.dataset.view==='adm')refresh(true)});
+ if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{if(document.body.dataset.view==='adm')refresh(true)})}});
  return{refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
