@@ -146,7 +146,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
   </div>
  </div>
  <div class="card"><h2><b>8</b> Madhyamik (Class X) result</h2>
-  <p class="note">Enter marks exactly as in the Madhyamik mark-sheet. Subject eligibility for Class XI is checked from these marks (minimum 33 where required).</p>
+  <p class="note">Enter marks exactly as in the Madhyamik mark-sheet. Subject eligibility for Class XI is checked from these marks (minimum 35 where required).</p>
   <div class="grid">
    <label>Madhyamik roll &amp; number<input id="mpRoll" maxlength="30" class="req"></label>
    <label>Year of passing<select id="mpYear" class="req"></select></label>
@@ -155,12 +155,11 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
    <label>Mathematics <small>(out of 100)</small><input id="mpMA" inputmode="numeric" maxlength="3" class="req"></label>
    <label>Physical Science <small>(out of 100)</small><input id="mpPS" inputmode="numeric" maxlength="3" class="req"></label>
    <label>Life Science <small>(out of 100)</small><input id="mpLS" inputmode="numeric" maxlength="3" class="req"></label>
-   <label>History <small>(out of 100)</small><input id="mpHI" inputmode="numeric" maxlength="3" class="req"></label>
    <label>Geography <small>(out of 100)</small><input id="mpGE" inputmode="numeric" maxlength="3" class="req"></label>
   </div>
  </div>
  <div class="card"><h2><b>9</b> Subjects for Class XI</h2>
-  <p class="note">Minimum 5 subjects: 2 languages (automatic) + 3 electives. 1 optional elective may be added. Subjects needing a pass in Madhyamik stay disabled until the marks above are entered and are at least 33.</p>
+  <p class="note">Minimum 5 subjects: 2 languages (automatic) + 3 electives. 1 optional elective may be added. Subjects needing a pass in Madhyamik stay disabled until the marks above are entered and are at least 35.</p>
   <div class="grid">
    <label>Language 1 <small>(automatic)</small><input id="lang1" class="ro" readonly></label>
    <label>Language 2 <small>(automatic)</small><input id="lang2" class="ro" readonly value="English"></label>
@@ -197,6 +196,9 @@ const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-por
 const VILLAGES=[
  {v:'Taldangra',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'}
 ];
+/* ===== Google Drive copy of the photo: paste your Apps Script web-app URL and the same secret key as in the script (see drive-photo-script.gs). Leave URL empty to turn off. ===== */
+const DRIVE_URL='https://script.google.com/macros/s/AKfycbyzuDKWOq2gD_Sre3zy-tcwwlSR64u5GTTyJpyhb2xnXYdw0cwmiuDFM1ArFh1ADslFTg/exec';
+const DRIVE_KEY='tfhs-adm-7Qx92Lm4';
 const $=id=>document.getElementById(id);
 const qs=new URLSearchParams(location.search),YEAR=+qs.get('y')||new Date().getFullYear()+1;
 const SES=YEAR+'-'+String(YEAR+1).slice(-2);
@@ -239,11 +241,11 @@ function aadhaarOK(s){if(!/^[2-9]\d{11}$/.test(s))return false;let c=0;s.split('
 const CORE=['Physics','Chemistry','Mathematics','Biology','Computer Science'];
 const COMMON=['Mathematics','History','Philosophy','Political Science','Sanskrit','Geography'];
 /* Madhyamik subject needing >=33 for each elective (null = no marks rule) */
-const ELIG={'Physics':'PS','Chemistry':'PS','Biology':'LS','Computer Science':'MA','Mathematics':'MA','History':'HI','Geography':'GE','Philosophy':null,'Political Science':null,'Sanskrit':null};
-const MKN={MA:'Mathematics',PS:'Physical Science',LS:'Life Science',HI:'History',GE:'Geography'};
+const ELIG={'Physics':'PS','Chemistry':'PS','Biology':'LS','Computer Science':'MA','Mathematics':'MA','History':null,'Geography':'GE','Philosophy':null,'Political Science':null,'Sanskrit':null};
+const MKN={MA:'Mathematics',PS:'Physical Science',LS:'Life Science',GE:'Geography'};
 const SLOTS=['el1','el2','el3','opt'];
 function mk(c){const v=val('mp'+c);return /^\d+$/.test(v)?+v:null}
-function okSub(s){const c=ELIG[s];if(!c)return true;const m=mk(c);return m!==null&&m>=33}
+function okSub(s){const c=ELIG[s];if(!c)return true;const m=mk(c);return m!==null&&m>=35}
 function poolFor(slot){const st=val('stream');if(!st)return [];
  if(slot==='opt')return st==='Science'?CORE.concat(COMMON.filter(x=>CORE.indexOf(x)<0)):COMMON;
  return st==='Science'?CORE:COMMON}
@@ -254,7 +256,7 @@ function drawSubj(){
  SLOTS.forEach(s=>{const sel=$(s),cur=sel.value;
   const taken=SLOTS.filter(x=>x!==s&&!(x==='el3'&&st==='Vocational')).map(x=>$(x).value).filter(Boolean);
   let h='<option value="">'+(s==='opt'?'— none —':'— select —')+'</option>';
-  poolFor(s).forEach(x=>{if(taken.indexOf(x)>=0)return;const ok=okSub(x);h+='<option value="'+x+'"'+(ok?'':' disabled')+'>'+x+(ok?'':' — needs 33 in '+MKN[ELIG[x]])+'</option>'});
+  poolFor(s).forEach(x=>{if(taken.indexOf(x)>=0)return;const ok=okSub(x);h+='<option value="'+x+'"'+(ok?'':' disabled')+'>'+x+(ok?'':' — needs 35 in '+MKN[ELIG[x]])+'</option>'});
   sel.innerHTML=h;sel.disabled=!st;if(cur&&poolFor(s).indexOf(cur)>=0&&okSub(cur)&&taken.indexOf(cur)<0)sel.value=cur});
  const base=2+slotsNeeded().filter(s=>val(s)).length+(st==='Vocational'&&val('trade')?1:0);
  const n=base+(val('opt')?1:0);
@@ -267,11 +269,11 @@ if(XI){
  const y=new Date().getFullYear();fill('mpYear',[y,y-1,y-2,y-3,y-4,y-5]);
  $('stream').addEventListener('change',()=>{SLOTS.forEach(s=>$(s).value='');drawSubj()});
  $('medium').addEventListener('change',()=>{if(!val('tongue')){$('tongue').value=val('medium')==='Santali'?'Santali':'Bengali';cond()}drawSubj()});
- ['mpMA','mpPS','mpLS','mpHI','mpGE','trade'].forEach(i=>$(i).addEventListener('input',drawSubj));
+ ['mpMA','mpPS','mpLS','mpGE','trade'].forEach(i=>$(i).addEventListener('input',drawSubj));
  $('mpMarks').addEventListener('input',pct);SLOTS.forEach(s=>$(s).addEventListener('change',drawSubj));
  drawSubj()}
 const BASE=['cls','medium','name','nameBn','sex','dob','pob','nationality','religion','tongue','caste','casteCert','blood','sikshaId','aadhaar','kanya','disab','disabType','bpl','bplNo','father','fatherOcc','fatherEdu','fatherMob','mother','motherOcc','motherEdu','motherMob','guardian','guardianRel','mobile','whatsapp','income','email','village','po','ps','block','dist','pin','state','transport','permAddr','prevSchool','prevAddr','prevClass','prevBoard','prevYear','prevMarks','tcNo','tcDate','sibling','accName','bank','accNo','ifsc'];
-const XIIDS=['stream','lang1','lang2','el1','el2','el3','opt','trade','mpRoll','mpYear','mpMarks','mpPct','mpMA','mpPS','mpLS','mpHI','mpGE','subj'];
+const XIIDS=['stream','lang1','lang2','el1','el2','el3','opt','trade','mpRoll','mpYear','mpMarks','mpPct','mpMA','mpPS','mpLS','mpGE','subj'];
 const IDS=XI?BASE.concat(XIIDS.filter(x=>x!=='subj')):BASE;
 function check(){
  const e=[],bad=[];const E=(id,m)=>{e.push(m);bad.push(id)};
@@ -289,7 +291,7 @@ function check(){
  else if(val('tongue')==='Other'&&val('tongueO').length<2)E('tongueO','Specify mother tongue.');
  if(!/^\d{14}$/.test(val('sikshaId')))E('sikshaId','Banglar Siksha Portal ID must be exactly 14 digits.');
  if(!/^\d{12}$/.test(val('aadhaar')))E('aadhaar','Student\'s Aadhaar must be exactly 12 digits.');
- else if(!aadhaarOK(val('aadhaar')))E('aadhaar','This Aadhaar number is not valid — please re-check each digit.');
+ 
  if(val('father').length<2)E('father','Enter father\'s name.');
  if(!val('fatherOcc'))E('fatherOcc','Select father\'s occupation (NA if none).');
  if(!val('motherOcc'))E('motherOcc','Select mother\'s occupation (NA if none).');
@@ -311,11 +313,11 @@ function check(){
   if(!val('mpRoll'))E('mpRoll','Enter Madhyamik roll & number.');
   if(!val('mpYear'))E('mpYear','Select Madhyamik year of passing.');
   if(!/^\d+$/.test(val('mpMarks'))||+val('mpMarks')>700||+val('mpMarks')<1)E('mpMarks','Madhyamik total marks must be between 1 and 700.');
-  ['MA','PS','LS','HI','GE'].forEach(c=>{const v=val('mp'+c);if(!/^\d+$/.test(v)||+v>100)E('mp'+c,'Enter Madhyamik marks of '+MKN[c]+' (0 to 100).')});
+  ['MA','PS','LS','GE'].forEach(c=>{const v=val('mp'+c);if(!/^\d+$/.test(v)||+v>100)E('mp'+c,'Enter Madhyamik marks of '+MKN[c]+' (0 to 100).')});
   if(val('stream')){
    slotsNeeded().forEach((s,i)=>{if(!val(s))E(s,'Choose elective '+(i+1)+'.')});
    if(val('stream')==='Vocational'&&!val('trade'))E('trade','Enter the vocational trade / course.');
-   SLOTS.forEach(s=>{const v=val(s);if(v&&!okSub(v))E(s,v+' needs at least 33 in Madhyamik '+MKN[ELIG[v]]+'.')});
+   SLOTS.forEach(s=>{const v=val(s);if(v&&!okSub(v))E(s,v+' needs at least 35 in Madhyamik '+MKN[ELIG[v]]+'.')});
    const ch=SLOTS.filter(s=>!(s==='el3'&&val('stream')==='Vocational')).map(val).filter(Boolean);
    if(new Set(ch).size!==ch.length)E('el1','The same subject is chosen twice.');
    if(val('stream')==='Science'&&['el1','el2','el3'].filter(s=>CORE.indexOf(val(s))>=0).length<3)E('el1','Science: choose at least 3 from Physics, Chemistry, Mathematics, Biology, Computer Science.');
@@ -350,7 +352,8 @@ $('f').addEventListener('submit',async ev=>{
    '<table><tr><td>Student</td><td><b>'+esc(d.name)+'</b></td></tr><tr><td>Class applied</td><td>'+esc(d.cls)+(d.stream?' ('+esc(d.stream)+')':'')+'</td></tr><tr><td>Portal ID</td><td>'+esc(d.sikshaId)+'</td></tr><tr><td>Date of birth</td><td>'+esc(d.dob)+'</td></tr><tr><td>Father</td><td>'+esc(d.father)+'</td></tr><tr><td>Contact</td><td>'+esc(d.mobile)+'</td></tr><tr><td>Session</td><td>'+SES+'</td></tr></table>'+
    '<p style="font-size:13.5px">Please keep this reference number. The school will <b>verify</b> your application (staff) and then it will be <b>approved</b> (Headmaster / Admin). You will be called on <b>'+esc(d.mobile)+'</b> to bring the original documents.</p>'+
    '<p class="no-print"><button class="sec" onclick="window.print()">🖨 Print / Save acknowledgement</button></p></div>';
-  window.scrollTo(0,0)}
+  window.scrollTo(0,0);
+  if(DRIVE_URL){try{fetch(DRIVE_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:DRIVE_KEY,session:SES,cls:d.cls,stream:d.stream||'',ref:d.ref,portal:d.sikshaId,aadhaar:d.aadhaar,name:d.name,photo:photo})}).catch(()=>{})}catch(x){}}}
  catch(e){$('btn').disabled=false;$('btn').textContent='Submit application';
   if(e.code==='permission-denied'){$('sikshaId').classList.add('bad');$('err').textContent='An application with Banglar Siksha Portal ID '+d.sikshaId+' has already been submitted for session '+SES+'. A duplicate application is not allowed.\nIf you think this is a mistake, please contact the school.'}
   else $('err').textContent='Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.'}
