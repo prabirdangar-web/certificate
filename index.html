@@ -2040,28 +2040,16 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
    <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button><span id="amRole" class="am-msg" style="margin:0"></span></div>
   <div id="amApps" class="am-box" style="display:none"></div>
   <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules)</b></summary>
-   <p>Firebase console → Firestore → Rules. Inside <code>match /databases/{database}/documents {</code> add (put your admin e-mails in <code>isAdmin</code>):</p>
-<pre>function isAdmin() {
-  return request.auth != null &amp;&amp;
-    request.auth.token.email in ['prabir.dangar@gmail.com','ganeschandradangar@gmail.com'];
-}
-match /admApps/{id} {
+   <p><b>If your staff logins already have read/write on everything</b> (old rules stay exactly as they are), add only this one block. It lets the public admission form <u>submit</u> an application without login; nothing else changes:</p>
+<pre>match /admApps/{id} {
   allow create: if request.resource.data.status == 'pending'
     &amp;&amp; request.resource.data.name is string &amp;&amp; request.resource.data.name.size() &lt; 120
     &amp;&amp; request.resource.data.keys().size() &lt; 90
     &amp;&amp; request.resource.data.get('photo','').size() &lt; 150000
     &amp;&amp; !('staffOk' in request.resource.data) &amp;&amp; !('adminOk' in request.resource.data);
-  allow read: if request.auth != null;
-  allow update: if request.auth != null &amp;&amp; (isAdmin() ||
-    (request.resource.data.diff(resource.data).affectedKeys()
-       .hasOnly(['staffOk','staffNote','status','rejectReason','admitted'])
-     &amp;&amp; request.resource.data.status != 'approved'
-     &amp;&amp; (request.resource.data.status != 'admitted' || 'adminOk' in resource.data)));
-  allow delete: if isAdmin();
-}
-match /admStudents/{id} { allow read, write: if request.auth != null; }
-match /admCounters/{id} { allow read, write: if request.auth != null; }</pre>
-   <p>The admin e-mails must also be listed in <code>ADMINS</code> inside this file (search for “const ADMINS”).</p></details>
+}</pre>
+   <p>Put it inside <code>match /databases/{database}/documents { … }</code>, beside your existing rule, then Publish. Rules are additive, so existing access keeps working. Your existing staff rule already covers reading and updating applications, <code>admStudents</code> and <code>admCounters</code>.</p>
+   <p><small>Note: because staff already have full write, “only admin can approve” is enforced by this page (admin e-mails in <code>const ADMINS</code> below), not by Firestore. To make Firestore enforce it too, the broad staff rule would have to exclude <code>admApps</code> updates for non-admins.</small></p></details>
  </div>
  <div class="dv-c"><h3>Placed students (this admission year)</h3>
   <div class="am-grid"><label>Class <select id="plCls" onchange="ADM.drawPlaced()"><option value="">All</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
