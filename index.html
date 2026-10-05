@@ -2033,20 +2033,35 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
   <div class="am-row"><button class="dv-b" type="button" onclick="ADM.addNew()">➕ Admit &amp; assign roll no.</button></div>
   <div id="naLast"></div>
  </div>
- <div class="dv-c"><h3>3 · Online application form (share link)</h3>
-  <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button></div>
-  <p class="am-msg" id="amAMsg">Parents / new students open the link on their phone, fill the form and submit. It comes here as “pending” — pick class &amp; section and press Admit: roll no. is given automatically.</p>
+ <div class="dv-c"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
+  <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><a class="dv-b g" id="amOpen" target="_blank" style="text-decoration:none">Open form ↗</a></div>
+  <p class="am-msg" id="amAMsg">Share this separate link with parents. Each application needs <b>1. staff verification</b> and <b>2. admin approval</b>; only then can it be admitted (class, section, auto roll no.).</p>
+  <div class="am-row"><label style="font-size:11px;font-weight:700">Show <select id="apFilt" onchange="ADM.drawApps()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="open">Open (pending / verified / approved)</option><option value="pending">Waiting for staff verification</option><option value="verified">Waiting for admin approval</option><option value="approved">Approved — ready to admit</option><option value="admitted">Admitted</option><option value="rejected">Rejected</option><option value="all">All</option></select></label>
+   <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button><span id="amRole" class="am-msg" style="margin:0"></span></div>
   <div id="amApps" class="am-box" style="display:none"></div>
   <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules)</b></summary>
-   <p>In Firebase console → Firestore → Rules, add these blocks inside <code>match /databases/{database}/documents {</code>:</p>
-<pre>match /admApps/{id} {
-  allow create: if request.resource.data.name is string
-                && request.resource.data.name.size() &lt; 120
-                && request.resource.data.status == 'pending';
-  allow read, update, delete: if request.auth != null;
+   <p>Firebase console → Firestore → Rules. Inside <code>match /databases/{database}/documents {</code> add (put your admin e-mails in <code>isAdmin</code>):</p>
+<pre>function isAdmin() {
+  return request.auth != null &amp;&amp;
+    request.auth.token.email in ['prabir.dangar@gmail.com','ganeschandradangar@gmail.com'];
+}
+match /admApps/{id} {
+  allow create: if request.resource.data.status == 'pending'
+    &amp;&amp; request.resource.data.name is string &amp;&amp; request.resource.data.name.size() &lt; 120
+    &amp;&amp; request.resource.data.keys().size() &lt; 90
+    &amp;&amp; request.resource.data.get('photo','').size() &lt; 150000
+    &amp;&amp; !('staffOk' in request.resource.data) &amp;&amp; !('adminOk' in request.resource.data);
+  allow read: if request.auth != null;
+  allow update: if request.auth != null &amp;&amp; (isAdmin() ||
+    (request.resource.data.diff(resource.data).affectedKeys()
+       .hasOnly(['staffOk','staffNote','status','rejectReason','admitted'])
+     &amp;&amp; request.resource.data.status != 'approved'
+     &amp;&amp; (request.resource.data.status != 'admitted' || 'adminOk' in resource.data)));
+  allow delete: if isAdmin();
 }
 match /admStudents/{id} { allow read, write: if request.auth != null; }
-match /admCounters/{id} { allow read, write: if request.auth != null; }</pre></details>
+match /admCounters/{id} { allow read, write: if request.auth != null; }</pre>
+   <p>The admin e-mails must also be listed in <code>ADMINS</code> inside this file (search for “const ADMINS”).</p></details>
  </div>
  <div class="dv-c"><h3>Placed students (this admission year)</h3>
   <div class="am-grid"><label>Class <select id="plCls" onchange="ADM.drawPlaced()"><option value="">All</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
@@ -2054,29 +2069,6 @@ match /admCounters/{id} { allow read, write: if request.auth != null; }</pre></d
   <div id="amPlaced" class="am-box"></div>
  </div>
 </div>
-<div id="applyView">
- <div class="ap-card">
-  <h1>Taldangra Fulmati High School [H.S.]</h1>
-  <p class="s" id="apSub">Admission application form</p>
-  <form id="apForm" onsubmit="return ADM.apply(event)">
-   <label>Student's full name *<input id="apName" required maxlength="80" autocomplete="off"></label>
-   <div class="ap-two"><label>Sex *<select id="apSex"><option>Male</option><option>Female</option></select></label>
-   <label>Date of birth *<input id="apDob" type="date" required></label></div>
-   <div class="ap-two"><label>Class applying for *<select id="apCls"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option></select></label>
-   <label>Caste / category<select id="apCaste"><option>GENERAL</option><option>OBC-A</option><option>OBC-B</option><option>SC</option><option>ST</option></select></label></div>
-   <label>Father's name *<input id="apFat" required maxlength="80"></label>
-   <label>Mother's name<input id="apMot" maxlength="80"></label>
-   <div class="ap-two"><label>Guardian's mobile *<input id="apMob" required inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10 digits"></label>
-   <label>Village *<input id="apVil" required maxlength="60"></label></div>
-   <label>Previous school &amp; class<input id="apPrev" maxlength="100"></label>
-   <label>Banglar Siksha ID (if known)<input id="apSik" maxlength="20"></label>
-   <input class="ap-hp" id="apHp" tabindex="-1" autocomplete="off">
-   <button type="submit" id="apBtn">Submit application</button>
-   <p id="apMsg" class="am-msg"></p>
-  </form>
- </div>
-</div>
-
 <script>
 /* ===== NEXT-YEAR FEE RECEIPTS (class-wise, promoted to next class) ===== */
 const FEE=(function(){
@@ -2160,7 +2152,7 @@ const ADM=(function(){
 
  /* ---------- placed list ---------- */
  async function refresh(quiet){
-  $('amSes').value=ses(yr());$('amLink').textContent=link();
+  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amOpen').href=link();
   if(!(db&&auth&&auth.currentUser)){if(!quiet)msg('Sign in (sidebar) to load the admission database.',true);return false}
   try{const q=await db.collection('admStudents').where('year','==',yr()).get();
    placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);
@@ -2240,43 +2232,75 @@ const ADM=(function(){
  function receipt(id){const p=placed.find(x=>x._id===id);if(!p)return;FEE.one(p,ses(p.year||yr()))}
  function toReceipts(){document.querySelector('.tf-side button[data-v=fees]').click();const m=$('fcMode');m.value='adm';FEE.mode();$('fcSes').value=ses(yr());$('fcMsg').textContent='Source: admission list ('+ses(yr())+'). Pick class/section and press Generate.'}
 
- /* ---------- 3. online applications ---------- */
- function link(){return location.href.split('#')[0].split('?')[0]+'?apply=1&y='+yr()}
- function copyLink(){const t=link();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($('amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
+ /* ---------- 3. online applications: staff verify -> admin approve -> admit ---------- */
+ const ADMINS=['prabir.dangar@gmail.com','ganeschandradangar@gmail.com']; /* admin logins: edit here AND in Firestore rules */
+ const meMail=()=>String(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase();
+ const isAdmin=()=>ADMINS.indexOf(meMail())>=0;
+ const A=id=>apps.find(x=>x._id===id);
+ const SKIP=/^_|^(status|ts|staffOk|adminOk|staffNote|adminNote|rejectReason|admitted|decl)$/;
+ const GROUPS=[['Admission',[['cls','Class'],['stream','Stream'],['medium','Medium'],['subj','Elective subjects']]],
+  ['Student',[['name','Name'],['nameBn','Name (Bengali)'],['sex','Sex'],['dob','Date of birth'],['pob','Place of birth'],['nationality','Nationality'],['religion','Religion'],['tongue','Mother tongue'],['caste','Category'],['casteCert','Caste cert. no.'],['blood','Blood group'],['sikshaId','Banglar Siksha ID'],['aadhaar','Aadhaar'],['kanya','Kanyashree'],['disab','Differently abled'],['disabType','Disability'],['bpl','BPL'],['bplNo','BPL / ration no.']]],
+  ['Parents / guardian',[['father','Father'],['fatherOcc','Occupation'],['fatherEdu','Education'],['fatherMob','Father mobile'],['mother','Mother'],['motherOcc','Occupation'],['motherEdu','Education'],['motherMob','Mother mobile'],['guardian','Guardian'],['guardianRel','Relation'],['mobile','Primary mobile'],['whatsapp','WhatsApp'],['income','Family income'],['email','Email']]],
+  ['Address',[['village','Village / Town'],['po','P.O.'],['ps','P.S.'],['block','Block'],['dist','District'],['pin','PIN'],['state','State'],['transport','Comes by'],['permAddr','Permanent address (if different)']]],
+  ['Previous school',[['prevSchool','School'],['prevAddr','Address'],['prevClass','Last class'],['prevBoard','Board'],['prevYear','Year'],['prevMarks','Marks / %'],['tcNo','TC no.'],['tcDate','TC date'],['sibling','Sibling in school']]],
+  ['Bank (scholarship)',[['accName','Account holder'],['bank','Bank & branch'],['accNo','A/C no.'],['ifsc','IFSC']]]];
+ const when=t=>t?new Date(t).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'';
+ const stText={pending:'Waiting for staff verification',verified:'Verified by staff — waiting for admin',approved:'Approved — ready to admit',admitted:'Admitted',rejected:'Rejected'};
+ function link(){return new URL('admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()}
+ function copyLink(){const t=link();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($('amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
  async function loadApps(){
   if(!need('amAMsg'))return;await refresh(true);
-  try{const q=await db.collection('admApps').where('status','==','pending').get();
-   apps=q.docs.map(d=>Object.assign({_id:d.id,_cls:'',_sec:'A'},d.data())).filter(a=>!a.year||a.year===yr()).sort((a,b)=>(a.ts&&a.ts.seconds||0)-(b.ts&&b.ts.seconds||0));
-   apps.forEach(a=>a._cls=a.cls);drawApps();msg(apps.length+' pending application(s).',false,'amAMsg')}
+  try{const q=await db.collection('admApps').where('year','==',yr()).get();
+   apps=q.docs.map(d=>{const a=Object.assign({_id:d.id},d.data());a._cls=a.cls;a._sec='A';return a}).sort((x,y)=>(x.ts&&x.ts.seconds||0)-(y.ts&&y.ts.seconds||0));
+   $('amRole').textContent='You are signed in as '+(isAdmin()?'ADMIN':'STAFF')+' ('+meMail()+')';drawApps();msg(apps.length+' application(s) for '+ses(yr())+'.',false,'amAMsg')}
   catch(e){msg('Load failed: '+(e.code||e.message),true,'amAMsg')}}
- function drawApps(){const b=$('amApps');b.style.display='block';
-  b.innerHTML=apps.length?'<table class="am-t"><tr><th>Name</th><th>Sex</th><th>DOB</th><th>Father</th><th>Mobile</th><th>Village</th><th>Prev. school</th><th>Class</th><th>Sec</th><th></th></tr>'+apps.map((a,i)=>'<tr><td class="l"><b>'+esc(a.name)+'</b></td><td>'+esc(a.sex)+'</td><td>'+esc(a.dob)+'</td><td class="l">'+esc(a.father)+'</td><td>'+esc(a.mobile)+'</td><td>'+esc(a.village)+'</td><td class="l">'+esc(a.prev)+'</td>'+
-   '<td><select onchange="ADM._a('+i+',\'_cls\',this.value)">'+CLS.map(c=>'<option'+(c===a._cls?' selected':'')+'>'+c+'</option>').join('')+'</select></td>'+
-   '<td><select onchange="ADM._a('+i+',\'_sec\',this.value)"><option>A</option><option>B</option><option>C</option><option value="">—</option></select></td>'+
-   '<td><button class="dv-b" onclick="ADM.admit('+i+')">Admit</button> <button class="dv-b g" style="color:#b00020" onclick="ADM.reject('+i+')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No pending applications.</p>'}
- function _a(i,k,v){apps[i][k]=v}
- async function admit(i){
-  if(!need('amAMsg'))return;const a=apps[i];await refresh(true);
-  const d={year:yr(),type:'new',appId:a._id,name:up(a.name),sex:a.sex,father:up(a.father),mother:up(a.mother),cls:a._cls,sec:a._sec,dob:a.dob||'',sikshaId:a.sikshaId||'',mobile:a.mobile||'',caste:a.caste||'',village:a.village||'',prev:a.prev||'',by:auth.currentUser.email};
-  try{const r=await allocate(d);await db.collection('admApps').doc(a._id).update({status:'admitted',cls:d.cls,sec:d.sec,roll:String(r.roll)});
-   placed.push(Object.assign({_id:r.id},d,{roll:String(r.roll)}));placed.sort(sorter);summary();drawPlaced();apps.splice(i,1);drawApps();
-   $('amAMsg').innerHTML='✔ Admitted <b>'+esc(d.name)+'</b> to '+d.cls+(d.sec?'-'+d.sec:'')+', Roll <b>'+r.roll+'</b> &nbsp;<button class="dv-b" onclick="ADM.receipt(\''+r.id+'\')">🖨 Receipt</button>';$('amAMsg').className='am-msg'}
+ function drawApps(){const b=$('amApps');b.style.display='block';const f=$('apFilt').value;
+  const list=apps.filter(a=>f==='all'||(f==='open'?['pending','verified','approved'].indexOf(a.status)>=0:a.status===f));
+  const chip=(o,t)=>o?'<span style="color:#145828;font-weight:700">✓ '+esc(String(o.by).split('@')[0])+'</span><br><small>'+esc(when(o.at))+'</small>':'<span style="color:#999">'+t+'</span>';
+  b.innerHTML=list.length?'<table class="am-t"><tr><th>Ref</th><th>Photo</th><th>Name</th><th>Class</th><th>Mobile</th><th>1 · Staff</th><th>2 · Admin</th><th>Action</th></tr>'+list.map(a=>{
+   let act='<button class="dv-b g" onclick="ADM.view(\''+a._id+'\')">View</button> ';
+   if(a.status==='pending')act+='<button class="dv-b" onclick="ADM.verify(\''+a._id+'\')">Verify (staff)</button>';
+   else if(a.status==='verified')act+=isAdmin()?'<button class="dv-b" style="background:#8a5600" onclick="ADM.approve(\''+a._id+'\')">Approve (admin)</button>':'<small>needs admin</small>';
+   else if(a.status==='approved')act+='<select onchange="ADM._a(\''+a._id+'\',\'_cls\',this.value)">'+CLS.map(c=>'<option'+(c===a._cls?' selected':'')+'>'+c+'</option>').join('')+'</select><select onchange="ADM._a(\''+a._id+'\',\'_sec\',this.value)"><option>A</option><option>B</option><option>C</option><option value="">—</option></select> <button class="dv-b" onclick="ADM.admit(\''+a._id+'\')">Admit</button>';
+   else if(a.status==='admitted'&&a.admitted)act+='<b>'+esc(a.admitted.cls)+(a.admitted.sec?'-'+esc(a.admitted.sec):'')+' / Roll '+esc(a.admitted.roll)+'</b>';
+   else if(a.status==='rejected')act+='<small>'+esc(a.rejectReason||'')+'</small>';
+   if(['pending','verified','approved'].indexOf(a.status)>=0)act+=' <button class="dv-b g" style="color:#b00020" onclick="ADM.reject(\''+a._id+'\')">✕</button>';
+   return '<tr><td><small>'+esc(a.ref||'')+'</small></td><td>'+(a.photo?'<img src="'+a.photo+'" style="width:34px;height:42px;object-fit:cover;border-radius:4px">':'')+'</td><td class="l"><b>'+esc(a.name)+'</b><br><small>'+esc(a.father)+' · '+esc(a.village)+'</small></td><td><b>'+esc(a.cls)+'</b>'+(a.stream?'<br><small>'+esc(a.stream)+'</small>':'')+'</td><td>'+esc(a.mobile)+'</td><td>'+chip(a.staffOk,'—')+'</td><td>'+chip(a.adminOk,'—')+'</td><td>'+act+'</td></tr>'}).join('')+'</table>':'<p style="padding:10px;font-size:13px">No applications in this view.</p>'}
+ function _a(id,k,v){const a=A(id);if(a)a[k]=v}
+ async function upd(id,patch){await db.collection('admApps').doc(id).update(patch);Object.assign(A(id),patch)}
+ async function verify(id){
+  if(!need('amAMsg'))return;const a=A(id);if(a.status!=='pending'){msg('Already verified.',true,'amAMsg');return}
+  const n=prompt('Staff verification of '+a.name+'.\nOriginal documents checked? Add a short note (optional):','Documents checked');if(n===null)return;
+  try{await upd(id,{staffOk:{by:meMail(),at:Date.now()},staffNote:n,status:'verified'});drawApps();msg('Verified by staff. Now waiting for admin approval.',false,'amAMsg')}catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+ async function approve(id){
+  if(!need('amAMsg'))return;if(!isAdmin()){msg('Only an admin login can approve.',true,'amAMsg');return}
+  const a=A(id);if(!a.staffOk){msg('Staff verification is missing.',true,'amAMsg');return}
+  const n=prompt('Admin approval of '+a.name+'. Note (optional):','Approved');if(n===null)return;
+  try{await upd(id,{adminOk:{by:meMail(),at:Date.now()},adminNote:n,status:'approved'});drawApps();msg('Approved. You can now admit the student (class, section → Admit).',false,'amAMsg')}catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+ async function reject(id){
+  if(!need('amAMsg'))return;const a=A(id);const r=prompt('Reject application of '+a.name+'?\nReason:','');if(r===null)return;
+  try{await upd(id,{status:'rejected',rejectReason:r+' ('+meMail().split('@')[0]+')'});drawApps()}catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+ async function admit(id){
+  if(!need('amAMsg'))return;const a=A(id);
+  if(!(a.staffOk&&a.adminOk&&a.status==='approved')){msg('Needs BOTH staff verification and admin approval first.',true,'amAMsg');return}
+  await refresh(true);
+  const d={};Object.keys(a).forEach(k=>{if(!SKIP.test(k))d[k]=a[k]});
+  Object.assign(d,{year:yr(),type:'new',appId:a._id,name:up(a.name),father:up(a.father),mother:up(a.mother),cls:a._cls,sec:a._sec,by:meMail(),verifiedBy:a.staffOk.by,approvedBy:a.adminOk.by});
+  try{const r=await allocate(d);await upd(id,{status:'admitted',admitted:{cls:d.cls,sec:d.sec,roll:String(r.roll),by:meMail(),at:Date.now()}});
+   placed.push(Object.assign({_id:r.id},d,{roll:String(r.roll)}));placed.sort(sorter);summary();drawPlaced();drawApps();
+   $('amAMsg').innerHTML='✔ Admitted <b>'+esc(d.name)+'</b> to '+d.cls+(d.sec?'-'+d.sec:'')+', Roll <b>'+r.roll+'</b> &nbsp;<button class="dv-b" onclick="ADM.receipt(\''+r.id+'\')">🖨 Fee receipt</button>';$('amAMsg').className='am-msg'}
   catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
- async function reject(i){if(!need('amAMsg'))return;const a=apps[i];if(!confirm('Reject application of '+a.name+'?'))return;
-  try{await db.collection('admApps').doc(a._id).update({status:'rejected'});apps.splice(i,1);drawApps()}catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+ function detailHTML(a){
+  let h='<div style="display:flex;gap:14px;align-items:flex-start">'+(a.photo?'<img src="'+a.photo+'" style="width:92px;height:116px;object-fit:cover;border:1px solid #999">':'')+'<div><h2 style="margin:0 0 4px">'+esc(a.name)+'</h2><div>Application ref: <b>'+esc(a.ref||a._id)+'</b> · Session '+ses(a.year)+'</div><div>Status: <b>'+esc(stText[a.status]||a.status)+'</b></div></div></div>';
+  GROUPS.forEach(g=>{const rows=g[1].filter(f=>a[f[0]]!==undefined&&a[f[0]]!=='');if(!rows.length)return;h+='<h3 style="margin:12px 0 4px;color:#145828;border-bottom:1px solid #ccc">'+g[0]+'</h3><table style="width:100%;border-collapse:collapse;font-size:13px">'+rows.map(f=>'<tr><td style="width:36%;padding:2px 4px;color:#555">'+f[1]+'</td><td style="padding:2px 4px"><b>'+esc(a[f[0]])+'</b></td></tr>').join('')+'</table>'});
+  h+='<h3 style="margin:12px 0 4px;color:#145828;border-bottom:1px solid #ccc">Verification</h3><table style="width:100%;font-size:13px"><tr><td style="width:36%;color:#555">1 · Staff</td><td>'+(a.staffOk?'<b>✓ '+esc(a.staffOk.by)+'</b> '+esc(when(a.staffOk.at))+' — '+esc(a.staffNote||''):'pending')+'</td></tr><tr><td style="color:#555">2 · Admin</td><td>'+(a.adminOk?'<b>✓ '+esc(a.adminOk.by)+'</b> '+esc(when(a.adminOk.at))+' — '+esc(a.adminNote||''):'pending')+'</td></tr>'+(a.admitted?'<tr><td style="color:#555">Admitted as</td><td><b>'+esc(a.admitted.cls)+' '+esc(a.admitted.sec)+' Roll '+esc(a.admitted.roll)+'</b></td></tr>':'')+'</table>';
+  return h}
+ function view(id){const a=A(id);if(!a)return;let m=$('apModal');if(!m){m=document.createElement('div');m.id='apModal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto';document.body.appendChild(m)}
+  m.style.display='flex';m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:720px;width:100%;padding:18px 20px;font-family:Segoe UI,Arial,sans-serif;color:#1d2b22"><div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px"><button class="dv-b" onclick="ADM.printApp(\''+id+'\')">🖨 Print form</button><button class="dv-b g" onclick="document.getElementById(\'apModal\').style.display=\'none\'">Close</button></div>'+detailHTML(a)+'</div>'}
+ function printApp(id){const a=A(id);const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+  w.document.write('<html><head><title>Application '+esc(a.ref||'')+'</title><style>body{font-family:Arial,sans-serif;margin:14mm;color:#000}h3{margin:12px 0 4px}table td{vertical-align:top}</style></head><body><h2 style="text-align:center;margin:0">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><p style="text-align:center;margin:2px 0 10px">Admission application — session '+ses(a.year)+'</p>'+detailHTML(a)+'<br><br><table style="width:100%;margin-top:30px"><tr><td>Signature of parent / guardian</td><td style="text-align:center">Verified by (Staff)</td><td style="text-align:right">Approved by (Headmaster / Admin)</td></tr></table></body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),300)}
 
- /* public form (no login) */
- async function apply(ev){ev.preventDefault();
-  if($('apHp').value)return false;
-  if(!db){msg('Form could not connect. Check internet and try again.',true,'apMsg');return false}
-  const mob=$('apMob').value.trim();if(!/^\d{10}$/.test(mob)){msg('Mobile must be 10 digits.',true,'apMsg');return false}
-  const d={year:+param('y')||new Date().getFullYear()+1,status:'pending',name:up($('apName').value),sex:$('apSex').value,dob:$('apDob').value,cls:$('apCls').value,caste:$('apCaste').value,father:up($('apFat').value),mother:up($('apMot').value),mobile:mob,village:$('apVil').value.trim(),prev:$('apPrev').value.trim(),sikshaId:$('apSik').value.trim(),ts:firebase.firestore.FieldValue.serverTimestamp()};
-  $('apBtn').disabled=true;
-  try{await db.collection('admApps').add(d);$('apForm').innerHTML='<div class="am-ok" style="font-size:15px">✔ Thank you! The application for <b>'+esc(d.name)+'</b> (Class '+d.cls+') has been received. The school will contact you on '+esc(mob)+'.</div>'}
-  catch(e){$('apBtn').disabled=false;msg('Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.',true,'apMsg')}
-  return false}
-
- /* ---------- publish to Data & Year ---------- */
+/* ---------- publish to Data & Year ---------- */
  async function publish(){
   if(!need())return;if(!await refresh(true))return;if(!placed.length){msg('Nothing to publish.',true);return}
   const y=String(yr());if(!confirm('Publish '+placed.length+' students as the certificate database for '+y+'?\nThis REPLACES the online copy of '+y+' in Data & Year.'))return;
@@ -2290,9 +2314,10 @@ const ADM=(function(){
  const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('amSes').value=ses(yr());$('amLink').textContent=link();
  const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{refresh(true)});
- if(isApply){document.body.classList.add('apply-mode');document.title='Admission Application — TFHS';const ay=+param('y')||y0+1;$('apSub').textContent='Admission application form — session '+ses(ay)}
+ if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
+ $('amOpen').href=link();
  if(auth)auth.onAuthStateChanged(u=>{if(u&&document.body.dataset.view==='adm')refresh(true)});
- return{refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,admit,reject,apply,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
