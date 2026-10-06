@@ -2013,6 +2013,9 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
 .c4{background:linear-gradient(135deg,#ff9a2e,#d9610a)}.c5{background:linear-gradient(135deg,#19b5a5,#0c7d86)}.c6{background:linear-gradient(135deg,#9b5de5,#5f2eb3)}
 .c7{background:linear-gradient(135deg,#ef476f,#b3203f)}.c8{background:linear-gradient(135deg,#5b6ee1,#2c3a9e)}.c9{background:linear-gradient(135deg,#8d6e63,#5d4037)}.c10{background:linear-gradient(135deg,#f6c026,#c78a00);color:#3a2a00}
 .ad-lock{text-align:center;padding:18px 10px;font-weight:800;color:#555}.ad-lock .ic{font-size:46px;display:block}
+.qr-row{display:flex;gap:14px;flex-wrap:wrap}.qr-b{flex:1;min-width:270px;border:4px solid;border-radius:18px;padding:12px;text-align:center}
+.qr-b>b{font-size:17px}.qr-c{display:flex;justify-content:center;margin:10px 0;min-height:220px;align-items:center}.qr-c canvas{width:220px;height:220px;image-rendering:pixelated;border:6px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);border-radius:6px}
+.qr-b .am-row{justify-content:center}
 .ad-strip{display:flex;gap:6px;align-items:center;cursor:pointer;flex:1;justify-content:center;overflow:hidden;padding:0 12px;min-width:0}
 .ad-strip .lv{color:#e0243c;font-size:13px;animation:adp 1.4s infinite}
 .sc{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;color:#fff;font-size:12.5px;font-weight:800;white-space:nowrap;box-shadow:0 2px 5px rgba(0,0,0,.18)}.sc .e{font-size:15px;line-height:1}.sc.c10{color:#3a2a00}
@@ -2127,6 +2130,16 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
     // =================================================================================================</pre>
    <p><small>Roles: <b>admin</b> approves and can delete; <b>staff / teacher</b> verify, admit and place students. “Publish to Data &amp; Year” writes <code>certDb</code>, which your rules allow for admin only.</small></p></details>
  </div>
+ <div class="dv-c"><h3>📱 Admission QR codes — WhatsApp &amp; notice board</h3>
+  <p class="am-msg" style="margin:0 0 8px">One QR for each form: <b>V–X</b> and <b>XI</b>. The QR carries the link for the session selected above. Upload the forms to your site before sharing. (QR needs internet to draw.)</p>
+  <div class="qr-row">
+   <div class="qr-b" style="border-color:#1e9b4a;background:#effaf2"><b style="color:#0b5a2b">Classes V – X</b><div id="qrVX" class="qr-c"></div>
+    <div class="am-row"><button class="dv-b" type="button" onclick="ADM.qrWa(false)">💬 WhatsApp image</button><button class="dv-b g" type="button" onclick="ADM.qrSend(false)">➤ Send link on WhatsApp</button><button class="dv-b" type="button" style="background:#8a5600" onclick="ADM.qrPoster(false)">🖨 Notice-board poster</button></div></div>
+   <div class="qr-b" style="border-color:#3a47c9;background:#eef0ff"><b style="color:#1b2370">Class XI</b><div id="qrXI" class="qr-c"></div>
+    <div class="am-row"><button class="dv-b" type="button" style="background:#3a47c9" onclick="ADM.qrWa(true)">💬 WhatsApp image</button><button class="dv-b g" type="button" onclick="ADM.qrSend(true)">➤ Send link on WhatsApp</button><button class="dv-b" type="button" style="background:#8a5600" onclick="ADM.qrPoster(true)">🖨 Notice-board poster</button></div></div>
+  </div>
+  <p id="qrMsg" class="am-msg"></p>
+ </div>
  <div class="dv-c"><h3>Admission Register — new admissions only (live)</h3>
   <p class="am-msg" style="margin:0 0 8px">Serial numbers and date are automatic for each admission year: <b>Classes V–X share one series</b>, <b>Class XI has its own series</b>. Promoted students are not entered. Only <b>admin</b> can correct a profile (✎).</p>
   <div class="am-grid"><label>Series <select id="rgSer" onchange="ADM.drawRegister()"><option value="">All</option><option value="VX">V–X</option><option value="XI">XI</option><option value="XII">XII</option></select></label>
@@ -2198,6 +2211,7 @@ const FEE=(function(){
  return{gen,print,words,mode,one}
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 /* ===== ADMISSION: promote old students, admit new ones, online form, auto roll ===== */
 const ADM=(function(){
@@ -2224,7 +2238,7 @@ const ADM=(function(){
 
  /* ---------- placed list ---------- */
  async function refresh(quiet){
-  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amOpen').href=link();$('amLinkXI').textContent=link(true);$('amOpenXI').href=link(true);
+  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amOpen').href=link();$('amLinkXI').textContent=link(true);$('amOpenXI').href=link(true);qrDraw();
   if(!(db&&auth&&auth.currentUser)){if(!quiet)msg('Sign in (sidebar) to load the admission database.',true);return false}
   live();
   try{const q=await db.collection('admStudents').where('year','==',yr()).get();
@@ -2534,6 +2548,54 @@ const ADM=(function(){
    closeEdit();await refresh(true);msg('Student profile saved ✔',false,'rgMsg')}
   catch(err){msg('Save failed: '+(err.code||err.message),true,'edMsg')}}
 
+ /* ---------- QR codes: WhatsApp image, send link, notice-board poster ---------- */
+ function qrCanvas(text,size){
+  if(typeof QRCode==='undefined')return null;
+  const d=document.createElement('div');d.style.cssText='position:absolute;left:-9999px;top:0';document.body.appendChild(d);
+  try{new QRCode(d,{text,width:size,height:size,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+   const c=d.querySelector('canvas');if(!c){d.remove();return null}
+   const o=document.createElement('canvas');o.width=o.height=size;const g=o.getContext('2d');g.imageSmoothingEnabled=false;g.fillStyle='#fff';g.fillRect(0,0,size,size);g.drawImage(c,0,0,c.width,c.height,0,0,size,size);d.remove();return o}
+  catch(e){d.remove();return null}}
+ function qrDraw(){
+  [['qrVX',false],['qrXI',true]].forEach(a=>{const el=$(a[0]);if(!el)return;el.innerHTML='';const c=qrCanvas(link(a[1]),440);
+   if(c)el.appendChild(c);else el.innerHTML='<small style="color:#b00020">QR library not loaded — check internet and reload.</small>'})}
+ const qrTitle=xi=>xi?'Class XI':'Classes V to X';
+ const rr=(g,x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()};
+ function fitText(g,txt,x,y,maxW,px,weight){let s=px;do{g.font=(weight||'')+' '+s+'px Arial';s-=2}while(g.measureText(txt).width>maxW&&s>14);g.fillText(txt,x,y)}
+ function waCanvas(xi){
+  const L=link(xi),W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+  const col=xi?['#3a47c9','#1b2370']:['#1e9b4a','#0b5a2b'];
+  const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,col[0]);gr.addColorStop(1,col[1]);g.fillStyle=gr;g.fillRect(0,0,W,H);
+  g.textAlign='center';g.fillStyle='#fff';fitText(g,'TALDANGRA FULMATI HIGH SCHOOL [H.S.]',W/2,92,980,46,'bold');
+  g.font='32px Arial';g.fillText('P.O. Taldangra · Dist. Bankura · PIN 722152',W/2,140,980);
+  g.fillStyle='#ffd23f';g.font='bold 96px Arial';g.fillText('ADMISSION OPEN',W/2,262);
+  g.fillStyle='#fff';g.font='bold 52px Arial';g.fillText('Session '+ses(yr()),W/2,335);
+  g.fillStyle='rgba(255,255,255,.95)';rr(g,190,372,700,86,43);g.fill();g.fillStyle=col[1];fitText(g,xi?'CLASS XI · Science · Arts · Vocational':'CLASSES  V  TO  X',W/2,432,640,42,'bold');
+  g.fillStyle='#fff';rr(g,190,490,700,700,36);g.fill();
+  const q=qrCanvas(L,620);if(q)g.drawImage(q,230,530,620,620);
+  g.fillStyle='#fff';g.font='bold 54px Arial';g.fillText('📱 Scan to apply online',W/2,1250);
+  g.fillStyle='#ffe9a8';fitText(g,L,W/2,1298,980,30,'');
+  g.fillStyle='#fff';g.font='26px Arial';g.fillText('Keep ready: Portal ID · Aadhaar · mobile no. · photo · TC',W/2,1334,980);
+  return q?c:null}
+ async function qrWa(xi){
+  const c=waCanvas(xi);if(!c){msg('QR library not loaded — check internet and reload.',true,'qrMsg');return}
+  const name='TFHS-admission-'+(xi?'XI':'V-X')+'-'+ses(yr())+'.png';
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+  try{const f=new File([blob],name,{type:'image/png'});
+   if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'TFHS Admission '+qrTitle(xi),text:'Admission open '+ses(yr())+' — '+qrTitle(xi)+'. Apply online: '+link(xi)});msg('Shared ✔',false,'qrMsg');return}}catch(e){if(e&&e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+  msg('Image downloaded ('+name+') — attach it in WhatsApp.',false,'qrMsg')}
+ function qrSend(xi){
+  const m='*Taldangra Fulmati High School [H.S.]*\nAdmission open — session '+ses(yr())+' ('+qrTitle(xi)+')\nApply online: '+link(xi)+'\nKeep ready: Banglar Siksha Portal ID, Aadhaar, mobile no., photo, TC'+(xi?', Madhyamik admit card & marks':'');
+  window.open('https://wa.me/?text='+encodeURIComponent(m),'_blank')}
+ function qrPoster(xi){
+  const q=qrCanvas(link(xi),800);if(!q){msg('QR library not loaded — check internet and reload.',true,'qrMsg');return}
+  const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+  const c1=xi?'#3a47c9':'#1e9b4a',c2=xi?'#1b2370':'#0b5a2b';
+  const need=xi?['Banglar Siksha Portal ID (14 digits)','Student\'s Aadhaar number (12 digits)','Primary mobile number','Madhyamik admit card &amp; mark-sheet','Transfer Certificate (TC)','Passport-size photograph']:['Banglar Siksha Portal ID (14 digits)','Student\'s Aadhaar number (12 digits)','Primary mobile number','Transfer Certificate (TC) &amp; last mark-sheet','Birth certificate','Passport-size photograph'];
+  w.document.write('<html><head><title>Admission poster '+qrTitle(xi)+'</title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}.p{width:210mm;height:297mm;padding:12mm;background:linear-gradient(180deg,'+c1+','+c2+');color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center}h1{margin:0;font-size:25pt;letter-spacing:.5px}.ad{margin:2mm 0 0;font-size:11.5pt}.open{margin:6mm 0 0;font-size:50pt;font-weight:900;color:#ffd23f;line-height:1}.ses{font-size:23pt;font-weight:800;margin-top:2mm}.cls{margin-top:5mm;background:#fff;color:'+c2+';border-radius:40px;padding:3mm 12mm;font-size:23pt;font-weight:900}.qr{margin-top:7mm;background:#fff;border-radius:8mm;padding:8mm}.qr img{width:105mm;height:105mm;display:block}.scan{margin-top:5mm;font-size:27pt;font-weight:900}.sub{font-size:13pt;margin-top:1mm}.need{margin-top:5mm;background:rgba(255,255,255,.16);border-radius:6mm;padding:4mm 8mm;text-align:left;font-size:13pt;width:150mm}.need b{display:block;text-align:center;font-size:14pt;margin-bottom:2mm;color:#ffd23f}.need div{margin:1mm 0}.link{margin-top:4mm;font-size:10.5pt;word-break:break-all;color:#ffe9a8;max-width:175mm}.ft{margin-top:auto;font-size:11pt}</style></head><body><div class="p"><h1>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h1><div class="ad">P.O. Taldangra, District: Bankura, PIN: 722152 · Ph: 03243-265114</div><div class="open">ADMISSION OPEN</div><div class="ses">Session '+ses(yr())+'</div><div class="cls">'+(xi?'CLASS XI — Science · Arts · Vocational':'CLASSES V TO X')+'</div><div class="qr"><img src="'+q.toDataURL('image/png')+'"></div><div class="scan">📱 Scan &amp; apply online</div><div class="sub">Open your phone camera and point it at the QR code</div><div class="need"><b>KEEP READY</b>'+need.map(x=>'<div>✔ '+x+'</div>').join('')+'</div><div class="link">'+esc(link(xi))+'</div><div class="ft">Apply online → school verifies → admin approves → bring original documents when called.</div></div></body></html>');
+  w.document.close();w.focus();setTimeout(()=>w.print(),600)}
+
 /* ---------- publish to Data & Year ---------- */
  async function publish(){
   if(!need())return;if(!await refresh(true))return;if(!placed.length){msg('Nothing to publish.',true);return}
@@ -2550,9 +2612,10 @@ const ADM=(function(){
  const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{profDraw();refresh(true)});
  if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
  $('amOpen').href=link();
+ window.addEventListener('load',qrDraw);
  if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{live();dash();if(document.body.dataset.view==='adm')refresh(true)})}else stopLive()});
  dash();
- return{pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
