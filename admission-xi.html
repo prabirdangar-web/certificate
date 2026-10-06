@@ -475,7 +475,7 @@ const SLOTS=['el1','el2','el3','opt'];
 function mk(c){const v=val('mp'+c);return /^\d+$/.test(v)?+v:null}
 function okSub(s){const c=ELIG[s];if(!c)return true;const m=mk(c);return m!==null&&m>=35}
 function poolFor(slot){const st=val('stream');if(!st)return [];
- if(st==='Science')return slot==='opt'?CORE.concat(COMMON.filter(x=>CORE.indexOf(x)<0)):CORE;
+ if(st==='Science')return CORE; /* optional elective too: science subjects only, no History / Pol. Science etc. */
  if(st==='Arts')return ARTS;
  return COMMON}
 function slotsNeeded(){return val('stream')==='Vocational'?['el1','el2']:['el1','el2','el3']}
