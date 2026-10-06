@@ -704,7 +704,8 @@
 .dv-t{width:100%;border-collapse:collapse;font-size:13px}.dv-t th{background:#145828;color:#fff;padding:6px}.dv-t td{padding:5px;border-bottom:1px solid #e6eee8;text-align:center}
 #dvMsg{font-size:13px;font-weight:600;color:#145828}#dvMsg.bad{color:#b00020}
 </style>
-<header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span></div></header>
+<header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div class="ad-strip" id="admStrip" onclick="ADM.pop()" title="Live new admissions — click for details"></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span></div></header>
+<div class="ad-pop" id="admPop"><div id="admLiveDash" class="ad-live"></div></div>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
 <div class="gp">DAILY</div><button data-v="cert" class="on"><span class="ic">📜</span><span class="l">Certificate</span></button>
 <div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button>
@@ -723,7 +724,6 @@
 
     <div class="dashboard-panel">
         <h2>Admission Control &amp; Verification Dashboard</h2>
-        <div id="admLiveDash" class="ad-live"></div>
 
         <div class="lookup-box" style="background:#eef8ef;border:1px solid #9bb29d;padding:10px;border-radius:6px;margin-bottom:10px;">
             <div class="dashboard-main-row"><div class="dashboard-data-entry"><div style="font-size:12px;font-weight:bold;color:#145828;margin-bottom:6px;">
@@ -2013,6 +2013,12 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
 .c4{background:linear-gradient(135deg,#ff9a2e,#d9610a)}.c5{background:linear-gradient(135deg,#19b5a5,#0c7d86)}.c6{background:linear-gradient(135deg,#9b5de5,#5f2eb3)}
 .c7{background:linear-gradient(135deg,#ef476f,#b3203f)}.c8{background:linear-gradient(135deg,#5b6ee1,#2c3a9e)}.c9{background:linear-gradient(135deg,#8d6e63,#5d4037)}.c10{background:linear-gradient(135deg,#f6c026,#c78a00);color:#3a2a00}
 .ad-lock{text-align:center;padding:18px 10px;font-weight:800;color:#555}.ad-lock .ic{font-size:46px;display:block}
+.ad-strip{display:flex;gap:6px;align-items:center;cursor:pointer;flex:1;justify-content:center;overflow:hidden;padding:0 12px;min-width:0}
+.ad-strip .lv{color:#e0243c;font-size:13px;animation:adp 1.4s infinite}
+.sc{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;color:#fff;font-size:12.5px;font-weight:800;white-space:nowrap;box-shadow:0 2px 5px rgba(0,0,0,.18)}.sc .e{font-size:15px;line-height:1}.sc.c10{color:#3a2a00}
+.ad-pop{position:fixed;top:72px;right:14px;width:min(640px,calc(100vw - 28px));max-height:calc(100vh - 90px);overflow:auto;z-index:60;display:none;background:#fff;border-radius:18px;box-shadow:0 10px 36px rgba(0,0,0,.30)}.ad-pop.show{display:block}.ad-pop .ad-live{margin:0;box-shadow:none}
+@media(max-width:800px){.ad-strip{display:none}}
+@media print{.ad-pop{display:none!important}}
 .report-view-toggle{display:flex!important;align-items:center;justify-content:center;gap:14px;width:100%;padding:16px 18px!important;border:0!important;border-radius:16px!important;background:linear-gradient(135deg,#2f8ef0,#9b5de5)!important;color:#fff!important;font-size:18px!important;font-weight:900!important;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;text-align:left}
 .report-view-toggle .rv-ic{font-size:40px;line-height:1}.report-view-toggle small{display:block;font-size:12px;font-weight:700;opacity:.92;margin-top:2px}
 .report-view-toggle.open{background:linear-gradient(135deg,#ef476f,#ff9a2e)!important}
@@ -2388,8 +2394,8 @@ const ADM=(function(){
 
  /* ---------- dashboard: live new-admission synopsis ---------- */
  function dash(){
-  const el=document.getElementById('admLiveDash');if(!el)return;const y=(typeof yr==='function')?yr():'';
-  if(!(db&&auth&&auth.currentUser)){el.innerHTML='<div class="ad-lock"><span class="ic">🔒</span>Sign in (sidebar 👤) to see live new admissions</div>';return}
+  const el=document.getElementById('admLiveDash');if(!el)return;const y=(typeof yr==='function')?yr():'';const st=document.getElementById('admStrip');
+  if(!(db&&auth&&auth.currentUser)){if(st)st.innerHTML='<span class="sc c9"><span class="e">🔒</span>Sign in — live admissions</span>';el.innerHTML='<div class="ad-lock"><span class="ic">🔒</span>Sign in (sidebar 👤) to see live new admissions</div>';return}
   const nw=placed.filter(p=>p.type==='new'),by={};
   nw.forEach(p=>{const b=by[p.cls]=by[p.cls]||{n:0,m:0,f:0};b.n++;/^f/i.test(p.sex||'')?b.f++:(/^m/i.test(p.sex||'')?b.m++:0)});
   let tn=0,tm=0,tf=0;CLS.forEach(c=>{if(by[c]){tn+=by[c].n;tm+=by[c].m;tf+=by[c].f}});
@@ -2401,7 +2407,9 @@ const ADM=(function(){
    '<div class="ad-grid">'+T('c1 big','🧑‍🎓',tn,'Total new','',' big')+T('c2 big','👦',tm,'Boys','',' big')+T('c3 big','👧',tf,'Girls','',' big')+'</div>'+
    '<div class="ad-gt">CLASS-WISE</div><div class="ad-grid">'+CLS.map((c,i)=>{const b=by[c]||{n:0,m:0,f:0};return T(cc[i],ci2[i],b.n,'Class '+c,'👦 '+b.m+' · 👧 '+b.f,b.n?'':' z')}).join('')+'</div>'+
    '<div class="ad-gt">ADMISSION REGISTER — LAST SL. NO.</div><div class="ad-grid">'+T('c10','📒',last.VX||0,'V – X','series')+T('c8','📘',last.XI||0,'XI','series')+(last.XII?T('c9','📕',last.XII,'XII','series'):'')+'</div>'+
-   '<div class="ad-gt">APPLICATIONS</div><div class="ad-grid">'+T('c4','🕒',cnt('pending'),'Waiting staff','verify')+T('c6','🛡️',cnt('verified'),'Waiting admin','approve')+T('c1','✅',cnt('approved'),'Approved','ready to admit')+'</div>'}
+   '<div class="ad-gt">APPLICATIONS</div><div class="ad-grid">'+T('c4','🕒',cnt('pending'),'Waiting staff','verify')+T('c6','🛡️',cnt('verified'),'Waiting admin','approve')+T('c1','✅',cnt('approved'),'Approved','ready to admit')+'</div>';
+  const S=(cl,e,v,tip)=>'<span class="sc '+cl+'" title="'+tip+'"><span class="e">'+e+'</span>'+v+'</span>';
+  if(st)st.innerHTML='<span class="lv">●</span>'+S('c1','🧑‍🎓',tn,'Total new admissions')+S('c2','👦',tm,'Boys')+S('c3','👧',tf,'Girls')+S('c10','📒','V–X '+(last.VX||0),'Register last Sl. V–X')+S('c8','📘','XI '+(last.XI||0),'Register last Sl. XI')+S('c4','🕒',cnt('pending'),'Waiting staff verification')+S('c6','🛡️',cnt('verified'),'Waiting admin approval')+S('c5','✅',cnt('approved'),'Approved, ready to admit')}
 
  /* ---------- ADMISSION REGISTER (new admissions only): V–X one serial, XI separate, per year ---------- */
  const serOf=c=>c==='XI'?'XI':(c==='XII'?'XII':'VX');
@@ -2450,6 +2458,8 @@ const ADM=(function(){
 
  /* ---------- profile finder (current year DB + new session) ---------- */
  let pfRows=[];
+ function pop(){document.getElementById('admPop').classList.toggle('show')}
+ document.addEventListener('click',e=>{const p=document.getElementById('admPop'),s=document.getElementById('admStrip');if(p&&p.classList.contains('show')&&!p.contains(e.target)&&!s.contains(e.target))p.classList.remove('show')});
  function profDraw(){
   const box=$('pfBox');if(!box)return;const src=$('pfSrc').value,c=$('pfCls').value,q=up($('pfQ').value),cur=src==='cur';
   let rows=(cur?STUDENT_DB.slice():placed.slice()).filter(s=>(!c||String(s.cls).toUpperCase()===c)&&(!q||up([s.name,s.father,s.mother,s.mobile,s.sikshaId,s.cls+' '+(s.sec||'')+' '+s.roll,s.cls+(s.sec||'')+s.roll].join(' ')).indexOf(q)>=0));
@@ -2542,7 +2552,7 @@ const ADM=(function(){
  $('amOpen').href=link();
  if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{live();dash();if(document.body.dataset.view==='adm')refresh(true)})}else stopLive()});
  dash();
- return{profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
