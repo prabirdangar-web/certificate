@@ -165,7 +165,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
   </div>
  </div>
  <div class="card"><h2><b>9</b> Subjects for Class XI</h2>
-  <p class="note">Minimum 5 subjects: 2 languages (automatic) + 3 electives. 1 optional elective may be added. Subjects needing a pass in Madhyamik stay disabled until the marks above are entered and are at least 35.</p>
+  <p class="note">Minimum 5 subjects: 2 languages (automatic) + 3 electives. 1 optional elective may be added. Subjects needing a pass in Madhyamik stay disabled until the marks above are entered and are at least 35. Computer Application (COMA) has no marks requirement; Science students may take one of COMA or COMS.</p>
   <div class="grid">
    <label>Language 1 <small>(automatic)</small><input id="lang1" class="ro" readonly></label>
    <label>Language 2 <small>(automatic)</small><input id="lang2" class="ro" readonly value="English"></label>
@@ -462,23 +462,29 @@ const VD=[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4
 const VP=[[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
 function aadhaarOK(s){if(!/^[2-9]\d{11}$/.test(s))return false;let c=0;s.split('').reverse().forEach((ch,i)=>{c=VD[c][VP[i%8][+ch]]});return c===0}
 /* ===== Class XI: Madhyamik marks, stream, subjects ===== */
-const CORE=['Physics','Chemistry','Mathematics','Biology','Computer Science'];
+const COMS='Computer Science (COMS)',COMA='Computer Application (COMA)';
+/* Science: COMA or COMS (one of the two, never both) counts with the core subjects */
+const CORE=['Physics','Chemistry','Mathematics','Biology',COMS,COMA];
 const COMMON=['Mathematics','History','Philosophy','Political Science','Sanskrit','Geography'];
+/* COMA is common to Science and Arts (not offered to Vocational) */
+const ARTS=COMMON.concat([COMA]);
 /* Madhyamik subject needing >=33 for each elective (null = no marks rule) */
-const ELIG={'Physics':'PS','Chemistry':'PS','Biology':'LS','Computer Science':'MA','Mathematics':'MA','History':null,'Geography':'GE','Philosophy':null,'Political Science':null,'Sanskrit':null};
+const ELIG={'Physics':'PS','Chemistry':'PS','Biology':'LS',[COMS]:'MA',[COMA]:null,'Mathematics':'MA','History':null,'Geography':'GE','Philosophy':null,'Political Science':null,'Sanskrit':null};
 const MKN={MA:'Mathematics',PS:'Physical Science',LS:'Life Science',GE:'Geography'};
 const SLOTS=['el1','el2','el3','opt'];
 function mk(c){const v=val('mp'+c);return /^\d+$/.test(v)?+v:null}
 function okSub(s){const c=ELIG[s];if(!c)return true;const m=mk(c);return m!==null&&m>=35}
 function poolFor(slot){const st=val('stream');if(!st)return [];
- if(slot==='opt')return st==='Science'?CORE.concat(COMMON.filter(x=>CORE.indexOf(x)<0)):COMMON;
- return st==='Science'?CORE:COMMON}
+ if(st==='Science')return slot==='opt'?CORE.concat(COMMON.filter(x=>CORE.indexOf(x)<0)):CORE;
+ if(st==='Arts')return ARTS;
+ return COMMON}
 function slotsNeeded(){return val('stream')==='Vocational'?['el1','el2']:['el1','el2','el3']}
 function drawSubj(){
  const st=val('stream');$('wTrade').classList.toggle('hide',st!=='Vocational');$('wEl3').classList.toggle('hide',st==='Vocational');
  $('lang1').value=val('medium')==='Santali'?'Santali':'Bengali';
  SLOTS.forEach(s=>{const sel=$(s),cur=sel.value;
   const taken=SLOTS.filter(x=>x!==s&&!(x==='el3'&&st==='Vocational')).map(x=>$(x).value).filter(Boolean);
+  if(taken.indexOf(COMA)>=0)taken.push(COMS);else if(taken.indexOf(COMS)>=0)taken.push(COMA); /* only one of COMA / COMS */
   let h='<option value="">'+(s==='opt'?'— none —':'— select —')+'</option>';
   poolFor(s).forEach(x=>{if(taken.indexOf(x)>=0)return;const ok=okSub(x);h+='<option value="'+x+'"'+(ok?'':' disabled')+'>'+x+(ok?'':' — needs 35 in '+MKN[ELIG[x]])+'</option>'});
   sel.innerHTML=h;sel.disabled=!st;if(cur&&poolFor(s).indexOf(cur)>=0&&okSub(cur)&&taken.indexOf(cur)<0)sel.value=cur});
@@ -544,6 +550,7 @@ function check(){
    SLOTS.forEach(s=>{const v=val(s);if(v&&!okSub(v))E(s,v+' needs at least 35 in Madhyamik '+MKN[ELIG[v]]+'.')});
    const ch=SLOTS.filter(s=>!(s==='el3'&&val('stream')==='Vocational')).map(val).filter(Boolean);
    if(new Set(ch).size!==ch.length)E('el1','The same subject is chosen twice.');
+   if(ch.indexOf(COMA)>=0&&ch.indexOf(COMS)>=0)E('el1','Choose only one of Computer Application (COMA) and Computer Science (COMS).');
    if(val('stream')==='Science'&&['el1','el2','el3'].filter(s=>CORE.indexOf(val(s))>=0).length<3)E('el1','Science: choose at least 3 from Physics, Chemistry, Mathematics, Biology, Computer Science.');
   }}
  if(SIGN_REQUIRED&&!signImg)E('sign','Upload the student\'s signature (full signature in black ink, not block letters).');
