@@ -31,6 +31,11 @@ input:focus,select:focus,textarea:focus{outline:3px solid rgba(20,88,40,.25);bor
 .hp{position:absolute;left:-9999px;height:0;overflow:hidden}
 .photo{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .photo img{width:92px;height:116px;object-fit:cover;border:2px dashed var(--line);border-radius:8px;background:#f4f7f4}
+.photo img.sig{width:200px;height:80px;object-fit:contain;border:2px dashed var(--line);background:#fff}
+.sigbox{border:1px solid var(--line);border-radius:10px;padding:10px 14px 12px;margin:14px 0 6px;background:#fafcfa}
+.sigbox h3{margin:0 0 4px;font-size:14px;color:var(--g)}
+.sigrule{font-size:12.5px;margin:6px 0 10px;padding-left:18px;color:#34473b}.sigrule li{margin:2px 0}
+#addrMsg{min-height:16px;font-weight:600}
 button.submit{width:100%;padding:14px;border:0;border-radius:12px;background:var(--g);color:#fff;font-size:16px;font-weight:800;cursor:pointer}
 button.submit:disabled{opacity:.6}
 button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;color:var(--g);font-weight:700;cursor:pointer}
@@ -105,10 +110,11 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
  </div>
 
  <div class="card"><h2><b>4</b> Address</h2>
-  <p class="note">Type the village / town exactly as in the certificate. If it is in the school's list, the other boxes fill automatically; otherwise fill them yourself. All are compulsory.</p>
+  <p class="note">Type the <b>PIN code</b> or the village / town. The other boxes fill automatically from the school's village list or the India Post directory &mdash; please check them and correct if needed. All are compulsory.</p>
+  <div class="note" id="addrMsg"></div>
   <div class="grid">
    <label>Village / Town<input id="village" class="key req" maxlength="60" list="vl"></label><datalist id="vl"></datalist>
-   <label>Post Office<input id="po" class="req" maxlength="60"></label>
+   <label>Post Office<input id="po" class="req" maxlength="60" list="pol"></label><datalist id="pol"></datalist>
    <label>Police Station<input id="ps" class="req" maxlength="60"></label>
    <label>Block<input id="block" class="req" maxlength="60"></label>
    <label>District<input id="dist" class="req" maxlength="40"></label>
@@ -150,6 +156,14 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
    <img id="pv" alt="photo preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='92' height='116'%3E%3Crect width='92' height='116' fill='%23f4f7f4'/%3E%3Ctext x='46' y='62' font-size='11' text-anchor='middle' fill='%23888'%3EPhoto%3C/text%3E%3C/svg%3E">
    <label style="flex:1;min-width:200px">Passport-size photo of student <small>(compulsory – JPG/PNG, auto-resized)</small><input id="photo" type="file" accept="image/*"></label>
   </div>
+  <div class="sigbox">
+   <h3>Student's signature <small style="font-weight:500;color:var(--mut)">(optional upload)</small></h3>
+   <ul class="sigrule"><li>Sign on <b>plain white paper</b> with a <b>black ink ball pen</b>.</li><li>Write your <b>full signature as you normally sign &mdash; not in block (capital) letters</b>.</li><li>Take a clear, well-lit photo or scan, crop close to the signature, then upload it here.</li></ul>
+   <div class="photo">
+    <img id="sv" class="sig" alt="signature preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='80'%3E%3Crect width='200' height='80' fill='%23fff'/%3E%3Ctext x='100' y='45' font-size='12' text-anchor='middle' fill='%23888'%3ESignature%3C/text%3E%3C/svg%3E">
+    <div style="flex:1;min-width:200px"><label style="margin-bottom:8px">Upload signature <small>(JPG/PNG &ndash; auto-cleaned &amp; resized)</small><input id="sign" type="file" accept="image/*"></label><button type="button" class="sec" id="signClr">Remove signature</button></div>
+   </div>
+  </div>
   <p class="note">Bring these originals when called for verification:</p>
   <ul class="docs"><li>Birth certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
   <label class="chk" style="margin-top:12px"><input type="checkbox" id="decl"> I declare that the information given above is true and complete. I understand that this is only an application: admission is confirmed only after verification by the school staff and approval by the Headmaster / Admin.</label>
@@ -165,9 +179,150 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
 <script>
 const XI=false;
 const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
-/* ===== Village list: add rows as  {v:'Village',po:'..',ps:'..',block:'..',dist:'Bankura',pin:'......',state:'West Bengal'} ===== */
+/* ===== Village list (same list as index.html): add rows as  {v:'Village',po:'..',ps:'..',block:'..',dist:'Bankura',pin:'......',state:'West Bengal'} ===== */
 const VILLAGES=[
- {v:'Taldangra',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'}
+ {v:'Adgargara',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Adhkara',po:'Panchmura',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Agaya',po:'Fulmati',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Akandboni',po:'Lauda',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Asanboni',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Asna',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Aulia',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bagdoba',po:'Pukuriya',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722160',state:'West Bengal'},
+ {v:'Bagisha',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bahara',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bairagibandh',po:'Nachna',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Baktore',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Balarampur',po:'Prardanga',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Balibandh',po:'Harmasra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bamun Para',po:'Nutangram',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722101',state:'West Bengal'},
+ {v:'Bankata',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Banktore',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Barakura',po:'Baital',ps:'Jaypur',block:'',dist:'Bankura',pin:'722138',state:'West Bengal'},
+ {v:'Baramehshya',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Barameshya',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Belatikri',po:'Moukura',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722150',state:'West Bengal'},
+ {v:'Belsula',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Belsulia',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Benagari',po:'Chhagulia',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Besulia',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bhallickchira',po:'Sukhidali',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722150',state:'West Bengal'},
+ {v:'Bhaluka',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bhalukchira',po:'Sukhadhali',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722150',state:'West Bengal'},
+ {v:'Bhatmara',po:'Gopalsole',ps:'Garhbeta',block:'',dist:'Bankura',pin:'721127',state:'West Bengal'},
+ {v:'Bhedua',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bhelara',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bhutama',po:'Nachna',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Bonsarenga',po:'Bonsarenga',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722160',state:'West Bengal'},
+ {v:'Boserdanga',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Brahamandanga',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Brahmandanga',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Brindabanpur',po:'Murakata',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722144',state:'West Bengal'},
+ {v:'Chakshyampur',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Chenchurya',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Chhatrakhanda',po:'Dighalgram',ps:'Indas',block:'',dist:'Bankura',pin:'722201',state:'West Bengal'},
+ {v:'Chingani',po:'Chingani',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Dahala',po:'Dahala',ps:'Khatra',block:'Khatra',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Dakshinsole',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Deuli',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Dhabani',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Dhanara',po:'Arkama',ps:'Khatra',block:'Khatra',dist:'Bankura',pin:'722140',state:'West Bengal'},
+ {v:'Dulalpur',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Dumuria',po:'Gholkunda',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Dunduria',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Fulmati',po:'Fulmati',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Gengari',po:'Khulyamuri',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Gopalnagar',po:'Hetyagora',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Gopalpur',po:'Palashboni',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722144',state:'West Bengal'},
+ {v:'Harakona',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Harulia',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Jafala',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Jhenja',po:'Shyamsundarpur',ps:'Barikul',block:'',dist:'Bankura',pin:'722134',state:'West Bengal'},
+ {v:'Joypur',po:'Panchmura',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722156',state:'West Bengal'},
+ {v:'Kadagote',po:'Ratanpur',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Kadamara',po:'Harmasra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Kajla',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Kalindipur',po:'Sandhipur',ps:'Garhbeta',block:'',dist:'Bankura',pin:'721127',state:'West Bengal'},
+ {v:'Karakanali',po:'Pathardoba',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Kashibani',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Kasidanga',po:'Douni',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722149',state:'West Bengal'},
+ {v:'Kendbuda',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Kendubuda',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Khalgram',po:'Khalgram',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Khamarberia',po:'Onda',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722144',state:'West Bengal'},
+ {v:'Khatbanda',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Khayergeria',po:'Bandubrajpur',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Khiraisole',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Khulimuri',po:'Khuilamuri',ps:'Khatra',block:'Khatra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Khulyamuri',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Kuldiha',po:'Sarenga',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722150',state:'West Bengal'},
+ {v:'Laltyagora',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Laltyagra',po:'Chechurya',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Laltyagura',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Latyagora',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Laxmanpur',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Machhrakhi',po:'Ratanpur',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Machla',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Majir Danga',po:'Manjir Danga',ps:'Sonamukhi',block:'',dist:'Bankura',pin:'722207',state:'West Bengal'},
+ {v:'Malatore',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Mallickdanga',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Manderboni',po:'Manderboni',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Masatkhal',po:'Pathardoba',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Molboni',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Molebani',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Mugai',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Napitbandh',po:'Jamjuri',ps:'Jamjuri',block:'',dist:'Bankura',pin:'722144',state:'West Bengal'},
+ {v:'Natungram',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Nayabasat',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Nibra',po:'Gargariya',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722150',state:'West Bengal'},
+ {v:'Nutangara',po:'Pratappur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Nutangram',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Pakurdiha',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Palashboni',po:'Palashboni',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Pararbandh',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Parulia',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Pathardoba',po:'Pathardoba',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Patharjal',po:'Dangordih',ps:'Boro',block:'',dist:'Bankura',pin:'723131',state:'West Bengal'},
+ {v:'Patrabandh',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Petyakana',po:'Gholkunda',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Pratappur',po:'Palashbani',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Punesa',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Puneshya',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Punisole',po:'Punisole',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722101',state:'West Bengal'},
+ {v:'Radamohanpur',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Radhamohanpur',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Raniara',po:'Vedua',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Ratanpur',po:'Ratanpur',ps:'Onda',block:'Onda',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Rengta Khulia',po:'Fulmati',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Rengtakhula',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Rengtakhulia',po:'Fulmoti',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Rengtatakhulia',po:'Fulmati',ps:'Bankura',block:'',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Saharghati',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Salboni',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Sankaria',po:'Choutar',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722150',state:'West Bengal'},
+ {v:'Saralia',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Shyampur',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Sialbathan',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Sidabad',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Simlapal',po:'Simlapal',ps:'Simlapal',block:'Simlapal',dist:'Bankura',pin:'722151',state:'West Bengal'},
+ {v:'Sukhanibas',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Suraldangaq',po:'Sukhadali',ps:'Sarenga',block:'Sarenga',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Taldangra',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Taldiha',po:'Saralia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tangrasole',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tantidanga',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Telanbandi',po:'Khulymuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tengrasole',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tengrosole',po:'Chhagulia',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tentuliadanga',po:'Pirrabani',ps:'Beliatore',block:'',dist:'Bankura',pin:'722203',state:'West Bengal'},
+ {v:'Tilaghagri',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tiring',po:'Tiring',ps:'Khatra',block:'Khatra',dist:'Bankura',pin:'722140',state:'West Bengal'},
+ {v:'Tring',po:'Khatra',ps:'Tiring',block:'',dist:'Bankura',pin:'722140',state:'West Bengal'},
+ {v:'Tulderia',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tulderya',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Tuldetya',po:'Khulyamuri',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Udayanpalli',po:'Taldangra',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'},
+ {v:'Velara',po:'Chakshyampur',ps:'Taldangra',block:'Taldangra',dist:'Bankura',pin:'722152',state:'West Bengal'}
 ];
 /* ===== Google Drive copy of the photo: paste your Apps Script web-app URL and the same secret key as in the script (see drive-photo-script.gs). Leave URL empty to turn off. ===== */
 const DRIVE_URL='https://script.google.com/macros/s/AKfycbyzuDKWOq2gD_Sre3zy-tcwwlSR64u5GTTyJpyhb2xnXYdw0cwmiuDFM1ArFh1ADslFTg/exec';
@@ -201,11 +356,80 @@ function cond(){
  $('wTon').classList.toggle('hide',$('tongue').value!=='Other');
  const d=$('dob').value;if(d){const b=new Date(d),n=new Date(),a=n.getFullYear()-b.getFullYear()-((n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))?1:0);$('age').textContent='Age today: '+a+' years';}else $('age').textContent=''}
 ['sex','disab','bpl','permSame','dob','nationality','tongue'].forEach(i=>$(i).addEventListener('change',cond));cond();
-function villageFill(){const k=val('village').toLowerCase();const m=VILLAGES.find(x=>x.v.toLowerCase()===k);
- if(m){['po','ps','block','dist','pin','state'].forEach(f=>$(f).value=m[f])}}
-$('village').addEventListener('input',villageFill);$('village').addEventListener('change',villageFill);
+/* ===== Address auto-fetch: school village list -> PIN (India Post directory) -> post-office name ===== */
+const ADDR={};let vTimer=0,pTimer=0;
+const uniq=a=>a.filter((x,i)=>x&&a.indexOf(x)===i);
+const cleanPO=n=>String(n||'').replace(/\s+(B\.?\s?O|S\.?\s?O|H\.?\s?O|G\.?\s?P\.?\s?O)\.?$/i,'').trim();
+const blk=o=>o.Block&&o.Block!=='NA'?o.Block:'';
+function say(m,warn){const e=$('addrMsg');e.textContent=m||'';e.style.color=warn?'#8a5600':'#145828'}
+function offer(id,list){const d=$(id);d.innerHTML='';uniq(list).forEach(x=>{const o=document.createElement('option');o.value=x;d.appendChild(o)})}
+/* keep the current value if it is one of the options; otherwise set it when there is exactly one option */
+function pick(id,list){const l=uniq(list);if(!l.length)return;const el=$(id),cur=el.value.trim().toLowerCase();
+ if(cur&&l.some(x=>x.toLowerCase()===cur))return;if(l.length===1){el.value=l[0];el.classList.remove('bad')}}
+async function jget(u){const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);
+ try{const r=await fetch(u,{signal:c.signal});if(!r.ok)throw new Error('http');return await r.json()}finally{clearTimeout(t)}}
+async function ipost(kind,q){const k=kind+q.toLowerCase();if(ADDR[k])return ADDR[k];
+ try{const j=await jget('https://api.postalpincode.in/'+kind+'/'+encodeURIComponent(q));
+  const o=j&&j[0]&&j[0].Status==='Success'?j[0].PostOffice:null;if(o&&o.length){ADDR[k]=o;return o}}catch(e){}
+ return null}
+async function fromPin(){
+ const pin=val('pin');if(!/^\d{6}$/.test(pin))return;
+ const loc=VILLAGES.filter(x=>x.pin===pin);
+ if(loc.length){pick('dist',loc.map(x=>x.dist));pick('state',loc.map(x=>x.state));pick('block',loc.map(x=>x.block));pick('ps',loc.map(x=>x.ps));pick('po',loc.map(x=>x.po));
+  offer('pol',loc.map(x=>x.po));offer('vl',loc.map(x=>x.v).concat(VILLAGES.map(x=>x.v)))}
+ say('Looking up PIN '+pin+'…');
+ const pos=await ipost('pincode',pin);if(val('pin')!==pin)return;
+ if(!pos){say(loc.length?'Address filled from the school list ✔ — please check it.':'PIN not found (or no internet) — please fill the address boxes yourself.',!loc.length);return}
+ const names=uniq(pos.map(x=>cleanPO(x.Name)));
+ pick('dist',pos.map(x=>x.District));pick('state',pos.map(x=>x.State));pick('block',pos.map(blk));pick('po',names);
+ offer('pol',names.concat(loc.map(x=>x.po)));offer('vl',loc.map(x=>x.v).concat(names,VILLAGES.map(x=>x.v)));
+ const po=val('po'),ps=val('ps'),poOk=po&&names.some(n=>n.toLowerCase()===po.toLowerCase());
+ const psOk=ps&&loc.some(x=>x.ps.toLowerCase()===ps.toLowerCase());
+ say('Address filled from PIN '+pin+' ✔ — please check it.'+(poOk?'':' Choose your Post Office from the list.')+(!ps?' Type the Police Station.':(psOk?'':' Please check the Police Station — the PIN directory does not list it.')),!poOk||!psOk)}
+function fromVillage(){
+ const k=val('village').toLowerCase(),m=VILLAGES.find(x=>x.v.toLowerCase()===k);
+ clearTimeout(vTimer);
+ if(m){['po','ps','block','dist','pin','state'].forEach(f=>{$(f).value=m[f]||'';$(f).classList.remove('bad')});
+  say('Address filled from the school village list ✔ — please check it.');fromPin();return}
+ if(k.length<3)return;
+ vTimer=setTimeout(async()=>{
+  const name=val('village');if(name.toLowerCase()!==k)return;
+  say('Searching the India Post directory for “'+name+'”…');
+  const pos=await ipost('postoffice',name);if(val('village').toLowerCase()!==k)return;
+  let c=(pos||[]).filter(x=>cleanPO(x.Name).toLowerCase()===k);
+  if(!c.length){say('');return}
+  const wb=c.filter(x=>x.State==='West Bengal');if(wb.length)c=wb;
+  const bk=c.filter(x=>x.District===(val('dist')||'Bankura'));if(bk.length)c=bk;
+  if(uniq(c.map(x=>x.Pincode)).length!==1){say('Several places named “'+name+'” found — type the PIN code and the rest will fill.',true);return}
+  const o=c[0];$('po').value=cleanPO(o.Name);$('pin').value=o.Pincode;$('dist').value=o.District;$('state').value=o.State;if(blk(o))$('block').value=blk(o);
+  say('Found in the India Post directory ✔ — please check it.');fromPin()},700)}
+$('village').addEventListener('input',fromVillage);$('village').addEventListener('change',fromVillage);
+$('pin').addEventListener('input',()=>{const p=$('pin'),c=p.value.replace(/\D/g,'').slice(0,6);if(c!==p.value)p.value=c;
+ clearTimeout(pTimer);if(c.length===6)pTimer=setTimeout(fromPin,250);else say('')});
 $('photo').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
  r.onload=()=>{const im=new Image();im.onload=()=>{const m=300,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);photo=c.toDataURL('image/jpeg',.8);$('pv').src=photo;$('photo').classList.remove('bad')};im.onerror=()=>{$('err').textContent='Could not read that image.'};im.src=r.result};r.readAsDataURL(f)});
+/* ===== Student signature (optional upload): cleaned to dark-on-white and resized small ===== */
+const SIGN_REQUIRED=false; /* set to true to make the signature compulsory */
+let signImg='';
+const SIGN_BLANK=$('sv').src;
+function cleanSign(im){
+ const k=Math.min(1,420/im.width,170/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k));
+ const c=document.createElement('canvas');c.width=w;c.height=h;
+ const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);
+ try{
+  const id=x.getImageData(0,0,w,h),p=id.data,n=w*h,L=new Uint8Array(n),H=new Uint32Array(256);
+  for(let i=0;i<n;i++){const l=(p[i*4]*.3+p[i*4+1]*.59+p[i*4+2]*.11)|0;L[i]=l;H[l]++}
+  const at=f=>{let a=0;for(let v=0;v<256;v++){a+=H[v];if(a>=n*f)return v}return 255};
+  const lo=at(.01),wp=Math.max(lo+30,at(.6)-8);
+  if(wp-lo>=40){for(let i=0;i<n;i++){const v=Math.max(0,Math.min(255,Math.round((L[i]-lo)*255/(wp-lo))));p[i*4]=p[i*4+1]=p[i*4+2]=v;p[i*4+3]=255}x.putImageData(id,0,0)}
+ }catch(e){}
+ let q=.85,o=c.toDataURL('image/jpeg',q);while(o.length>60000&&q>.4){q-=.1;o=c.toDataURL('image/jpeg',q)}
+ return o}
+$('sign').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{signImg=cleanSign(im);$('sv').src=signImg;$('sign').classList.remove('bad')};
+  im.onerror=()=>{$('err').textContent='Could not read that signature image. Please use a JPG or PNG.'};im.src=r.result};
+ r.readAsDataURL(f)});
+$('signClr').addEventListener('click',()=>{signImg='';$('sign').value='';$('sv').src=SIGN_BLANK});
 /* Aadhaar checksum (Verhoeff) */
 const VD=[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
 const VP=[[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
@@ -295,6 +519,7 @@ function check(){
    if(new Set(ch).size!==ch.length)E('el1','The same subject is chosen twice.');
    if(val('stream')==='Science'&&['el1','el2','el3'].filter(s=>CORE.indexOf(val(s))>=0).length<3)E('el1','Science: choose at least 3 from Physics, Chemistry, Mathematics, Biology, Computer Science.');
   }}
+ if(SIGN_REQUIRED&&!signImg)E('sign','Upload the student\'s signature (full signature in black ink, not block letters).');
  if(!photo)E('photo','Upload the student\'s passport-size photo.');
  if(!$('decl').checked)E('decl','Please tick the declaration.');
  bad.forEach(i=>{const x=$(i);if(x)x.classList.add('bad')});
@@ -313,7 +538,7 @@ $('f').addEventListener('submit',async ev=>{
  if(XI){d.cls='XI';d.mpPct=(+d.mpMarks/7).toFixed(2);
   d.subj='Language 1: '+d.lang1+'; Language 2: '+d.lang2+'; Electives: '+['el1','el2','el3'].map(s=>d[s]).filter(Boolean).join(', ')+(d.stream==='Vocational'?'; Trade: '+d.trade:'')+(d.opt?'; Optional: '+d.opt:'')}
  d.permSame=$('permSame').checked;if(d.permSame)d.permAddr='';
- d.photo=photo;d.decl=true;
+ d.photo=photo;d.sign=signImg;d.decl=true;
  d.ref='TF'+String(YEAR).slice(-2)+'-'+Math.random().toString(36).slice(2,7).toUpperCase()+Date.now().toString(36).slice(-3).toUpperCase();
  d.ts=firebase.firestore.FieldValue.serverTimestamp();
  $('btn').disabled=true;$('btn').textContent='Submitting…';
