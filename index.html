@@ -1689,13 +1689,14 @@ function generateStudentReport(type) {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'report-view-toggle';
-                btn.textContent = 'VIEW STUDENT REPORTS (OPTIONAL)';
+                btn.innerHTML = '<span class="rv-ic">📊</span><span>STUDENT REPORTS<small>Tap to open class · sex · caste tables</small></span>';
                 btn.onclick = function () {
                     const visible = reportPanel.style.display === 'block';
                     reportPanel.style.display = visible ? 'none' : 'block';
-                    btn.textContent = visible
-                        ? 'VIEW STUDENT REPORTS (OPTIONAL)'
-                        : 'HIDE STUDENT REPORTS';
+                    btn.classList.toggle('open', !visible);
+                    btn.innerHTML = visible
+                        ? '<span class="rv-ic">📊</span><span>STUDENT REPORTS<small>Tap to open class · sex · caste tables</small></span>'
+                        : '<span class="rv-ic">✖️</span><span>HIDE REPORTS<small>Tap to close</small></span>';
                 };
                 reportHost.insertBefore(btn, reportPanel);
                 reportPanel.style.display = 'none';
@@ -1916,13 +1917,18 @@ const TFDB=(function(){
  async function upload(){if(!need())return;year=$('dvYear').value;if(!confirm('Upload '+STUDENT_DB.length+' students as database for '+year+'? This replaces the online copy.'))return;
   try{const b=db.batch(),n=Math.ceil(STUDENT_DB.length/CH);for(let i=0;i<n;i++)b.set(db.collection('certDb').doc(year+'_'+i),{year,i,rows:STUDENT_DB.slice(i*CH,(i+1)*CH).map(s=>Object.assign({},s))});
    b.set(db.collection('certDb').doc(year),{year,count:STUDENT_DB.length,chunks:n,updatedBy:auth.currentUser.email,updated:firebase.firestore.FieldValue.serverTimestamp()});await b.commit();chips();msg('Uploaded '+STUDENT_DB.length+' students for '+year+' ✔')}catch(e){msg('Upload failed (admin only): '+(e.code||e.message),true)}}
+ function touch(){Object.keys(STUDENT_INDEX).forEach(k=>delete STUDENT_INDEX[k]);STUDENT_DB.forEach(s=>{STUDENT_INDEX[s.cls+'|'+s.sec+'|'+s.roll]=s});try{lookupStudent()}catch(e){}chips();summary()}
+ async function saveOnline(){if(!need())return false;year=$('dvYear').value;if(src!=='firebase'&&!confirm('This screen is using the '+src+' student list, not the online copy.\nSaving will REPLACE the online database for '+year+' with this list plus your edit.\n\nTip: Data & Year → Load from Firebase first. Continue?'))return false;
+  try{const b=db.batch(),n=Math.ceil(STUDENT_DB.length/CH);for(let i=0;i<n;i++)b.set(db.collection('certDb').doc(year+'_'+i),{year,i,rows:STUDENT_DB.slice(i*CH,(i+1)*CH).map(s=>Object.assign({},s))});
+   b.set(db.collection('certDb').doc(year),{year,count:STUDENT_DB.length,chunks:n,updatedBy:auth.currentUser.email,updated:firebase.firestore.FieldValue.serverTimestamp()});await b.commit();chips();msg('Saved '+STUDENT_DB.length+' students online for '+year+' ✔');return true}
+  catch(e){msg('Online save failed (admin only): '+(e.code||e.message),true);return false}}
  function builtin(){apply(BUILTIN.slice(),'built-in');msg('Source: built-in database (offline).')}
  function setView(v){document.body.setAttribute('data-view',v);document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('tfT').textContent=T[v][0];$('tfS').textContent=T[v][1];if(v==='data')summary();window.scrollTo(0,0)}
  const y=new Date().getFullYear();$('dvYear').innerHTML=[y-2,y-1,y,y+1].map(v=>'<option'+(v===y?' selected':'')+'>'+v+'</option>').join('');
  document.querySelector('.tf-side').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.v)setView(b.dataset.v);else if(b.id==='tfCol'){document.body.classList.toggle('tf-c');$('tfCol').querySelector('.ic').textContent=document.body.classList.contains('tf-c')?'»':'«'}else if(b.id==='tfSign')$('tfLogin').classList.toggle('show')});
  setView('cert');chips();summary();
  if(ok){const app=firebase.apps.find(a=>a.name==='tfdb')||firebase.initializeApp(CFG,'tfdb');db=app.firestore();auth=app.auth();auth.onAuthStateChanged(u=>{chips();if(u){$('tfLogin').classList.remove('show');$('tfLm').textContent='';msg('Signed in as '+u.email+'. Source: '+src+'.')}})}
- return{load,upload,builtin,login(){if(!ok){$('tfLm').textContent='Firebase not loaded';return}auth.signInWithEmailAndPassword($('tfE').value.trim(),$('tfP').value).catch(e=>$('tfLm').textContent=e.code||e.message)},logout(){if(auth)auth.signOut().then(()=>$('tfLogin').classList.remove('show'))}};
+ return{touch,saveOnline,getYear:()=>year,load,upload,builtin,login(){if(!ok){$('tfLm').textContent='Firebase not loaded';return}auth.signInWithEmailAndPassword($('tfE').value.trim(),$('tfP').value).catch(e=>$('tfLm').textContent=e.code||e.message)},logout(){if(auth)auth.signOut().then(()=>$('tfLogin').classList.remove('show'))}};
 })();
 </script>
 <script>
@@ -1991,9 +1997,25 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
 .ap-hp{position:absolute;left:-9999px}
 
 /* admission register / live dashboard / editor */
-.ad-live{background:#fff8e1;border:1px solid #e0b84a;border-radius:8px;padding:8px 10px;margin:6px 0 10px;font-size:12px;color:#1d2b22}
-.ad-live table{width:100%;border-collapse:collapse;margin-top:4px}.ad-live th,.ad-live td{border:1px solid #e0cf9a;padding:2px 5px;text-align:center}.ad-live th{background:#f3e3a6}
-.ad-sm{font-size:11px;color:#555;margin-top:3px}
+.ad-live{background:#fff;border-radius:18px;padding:16px 16px 14px;margin:6px 0 14px;box-shadow:0 4px 16px rgba(0,0,0,.10);color:#1d2b22}
+.ad-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ad-h .ic{font-size:34px;line-height:1}.ad-h b{font-size:21px;color:#145828;letter-spacing:.2px}.ad-h small{font-size:13px;color:#555;font-weight:700}
+.ad-live{--g1:#2e9e4f}.ad-live .lv{color:#e0243c;font-weight:900;font-size:13px;animation:adp 1.4s infinite}
+@keyframes adp{50%{opacity:.35}}
+.ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;margin-bottom:10px}
+.ad-gt{font-size:11px;font-weight:900;letter-spacing:1.2px;color:#6b7a70;margin:12px 0 6px}
+.tl{border-radius:16px;padding:12px 8px 10px;color:#fff;text-align:center;box-shadow:0 3px 8px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;gap:2px;min-height:112px;justify-content:center}
+.tl .ic{font-size:36px;line-height:1.1}.tl .n{font-size:36px;font-weight:900;line-height:1.05}
+.tl .l{font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}.tl .s{font-size:12px;font-weight:700;opacity:.95}
+.tl.z{opacity:.55;filter:saturate(.6)}
+.tl.big{grid-column:span 1;min-height:128px}.tl.big .n{font-size:44px}
+.c1{background:linear-gradient(135deg,#1e9b4a,#0f6b32)}.c2{background:linear-gradient(135deg,#2f8ef0,#1456b8)}.c3{background:linear-gradient(135deg,#f0508f,#b8185c)}
+.c4{background:linear-gradient(135deg,#ff9a2e,#d9610a)}.c5{background:linear-gradient(135deg,#19b5a5,#0c7d86)}.c6{background:linear-gradient(135deg,#9b5de5,#5f2eb3)}
+.c7{background:linear-gradient(135deg,#ef476f,#b3203f)}.c8{background:linear-gradient(135deg,#5b6ee1,#2c3a9e)}.c9{background:linear-gradient(135deg,#8d6e63,#5d4037)}.c10{background:linear-gradient(135deg,#f6c026,#c78a00);color:#3a2a00}
+.ad-lock{text-align:center;padding:18px 10px;font-weight:800;color:#555}.ad-lock .ic{font-size:46px;display:block}
+.report-view-toggle{display:flex!important;align-items:center;justify-content:center;gap:14px;width:100%;padding:16px 18px!important;border:0!important;border-radius:16px!important;background:linear-gradient(135deg,#2f8ef0,#9b5de5)!important;color:#fff!important;font-size:18px!important;font-weight:900!important;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;text-align:left}
+.report-view-toggle .rv-ic{font-size:40px;line-height:1}.report-view-toggle small{display:block;font-size:12px;font-weight:700;opacity:.92;margin-top:2px}
+.report-view-toggle.open{background:linear-gradient(135deg,#ef476f,#ff9a2e)!important}
 .ed-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
 .ed-g label{font-size:11px;font-weight:700;display:flex;flex-direction:column;gap:2px;color:#333}
 .ed-g input,.ed-g select{padding:6px;border:1px solid #c9d6cc;border-radius:6px;font-size:13px}
@@ -2001,6 +2023,15 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
 .rg-sl{background:#FFD700;color:#8B0000;font-weight:900;border-radius:20px;padding:1px 8px}
 </style>
 <div id="admView">
+ <div class="dv-c" style="border-top:5px solid #9b5de5"><h3>✏️ Student profile — find, edit &amp; save <small style="color:#b00020">(admin only)</small></h3>
+  <div class="am-grid">
+   <label>Which students <select id="pfSrc" onchange="ADM.profDraw()"><option value="cur">Current year — Data &amp; Year database</option><option value="new">New session — placed / admitted</option></select></label>
+   <label>Class <select id="pfCls" onchange="ADM.profDraw()"><option value="">All</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
+   <label>Search <input id="pfQ" oninput="ADM.profDraw()" placeholder="name / father / mobile / Portal ID / roll"></label>
+  </div>
+  <p id="pfInfo" class="am-msg" style="margin:8px 0 0"></p><p id="pfMsg" class="am-msg"></p>
+  <div id="pfBox" class="am-box"></div>
+ </div>
  <div class="dv-c"><h3>Admission — session setup</h3>
   <div class="am-grid">
    <label>Admission year (new session starts in) <select id="amYear" onchange="ADM.refresh()"></select></label>
@@ -2200,7 +2231,7 @@ const ADM=(function(){
   $('amSum').innerHTML=ks.length?'<div class="am-box"><table class="am-t"><tr><th>Class-Sec</th><th>Promoted</th><th>New</th><th>Total</th><th>Last roll</th><th>Next roll</th></tr>'+ks.map(k=>'<tr><td><b>'+k+'</b></td><td>'+g[k].pro+'</td><td>'+g[k].nw+'</td><td>'+g[k].n+'</td><td>'+g[k].max+'</td><td><b>'+(g[k].max+1)+'</b></td></tr>').join('')+'</table></div>':'<p class="am-msg">No student placed for this year yet. Start with step 1 (promote old students).</p>'}
  function drawPlaced(){
   const c=$('plCls').value,s=$('plSec').value;const rows=placed.filter(p=>(!c||p.cls===c)&&(!s||secOf(p)===s));
-  $('amPlaced').innerHTML=rows.length?'<table class="am-t"><tr><th>Reg. Sl.</th><th>Class</th><th>Sec</th><th>Roll</th><th>Name</th><th>Type</th><th>Father</th><th>Mobile</th><th></th></tr>'+rows.map(p=>'<tr><td>'+(p.regNo?'<span class="rg-sl">'+esc(regText(p))+'</span>':'')+'</td><td>'+p.cls+'</td><td>'+esc(secOf(p))+'</td><td><b>'+esc(p.roll)+'</b></td><td class="l">'+esc(p.name)+'</td><td>'+(p.type==='new'?'New':'Promoted')+'</td><td class="l">'+esc(p.father)+'</td><td>'+esc(p.mobile)+'</td><td><button class="dv-b g" onclick="ADM.receipt(\''+p._id+'\')">🧾</button> '+(isAdmin()?'<button class="dv-b g" onclick="ADM.edit(\'s\',\''+p._id+'\')">✎</button> ':'')+'<button class="dv-b g" style="color:#b00020" onclick="ADM.del(\''+p._id+'\')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">Nothing to show.</p>'}
+  $('amPlaced').innerHTML=rows.length?'<table class="am-t"><tr><th>Reg. Sl.</th><th>Class</th><th>Sec</th><th>Roll</th><th>Name</th><th>Type</th><th>Father</th><th>Mobile</th><th></th></tr>'+rows.map(p=>'<tr><td>'+(p.regNo?'<span class="rg-sl">'+esc(regText(p))+'</span>':'')+'</td><td>'+p.cls+'</td><td>'+esc(secOf(p))+'</td><td><b>'+esc(p.roll)+'</b></td><td class="l">'+esc(p.name)+'</td><td>'+(p.type==='new'?'New':'Promoted')+'</td><td class="l">'+esc(p.father)+'</td><td>'+esc(p.mobile)+'</td><td><button class="dv-b g" onclick="ADM.receipt(\''+p._id+'\')">🧾</button> '+'<button class="dv-b g" onclick="ADM.edit(\'s\',\''+p._id+'\')">✎</button> '+'<button class="dv-b g" style="color:#b00020" onclick="ADM.del(\''+p._id+'\')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">Nothing to show.</p>'}
  async function del(id){if(!need())return;const p=placed.find(x=>x._id===id);if(!p||!confirm('Remove '+p.name+' ('+p.cls+' '+secOf(p)+' roll '+p.roll+') from the admission list?'))return;
   try{await db.collection('admStudents').doc(id).delete();placed=placed.filter(x=>x._id!==id);summary();drawPlaced();msg('Removed.')}catch(e){msg('Failed: '+(e.code||e.message),true)}}
 
@@ -2277,7 +2308,7 @@ const ADM=(function(){
  const ADMINS=['prabir.dangar@gmail.com']; /* fallback only if the users/{uid} role document cannot be read */
  const meMail=()=>String(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase();
  let role=null,roleP=Promise.resolve(); /* role comes from users/{uid}.role in Firestore (admin / staff / teacher) */
- const isAdmin=()=>role==='admin'||(role==='?'&&ADMINS.indexOf(meMail())>=0);
+ const isAdmin=()=>['admin','administrator','headmaster'].indexOf(String(role||'').trim().toLowerCase())>=0||ADMINS.indexOf(meMail())>=0;
  const A=id=>apps.find(x=>x._id===id);
  const SKIP=/^_|^(status|ts|staffOk|adminOk|staffNote|adminNote|rejectReason|admitted|decl)$/;
  const GROUPS=[['Admission',[['cls','Class'],['stream','Stream'],['medium','Medium'],['subj','Subjects'],['lang1','Language 1'],['lang2','Language 2'],['el1','Elective 1'],['el2','Elective 2'],['el3','Elective 3'],['opt','Optional elective'],['trade','Vocational trade']]],
@@ -2307,7 +2338,7 @@ const ADM=(function(){
    else if(a.status==='approved')act+=!isAdmin()?'<small>waiting for admin to admit</small>':'<select onchange="ADM._a(\''+a._id+'\',\'_cls\',this.value)">'+CLS.map(c=>'<option'+(c===a._cls?' selected':'')+'>'+c+'</option>').join('')+'</select><select onchange="ADM._a(\''+a._id+'\',\'_sec\',this.value)">'+['A','B','C',''].map(x=>'<option value="'+x+'"'+(x===a._sec?' selected':'')+'>'+(x||'—')+'</option>').join('')+'</select> <button class="dv-b" onclick="ADM.admit(\''+a._id+'\')">Admit</button>';
    else if(a.status==='admitted'&&a.admitted)act+='<b>'+esc(a.admitted.cls)+(a.admitted.sec?'-'+esc(a.admitted.sec):'')+' / Roll '+esc(a.admitted.roll)+'</b>';
    else if(a.status==='rejected')act+='<small>'+esc(a.rejectReason||'')+'</small>';
-   if(isAdmin()&&a.status!=='admitted')act+=' <button class="dv-b g" onclick="ADM.edit(\'a\',\''+a._id+'\')">✎ Edit</button>';
+   if(a.status!=='admitted')act+=' <button class="dv-b g" onclick="ADM.edit(\'a\',\''+a._id+'\')">✎ Edit</button>';
    if(['pending','verified','approved'].indexOf(a.status)>=0)act+=' <button class="dv-b g" style="color:#b00020" onclick="ADM.reject(\''+a._id+'\')">✕</button>';
    return '<tr><td><small>'+esc(a.ref||'')+'</small></td><td>'+(a.photo?'<img src="'+a.photo+'" style="width:34px;height:42px;object-fit:cover;border-radius:4px">':'')+'</td><td class="l"><b>'+esc(a.name)+'</b><br><small>'+esc(a.father)+' · '+esc(a.village)+'</small></td><td><b>'+esc(a.cls)+'</b>'+(a.stream?'<br><small>'+esc(a.stream)+'</small>':'')+'</td><td>'+esc(a.mobile)+'</td><td>'+chip(a.staffOk,'—')+'</td><td>'+chip(a.adminOk,'—')+'</td><td>'+act+'</td></tr>'}).join('')+'</table>':'<p style="padding:10px;font-size:13px">No applications in this view.</p>'}
  function _a(id,k,v){const a=A(id);if(a)a[k]=v}
@@ -2352,22 +2383,25 @@ const ADM=(function(){
  function live(){
   if(!(db&&auth&&auth.currentUser))return;const y=yr();if(unsubS&&liveY===y)return;
   if(unsubS)unsubS();if(unsubA)unsubA();liveY=y;
-  unsubS=db.collection('admStudents').where('year','==',y).onSnapshot(q=>{placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);summary();drawPlaced();drawRegister();dash();preview()},e=>{});
+  unsubS=db.collection('admStudents').where('year','==',y).onSnapshot(q=>{placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);summary();drawPlaced();drawRegister();dash();preview();if($('pfSrc').value==='new')profDraw()},e=>{});
   unsubA=db.collection('admApps').where('year','==',y).onSnapshot(q=>{apps=mapApps(q.docs);if($('amApps').style.display==='block')drawApps();dash()},e=>{})}
 
  /* ---------- dashboard: live new-admission synopsis ---------- */
  function dash(){
   const el=document.getElementById('admLiveDash');if(!el)return;const y=(typeof yr==='function')?yr():'';
-  if(!(db&&auth&&auth.currentUser)){el.innerHTML='<b>🎓 New admissions — live</b><div class="ad-sm">Sign in (sidebar) to see the live class-wise count of newly admitted students.</div>';return}
+  if(!(db&&auth&&auth.currentUser)){el.innerHTML='<div class="ad-lock"><span class="ic">🔒</span>Sign in (sidebar 👤) to see live new admissions</div>';return}
   const nw=placed.filter(p=>p.type==='new'),by={};
   nw.forEach(p=>{const b=by[p.cls]=by[p.cls]||{n:0,m:0,f:0};b.n++;/^f/i.test(p.sex||'')?b.f++:(/^m/i.test(p.sex||'')?b.m++:0)});
-  const ks=CLS.filter(c=>by[c]);let tn=0,tm=0,tf=0;ks.forEach(c=>{tn+=by[c].n;tm+=by[c].m;tf+=by[c].f});
+  let tn=0,tm=0,tf=0;CLS.forEach(c=>{if(by[c]){tn+=by[c].n;tm+=by[c].m;tf+=by[c].f}});
   const last={};nw.forEach(p=>{const k=p.regSeries||serOf(p.cls);last[k]=Math.max(last[k]||0,+p.regNo||0)});
   const cnt=s=>apps.filter(a=>a.status===s).length;
-  el.innerHTML='<b>🎓 New admissions — session '+ses(y)+' <span style="color:#145828">● live</span></b>'+
-   (ks.length?'<table><tr><th>Class</th><th>New</th><th>Boys</th><th>Girls</th></tr>'+ks.map(c=>'<tr><td><b>'+c+'</b></td><td>'+by[c].n+'</td><td>'+by[c].m+'</td><td>'+by[c].f+'</td></tr>').join('')+'<tr style="font-weight:800;background:#fbeebd"><td>Total</td><td>'+tn+'</td><td>'+tm+'</td><td>'+tf+'</td></tr></table>':'<div class="ad-sm">No new student admitted yet for this session.</div>')+
-   '<div class="ad-sm">Register last Sl.: V–X <b>'+(last.VX||0)+'</b> · XI <b>'+(last.XI||0)+'</b>'+(last.XII?' · XII <b>'+last.XII+'</b>':'')+'</div>'+
-   '<div class="ad-sm">Applications: waiting staff <b>'+cnt('pending')+'</b> · waiting admin <b>'+cnt('verified')+'</b> · approved, to admit <b>'+cnt('approved')+'</b></div>'}
+  const T=(cl,ic,n,l,s,extra)=>'<div class="tl '+cl+(extra||'')+'"><span class="ic">'+ic+'</span><span class="n">'+n+'</span><span class="l">'+l+'</span>'+(s?'<span class="s">'+s+'</span>':'')+'</div>';
+  const cc=['c4','c5','c6','c2','c7','c1','c8','c9'],ci2=['🎒','📚','🔬','🧪','📐','🏅','🎓','🏆'];
+  el.innerHTML='<div class="ad-h"><span class="ic">🎓</span><div><b>New admissions</b><br><small>Session '+ses(y)+' &nbsp;<span class="lv">● LIVE</span></small></div></div>'+
+   '<div class="ad-grid">'+T('c1 big','🧑‍🎓',tn,'Total new','',' big')+T('c2 big','👦',tm,'Boys','',' big')+T('c3 big','👧',tf,'Girls','',' big')+'</div>'+
+   '<div class="ad-gt">CLASS-WISE</div><div class="ad-grid">'+CLS.map((c,i)=>{const b=by[c]||{n:0,m:0,f:0};return T(cc[i],ci2[i],b.n,'Class '+c,'👦 '+b.m+' · 👧 '+b.f,b.n?'':' z')}).join('')+'</div>'+
+   '<div class="ad-gt">ADMISSION REGISTER — LAST SL. NO.</div><div class="ad-grid">'+T('c10','📒',last.VX||0,'V – X','series')+T('c8','📘',last.XI||0,'XI','series')+(last.XII?T('c9','📕',last.XII,'XII','series'):'')+'</div>'+
+   '<div class="ad-gt">APPLICATIONS</div><div class="ad-grid">'+T('c4','🕒',cnt('pending'),'Waiting staff','verify')+T('c6','🛡️',cnt('verified'),'Waiting admin','approve')+T('c1','✅',cnt('approved'),'Approved','ready to admit')+'</div>'}
 
  /* ---------- ADMISSION REGISTER (new admissions only): V–X one serial, XI separate, per year ---------- */
  const serOf=c=>c==='XI'?'XI':(c==='XII'?'XII':'VX');
@@ -2385,7 +2419,7 @@ const ADM=(function(){
   const c={};all.forEach(p=>{const k=serName(p.regSeries||serOf(p.cls));c[k]=(c[k]||0)+1});
   $('rgCnt').textContent=all.length?('Entries: '+Object.keys(c).map(k=>k+' = '+c[k]).join(' · ')+' · showing '+rows.length):'';
   const ad=isAdmin();
-  box.innerHTML=rows.length?'<table class="am-t rg-t"><tr><th>Reg. Sl.</th><th>Date</th><th>Name</th><th>Sex</th><th>DOB</th><th>Class</th><th>Sec</th><th>Roll</th><th>Father</th><th>Mother</th><th>Village</th><th>Caste</th><th>Religion</th><th>Portal ID</th><th>Aadhaar</th><th>Mobile</th><th>Last school</th><th>TC no.</th><th></th></tr>'+rows.map(p=>'<tr><td>'+(p.regNo?'<span class="rg-sl">'+esc(regText(p))+'</span>':'<i>—</i>')+'</td><td>'+esc(dmy(p.regDate))+'</td><td class="l"><b>'+esc(p.name)+'</b></td><td>'+esc(p.sex)+'</td><td>'+esc(dmy(p.dob))+'</td><td>'+esc(p.cls)+(p.stream?' <small>'+esc(p.stream)+'</small>':'')+'</td><td>'+esc(secOf(p))+'</td><td>'+esc(p.roll)+'</td><td class="l">'+esc(p.father)+'</td><td class="l">'+esc(p.mother)+'</td><td class="l">'+esc(p.village)+'</td><td>'+esc(p.caste)+'</td><td>'+esc(p.religion)+'</td><td>'+esc(p.sikshaId)+'</td><td>'+esc(p.aadhaar)+'</td><td>'+esc(p.mobile)+'</td><td class="l">'+esc(p.prevSchool)+'</td><td>'+esc(p.tcNo)+'</td><td>'+(ad?'<button class="dv-b g" onclick="ADM.edit(\'s\',\''+p._id+'\')">✎</button>':'')+'</td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">'+(db&&auth&&auth.currentUser?'No new admission in the register yet.':'Sign in to see the register.')+'</p>'}
+  box.innerHTML=rows.length?'<table class="am-t rg-t"><tr><th>Reg. Sl.</th><th>Date</th><th>Name</th><th>Sex</th><th>DOB</th><th>Class</th><th>Sec</th><th>Roll</th><th>Father</th><th>Mother</th><th>Village</th><th>Caste</th><th>Religion</th><th>Portal ID</th><th>Aadhaar</th><th>Mobile</th><th>Last school</th><th>TC no.</th><th></th></tr>'+rows.map(p=>'<tr><td>'+(p.regNo?'<span class="rg-sl">'+esc(regText(p))+'</span>':'<i>—</i>')+'</td><td>'+esc(dmy(p.regDate))+'</td><td class="l"><b>'+esc(p.name)+'</b></td><td>'+esc(p.sex)+'</td><td>'+esc(dmy(p.dob))+'</td><td>'+esc(p.cls)+(p.stream?' <small>'+esc(p.stream)+'</small>':'')+'</td><td>'+esc(secOf(p))+'</td><td>'+esc(p.roll)+'</td><td class="l">'+esc(p.father)+'</td><td class="l">'+esc(p.mother)+'</td><td class="l">'+esc(p.village)+'</td><td>'+esc(p.caste)+'</td><td>'+esc(p.religion)+'</td><td>'+esc(p.sikshaId)+'</td><td>'+esc(p.aadhaar)+'</td><td>'+esc(p.mobile)+'</td><td class="l">'+esc(p.prevSchool)+'</td><td>'+esc(p.tcNo)+'</td><td>'+'<button class="dv-b g" onclick="ADM.edit(\'s\',\''+p._id+'\')">✎</button>'+'</td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">'+(db&&auth&&auth.currentUser?'No new admission in the register yet.':'Sign in to see the register.')+'</p>'}
  function printRegister(){
   const rows=regRows();if(!rows.length){msg('No new admission to print.',true,'rgMsg');return}
   const g={};rows.forEach(p=>{const k=p.regSeries||serOf(p.cls);(g[k]=g[k]||[]).push(p)});
@@ -2414,31 +2448,44 @@ const ADM=(function(){
    msg('Register numbers assigned to '+todo.length+' admission(s) ✔',false,'rgMsg')}
   catch(e){msg('Failed: '+(e.code||e.message),true,'rgMsg')}}
 
+ /* ---------- profile finder (current year DB + new session) ---------- */
+ let pfRows=[];
+ function profDraw(){
+  const box=$('pfBox');if(!box)return;const src=$('pfSrc').value,c=$('pfCls').value,q=up($('pfQ').value),cur=src==='cur';
+  let rows=(cur?STUDENT_DB.slice():placed.slice()).filter(s=>(!c||String(s.cls).toUpperCase()===c)&&(!q||up([s.name,s.father,s.mother,s.mobile,s.sikshaId,s.cls+' '+(s.sec||'')+' '+s.roll,s.cls+(s.sec||'')+s.roll].join(' ')).indexOf(q)>=0));
+  rows.sort(sorter);const tot=rows.length;rows=rows.slice(0,80);pfRows=rows;
+  $('pfInfo').textContent=(cur?'Current database · Year '+TFDB.getYear()+' · '+STUDENT_DB.length+' students':'New session '+ses(yr())+' · '+placed.length+' placed students'+((db&&auth&&auth.currentUser)?'':' (sign in to load)'))+' · '+(tot>rows.length?'showing first '+rows.length+' of '+tot+' — type in Search to narrow':tot+' match(es)');
+  box.innerHTML=rows.length?'<table class="am-t"><tr><th>Class</th><th>Sec</th><th>Roll</th><th>Name</th><th>Father</th><th>Mobile</th><th></th></tr>'+rows.map((s,i)=>'<tr><td>'+esc(s.cls)+'</td><td>'+esc(secOf(s))+'</td><td><b>'+esc(s.roll)+'</b></td><td class="l"><b>'+esc(s.name)+'</b></td><td class="l">'+esc(s.father)+'</td><td>'+esc(s.mobile)+'</td><td><button class="dv-b" onclick="ADM.edit(\''+(cur?'c\','+i:'s\',\''+s._id+'\'')+')">✎ Edit</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No student found.</p>'}
+
  /* ---------- ADMIN-ONLY profile editor (placed students + applications) ---------- */
  let EDIT=null;
  const SEL={sex:['Male','Female','Other'],caste:['GENERAL','OBC-A','OBC-B','SC','ST'],cls:CLS,sec:['','A','B','C'],stream:['Science','Arts','Vocational'],medium:['Bengali','Santali','English','Other'],disab:['No','Yes'],bpl:['No','Yes']};
  const DATEK={dob:1,tcDate:1,regDate:1};
- const CORE_G=['Register & placement','Student','Parents / guardian','Address','Previous school','Bank (scholarship)'];
+ const CORE_G=['Register & placement','Student','Parents / guardian','Address','Previous school','Bank (scholarship)','Class','Parents / contact','Other fields'];
  function fld(k,label,v){const id='ed_'+k;v=v==null?'':String(v);
   if(SEL[k]){const o=SEL[k].slice();if(v!==''&&o.indexOf(v)<0)o.push(v);return '<label>'+label+'<select id="'+id+'">'+o.map(x=>'<option value="'+esc(x)+'"'+(x===v?' selected':'')+'>'+(x===''?'—':esc(x))+'</option>').join('')+'</select></label>'}
   const iso=DATEK[k]&&(v===''||/^\d{4}-\d\d-\d\d$/.test(v));
   return '<label>'+label+'<input id="'+id+'" '+(iso?'type="date" ':'')+'value="'+esc(v)+'"></label>'}
  async function edit(kind,id){
-  const mid=kind==='s'?'rgMsg':'amAMsg';if(!need(mid))return;await roleP;
-  if(!isAdmin()){msg('Only admin can edit a student profile.',true,mid);return}
-  const rec=kind==='s'?placed.find(x=>x._id===id):A(id);if(!rec)return;
-  let groups=[];if(kind==='s')groups.push(['Register & placement',[['regNo','Register Sl. No.'],['regDate','Admission date'],['cls','Class'],['sec','Section'],['roll','Roll no.']]]);
-  groups=groups.concat(GROUPS);const used={},fields=[];let body='';
+  const mid=kind==='c'?'pfMsg':(kind==='s'?'rgMsg':'amAMsg');if(!need(mid))return;await roleP;
+  if(!isAdmin()){msg('Only admin can edit a student profile.',true,mid);alert('Only an ADMIN login can edit and save student profiles.');return}
+  const rec=kind==='c'?pfRows[id]:(kind==='s'?placed.find(x=>x._id===id):A(id));if(!rec)return;
+  let groups=[];
+  if(kind==='c'){const K=['name','sex','dob','caste','sikshaId','cls','sec','roll','father','mother','mobile'];
+   groups=[['Student',[['name','Name'],['sex','Sex'],['dob','Date of birth'],['caste','Category'],['sikshaId','Banglar Siksha Portal ID']]],['Class',[['cls','Class'],['sec','Section'],['roll','Roll no.']]],['Parents / contact',[['father','Father'],['mother','Mother'],['mobile','Mobile']]]];
+   const ex=Object.keys(rec).filter(k=>K.indexOf(k)<0&&k.charAt(0)!=='_');if(ex.length)groups.push(['Other fields',ex.map(k=>[k,k])])}
+  else{if(kind==='s')groups.push(['Register & placement',(rec.type==='new'?[['regNo','Register Sl. No.'],['regDate','Admission date']]:[]).concat([['cls','Class'],['sec','Section'],['roll','Roll no.']])]);
+   groups=groups.concat(GROUPS)}const used={},fields=[];let body='';
   groups.forEach(g=>{const fs=g[1].filter(f=>!used[f[0]]);if(!fs.length)return;
    if(CORE_G.indexOf(g[0])<0&&!fs.some(f=>rec[f[0]]!==undefined&&rec[f[0]]!==''))return;
    fs.forEach(f=>{used[f[0]]=1;fields.push(f[0])});
    body+='<h3 style="margin:12px 0 6px;color:#145828;border-bottom:1px solid #ccc">'+g[0]+'</h3><div class="ed-g">'+fs.map(f=>fld(f[0],f[1],rec[f[0]])).join('')+'</div>'});
-  EDIT={kind,rec,fields,photo:''};
+  EDIT={kind,rec,fields,photo:''};const showPh=kind!=='c';
   let m=$('edModal');if(!m){m=document.createElement('div');m.id='edModal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto';document.body.appendChild(m)}
   m.style.display='flex';
   m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:900px;width:100%;padding:16px 20px;font-family:Segoe UI,Arial,sans-serif;color:#1d2b22"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:0;background:#fff;padding-bottom:8px;border-bottom:1px solid #ddd"><h2 style="margin:0;flex:1;font-size:17px">✎ Edit profile — '+esc(rec.name)+(rec.regNo?' · Reg. '+esc(regText(rec)):'')+'</h2><button class="dv-b" type="button" onclick="ADM.saveEdit()">💾 Save</button><button class="dv-b g" type="button" onclick="ADM.closeEdit()">Cancel</button></div><p id="edMsg" class="am-msg"></p>'+
-   '<div style="display:flex;gap:12px;align-items:center;margin:8px 0"><img id="edImg" src="'+(rec.photo||'')+'" style="width:70px;height:88px;object-fit:cover;border:1px solid #999;background:#f3f3f3"><label style="font-size:11px;font-weight:700">Replace photo <input type="file" id="edPh" accept="image/*"></label></div>'+body+'</div>';
-  $('edPh').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,300/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);EDIT.photo=c.toDataURL('image/jpeg',.8);$('edImg').src=EDIT.photo};im.src=r.result};r.readAsDataURL(f)}}
+   ''+(showPh?'<div style="display:flex;gap:12px;align-items:center;margin:8px 0"><img id="edImg" src="'+(rec.photo||'')+'" style="width:70px;height:88px;object-fit:cover;border:1px solid #999;background:#f3f3f3"><label style="font-size:11px;font-weight:700">Replace photo <input type="file" id="edPh" accept="image/*"></label></div>':'')+body+'</div>';
+  if($('edPh'))$('edPh').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,300/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);EDIT.photo=c.toDataURL('image/jpeg',.8);$('edImg').src=EDIT.photo};im.src=r.result};r.readAsDataURL(f)}}
  function closeEdit(){const m=$('edModal');if(m)m.style.display='none';EDIT=null}
  async function saveEdit(){
   if(!EDIT)return;if(!need('edMsg'))return;await roleP;if(!isAdmin()){msg('Only admin can save profile changes.',true,'edMsg');return}
@@ -2448,9 +2495,16 @@ const ADM=(function(){
   if(!Object.keys(patch).length){msg('No changes to save.',true,'edMsg');return}
   const m=Object.assign({},rec,patch);
   if(!m.name||String(m.name).length<3){msg('Student name is required.',true,'edMsg');return}
-  if(m.mobile&&!/^\d{10}$/.test(m.mobile)){msg('Primary mobile must be 10 digits.',true,'edMsg');return}
-  if(m.aadhaar&&!/^\d{12}$/.test(m.aadhaar)){msg('Aadhaar must be 12 digits.',true,'edMsg');return}
-  if(m.sikshaId&&!/^\d{14}$/.test(m.sikshaId)){msg('Banglar Siksha Portal ID must be 14 digits.',true,'edMsg');return}
+  if(patch.mobile&&!/^\d{10}$/.test(patch.mobile)){msg('Primary mobile must be 10 digits.',true,'edMsg');return}
+  if(patch.aadhaar&&!/^\d{12}$/.test(patch.aadhaar)){msg('Aadhaar must be 12 digits.',true,'edMsg');return}
+  if(patch.sikshaId&&!/^\d{14}$/.test(patch.sikshaId)){msg('Banglar Siksha Portal ID must be 14 digits.',true,'edMsg');return}
+  if(e.kind==='c'){
+   const nc=String(m.cls),ns=String(m.sec||''),nr=String(m.roll);
+   if(!(parseInt(nr,10)>0)){msg('Roll no. must be a positive number.',true,'edMsg');return}
+   if(STUDENT_DB.some(s=>s!==rec&&String(s.cls)===nc&&String(s.sec||'')===ns&&String(s.roll)===nr)){msg('Roll '+nr+' already exists in class '+nc+(ns?'-'+ns:'')+'.',true,'edMsg');return}
+   Object.assign(rec,patch);TFDB.touch();msg('Saving online…',false,'edMsg');
+   const ok=await TFDB.saveOnline();closeEdit();profDraw();
+   msg(ok?'Saved ✔ — profile updated in the online database (year '+TFDB.getYear()+').':'Changed on this screen only — online save FAILED (admin sign-in needed). Reloading will lose it.',!ok,'pfMsg');return}
   patch.editedBy=meMail();patch.editedAt=Date.now();
   try{
    if(e.kind==='a'){await db.collection('admApps').doc(rec._id).update(patch);Object.assign(rec,patch);if(patch.cls)rec._cls=patch.cls;drawApps();dash();closeEdit();msg('Application profile saved ✔',false,'amAMsg');return}
@@ -2483,12 +2537,12 @@ const ADM=(function(){
  /* ---------- init ---------- */
  const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amLinkXI').textContent=link(true);
- const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{refresh(true)});
+ const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{profDraw();refresh(true)});
  if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
  $('amOpen').href=link();
  if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{live();dash();if(document.body.dataset.view==='adm')refresh(true)})}else stopLive()});
  dash();
- return{regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
