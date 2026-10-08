@@ -2756,7 +2756,7 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
    <label>New class <select id="pmCls"><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
    <label>New section <select id="pmSec"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
    <label>Show students of old section <select id="pmOld" onchange="PROMO.draw()"><option value="*">All</option><option>A</option><option>B</option><option>C</option><option value="__">No section</option></select></label>
-   <label>Auto-roll order <select id="pmOrd"><option value="old">Old roll order</option><option value="name">Name A → Z</option></select></label>
+   <label>Auto-roll order <select id="pmOrd"><option value="old">Old roll order</option><option value="name">Name A → Z</option><option value="merit">Merit marks (high → low)</option></select></label>
   </div>
   <div class="am-row"><button class="dv-b" type="button" onclick="PROMO.load()">⟳ Open this class-section</button>
    <span id="pmCur" style="font-weight:800;color:#145828"></span></div>
@@ -2776,6 +2776,23 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
   </div>
   <div id="pmNote"></div>
   <div class="am-box" style="max-height:520px"><div id="pmTbl"></div></div>
+ </div>
+  <div class="dv-c" id="pmAuto" style="display:none;border-top:5px solid #0b7a75">
+  <h3>⚖ Auto-allocate whole class — merit rule <small style="color:#555">(admin only)</small></h3>
+  <p class="am-msg" id="auRule" style="margin:0 0 8px;color:#333">Choose the NEW class and session above (e.g. VII), then press ① to load the previous class (all sections together).</p>
+  <div class="am-grid"><label>Sections next year <select id="auSecs"><option value="A">One section (A)</option><option value="">One section (no section)</option><option value="A,B">Two sections (A &amp; B)</option></select></label></div>
+  <div class="am-row">
+   <button class="dv-b" type="button" onclick="PROMO.auLoad()">① Load previous-class students</button>
+   <button class="dv-b g" type="button" onclick="PROMO.auPreview()">② Preview merit allocation</button>
+   <button class="dv-b amb" type="button" onclick="PROMO.auSave()">③ Create draft sheets</button>
+   <button class="dv-b g" type="button" onclick="PROMO.auPrint()">🖨 Print merit list</button>
+  </div>
+  <details class="am-d"><summary><b>Paste marks</b> (one per line: <code>SEC ROLL MARKS</code>, e.g. <code>A 1 456</code>; if the old class had one section: <code>ROLL MARKS</code>)</summary>
+   <textarea id="auPaste" rows="5" style="width:100%;font-family:monospace"></textarea>
+   <div class="am-row"><button class="dv-b g" type="button" onclick="PROMO.auApply()">Apply pasted marks</button></div></details>
+  <p class="am-msg" id="auMsg"></p>
+  <div id="auTbl" class="am-box" style="max-height:340px"></div>
+  <div id="auPrev" class="am-box" style="max-height:420px;margin-top:10px"></div>
  </div>
  <div class="dv-c"><h3>📋 All class-sections — session status</h3><div id="pmSheets" class="am-box"></div></div>
  <div class="dv-c" id="pmAdmin" style="display:none;border-top:5px solid #9b5de5">
@@ -2923,14 +2940,14 @@ const PROMO=(function(){
   const v=document.body.dataset.view;if(show[v]===0){const b=document.querySelector('.tf-side button[data-v=cert]');if(b)b.click()}}
  function head(){
   const u=auth&&auth.currentUser;
-  if(!u){$('pmWho').textContent='Sign in (sidebar 👤) to start.';$('pmWho').className='am-msg';$('pmAdmin').style.display='none';return}
+  if(!u){$('pmWho').textContent='Sign in (sidebar 👤) to start.';$('pmWho').className='am-msg';$('pmAdmin').style.display='none';$('pmAuto').style.display='none';return}
   let t='Signed in as '+mail()+' · ';
   if(isAdmin())t+='ADMIN — can do everything, including unlock.';
   else if(isCT())t+='CLASS TEACHER of '+label(me.cls,me.sec)+(me.name?' ('+me.name+')':'')+' — you can allocate roll numbers for your class-section only.';
   else if(me.disabled)t+='This class-teacher login is disabled. Ask the admin.';
   else t+='STAFF — reports, printing and certificates only.';
   $('pmWho').textContent=t;$('pmWho').className='am-msg';
-  $('pmAdmin').style.display=isAdmin()?'block':'none';
+  $('pmAdmin').style.display=isAdmin()?'block':'none';$('pmAuto').style.display=isAdmin()?'block':'none';
   if(isCT()){$('pmCls').value=me.cls;$('pmSec').value=me.sec||'';$('pmCls').disabled=$('pmSec').disabled=true}
   else $('pmCls').disabled=$('pmSec').disabled=false}
  function loadRole(u){
@@ -2984,7 +3001,7 @@ const PROMO=(function(){
    STUDENT_DB.forEach(x=>{if(String(x.cls).trim().toUpperCase()!==old)return;pool++;
     const k=old+'|'+String(x.sec||'').trim().toUpperCase()+'|'+x.roll;
     if(sv[k])return;if(taken[k]){skipped++;return}
-    rows.push({key:k,name:up(x.name),sex:x.sex||'',father:up(x.father),mother:up(x.mother),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',oc:old,os:String(x.sec||'').trim().toUpperCase(),or:String(x.roll),on:false,roll:''})});
+    rows.push({key:k,name:up(x.name),sex:x.sex||'',father:up(x.father),mother:up(x.mother),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',oc:old,os:String(x.sec||'').trim().toUpperCase(),or:String(x.roll),on:false,roll:'',mk:''})});
    rows.sort((a,b)=>String(a.os).localeCompare(String(b.os))||(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0));
    cur={y,c,s,key};dirty=false;
    $('pmCur').textContent='Editing: Class '+label(c,s)+' · session '+ses(y);
@@ -3003,25 +3020,26 @@ const PROMO=(function(){
   else if(!canEdit(cur.c,cur.s))note='<div class="pm-lock">View only.</div>';
   note+='<p class="am-msg" id="pmCount" style="margin:8px 0 0"></p>';$('pmNote').innerHTML=note;
   const list=[];rows.forEach((r,i)=>{if(f==='*'||(f==='__'?!r.os:r.os===f))list.push(i)});
-  $('pmTbl').innerHTML='<table class="am-t pm-t" id="pmT"><tr><th>✓</th><th>#</th><th>Name</th><th>Sex</th><th>Father</th><th>Old class-sec</th><th>Old roll</th><th>→ New roll</th></tr>'+list.map((i,n)=>{const r=rows[i];
-   return '<tr data-i="'+i+'"'+(r.on?'':' class="pm-off"')+'><td><input type="checkbox" '+(r.on?'checked ':'')+(edit?'':'disabled ')+'onchange="PROMO._o('+i+',this.checked)"></td><td>'+(n+1)+'</td><td class="l">'+esc(r.name)+'</td><td>'+esc(r.sex)+'</td><td class="l">'+esc(r.father)+'</td><td>'+esc(r.oc)+(r.os?'-'+esc(r.os):'')+'</td><td>'+esc(r.or)+'</td><td><input type="number" min="1" value="'+esc(r.roll)+'" '+(edit&&r.on?'':'disabled ')+'onchange="PROMO._r('+i+',this.value)"></td></tr>'}).join('')+'</table>';
+  $('pmTbl').innerHTML='<table class="am-t pm-t" id="pmT"><tr><th>✓</th><th>#</th><th>Name</th><th>Sex</th><th>Father</th><th>Old class-sec</th><th>Old roll</th><th>Merit marks</th><th>→ New roll</th></tr>'+list.map((i,n)=>{const r=rows[i];
+   return '<tr data-i="'+i+'"'+(r.on?'':' class="pm-off"')+'><td><input type="checkbox" '+(r.on?'checked ':'')+(edit?'':'disabled ')+'onchange="PROMO._o('+i+',this.checked)"></td><td>'+(n+1)+'</td><td class="l">'+esc(r.name)+'</td><td>'+esc(r.sex)+'</td><td class="l">'+esc(r.father)+'</td><td>'+esc(r.oc)+(r.os?'-'+esc(r.os):'')+'</td><td>'+esc(r.or)+'</td><td><input type="number" step="any" value="'+esc(r.mk)+'" '+(edit?'':'disabled ')+'onchange="PROMO._m('+i+',this.value)"></td><td><input class="pm-roll" type="number" min="1" value="'+esc(r.roll)+'" '+(edit&&r.on?'':'disabled ')+'onchange="PROMO._r('+i+',this.value)"></td></tr>'}).join('')+'</table>';
   markDup()}
- function _o(i,v){rows[i].on=v;dirty=true;const tr=document.querySelector('#pmTbl tr[data-i="'+i+'"]');if(tr){tr.classList.toggle('pm-off',!v);const inp=tr.querySelector('input[type=number]');if(inp)inp.disabled=!v}markDup()}
+ function _o(i,v){rows[i].on=v;dirty=true;const tr=document.querySelector('#pmTbl tr[data-i="'+i+'"]');if(tr){tr.classList.toggle('pm-off',!v);const inp=tr.querySelector('input.pm-roll');if(inp)inp.disabled=!v}markDup()}
+ function _m(i,v){rows[i].mk=String(v).trim();dirty=true}
  function _r(i,v){rows[i].roll=String(v).trim();dirty=true;markDup()}
  function selAll(v){if(!cur||!canEdit(cur.c,cur.s)||status()==='final')return;const f=$('pmOld').value;rows.forEach(r=>{if(f==='*'||(f==='__'?!r.os:r.os===f))r.on=v});dirty=true;draw()}
  function autoRoll(all){
   if(!cur||!canEdit(cur.c,cur.s)||status()==='final')return;
-  const byName=$('pmOrd').value==='name',on=rows.filter(r=>r.on);if(!on.length){msg('Tick students first.',true);return}
+  const ord=$('pmOrd').value,byName=ord==='name',on=rows.filter(r=>r.on);if(!on.length){msg('Tick students first.',true);return}
   if(all)on.forEach(r=>r.roll='');
   const used={};Object.keys(fixed).forEach(n=>used[n]=1);on.forEach(r=>{const n=parseInt(r.roll,10);if(n>0)used[n]=1});
   const todo=on.filter(r=>!(parseInt(r.roll,10)>0));
-  todo.sort((a,b)=>byName?a.name.localeCompare(b.name):(String(a.os).localeCompare(String(b.os))||(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0)));
+  todo.sort((a,b)=>{if(ord==='merit'){const ma=num(a.mk),mb=num(b.mk);if(ma!==mb){if(ma===null)return 1;if(mb===null)return-1;return mb-ma}}return byName?a.name.localeCompare(b.name):(String(a.os).localeCompare(String(b.os))||(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0))});
   let n=all?0:Math.max.apply(null,[0].concat(Object.keys(used).map(Number)));
   todo.forEach(r=>{do{n++}while(used[n]);used[n]=1;r.roll=String(n)});
   dirty=true;draw();msg('Roll numbers filled for '+todo.length+' student(s). You can still edit any box, then Save draft.')}
 
  /* ---------- save / finalize / unlock ---------- */
- const clean=r=>({key:r.key,name:r.name,sex:r.sex,father:r.father,mother:r.mother,dob:r.dob,sikshaId:r.sikshaId,mobile:r.mobile,caste:r.caste,village:r.village,oc:r.oc,os:r.os,or:r.or,roll:String(r.roll||'').trim()});
+ const clean=r=>({key:r.key,name:r.name,sex:r.sex,father:r.father,mother:r.mother,dob:r.dob,sikshaId:r.sikshaId,mobile:r.mobile,caste:r.caste,village:r.village,oc:r.oc,os:r.os,or:r.or,roll:String(r.roll||'').trim(),mk:r.mk==null?'':String(r.mk)});
  async function persist(){
   const {y,c,s,key}=cur,on=rows.filter(r=>r.on).map(clean),ref=db.collection('admAlloc').doc(key);
   await db.runTransaction(async tx=>{const sn=await tx.get(ref),old=sn.exists?sn.data():null;
@@ -3121,12 +3139,101 @@ const PROMO=(function(){
  function enter(){head();if(!(auth&&auth.currentUser)){msg('Sign in (sidebar 👤) to start.',true);return}
   roleP.then(()=>{head();refreshSheets();loadAdmin();if(!cur&&(isAdmin()||isCT()))load(true)})}
 
+ /* ---------- auto-allocate whole class by merit (admin) ---------- */
+ const num=v=>{const n=parseFloat(String(v==null?'':v).trim());return isNaN(n)?null:n};
+ let au=null;
+ /* Rule: XII = same section, same roll carried from XI.  VI-XI = ONE merit list of all old sections:
+    1 new section -> roll = merit rank;  2 new sections -> odd ranks to 1st section, even ranks to 2nd
+    (rolls 1,2,3.. inside each section).  No marks entered -> previous roll order (roll 1 of each old section first). */
+ function mkPlan(list,c,secs){
+  const L=list.slice();
+  if(c==='XII')return L.map(x=>({x,rank:0,sec:x.os,roll:String(x.or)})).sort((a,b)=>String(a.sec).localeCompare(String(b.sec))||(parseInt(a.roll,10)||0)-(parseInt(b.roll,10)||0));
+  const any=L.some(x=>num(x.mk)!==null);
+  L.sort((a,b)=>{if(any){const ma=num(a.mk),mb=num(b.mk);if(ma!==mb){if(ma===null)return 1;if(mb===null)return-1;return mb-ma}}
+   return(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0)||String(a.os).localeCompare(String(b.os))||a.name.localeCompare(b.name)});
+  return L.map((x,i)=>{const r=i+1;return secs.length===2?{x,rank:r,sec:secs[r%2?0:1],roll:String(Math.ceil(r/2))}:{x,rank:r,sec:secs[0],roll:String(r)}})}
+ async function auLoad(){
+  if(!need('auMsg'))return;await roleP;if(!isAdmin()){msg('Admin only.',true,'auMsg');return}
+  const y=+$('pmYear').value,c=$('pmCls').value,old=PREV[c];
+  msg('Loading…',false,'auMsg');
+  try{
+   const r=await Promise.all([db.collection('admAlloc').where('year','==',y).get(),db.collection('admStudents').where('year','==',y).get()]);
+   const shs=r[0].docs.map(d=>Object.assign({_id:d.id},d.data())),taken={},fx={},mk={};
+   shs.forEach(x=>{if(x.cls===c){(x.rows||[]).forEach(k=>{if(k.mk!=null&&k.mk!=='')mk[k.key]=k.mk})}else(x.rows||[]).forEach(k=>taken[k.key]=1)});
+   r[1].docs.forEach(d=>{const p=d.data();if(String(p.allocKey||'').indexOf(y+'_'+c+'_')===0)return;
+    if(p.from&&p.cls!==c)taken[p.from]=1;if(p.from&&p.cls===c&&!p.allocKey)taken[p.from]=1;
+    if(p.cls===c){fx[(p.sec||'')+'|'+parseInt(p.roll,10)]=p.name}});
+   const cands=[];let skip=0;
+   STUDENT_DB.forEach(x=>{if(String(x.cls).trim().toUpperCase()!==old)return;const os=String(x.sec||'').trim().toUpperCase(),k=old+'|'+os+'|'+x.roll;
+    if(taken[k]){skip++;return}
+    cands.push({key:k,name:up(x.name),sex:x.sex||'',father:up(x.father),mother:up(x.mother),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',oc:old,os,or:String(x.roll),mk:mk[k]==null?'':String(mk[k])})});
+   cands.sort((a,b)=>String(a.os).localeCompare(String(b.os))||(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0));
+   const oldSecs=Array.from(new Set(cands.map(x=>x.os))).sort();
+   au={y,c,old,cands,fx,oldSecs,plan:null};
+   const sel=$('auSecs');
+   if(c==='XII'){sel.disabled=true;$('auRule').innerHTML='<b>Class XI → XII:</b> same section and the <b>same roll number</b> are carried over. No merit list needed.'}
+   else{sel.disabled=false;if(oldSecs.length>=2){sel.value='A,B'}else if(sel.value==='A,B'&&oldSecs.length<2){sel.value=oldSecs[0]===''?'':'A'}
+    $('auRule').innerHTML='<b>Class '+esc(old)+' → '+esc(c)+':</b> previous class has <b>'+oldSecs.length+' section(s)</b> ('+esc(oldSecs.map(s=>s||'none').join(', '))+'). All students go into <b>one merit list</b>. One new section → roll = merit rank. Two new sections → <b>odd ranks to A, even ranks to B</b> (rolls 1, 2, 3… in each). Equal marks → lower previous roll first. If no marks are entered, previous roll order is used.'}
+   auTable();$('auPrev').innerHTML='';
+   msg(cands.length+' student(s) of class '+old+' loaded'+(skip?' · '+skip+' already placed elsewhere (hidden)':'')+(cands.length?'. Enter / paste marks, then ② Preview.':'. Load Data & Year → from Firebase first.'),!cands.length,'auMsg')}
+  catch(e){msg('Load failed: '+(e.code||e.message),true,'auMsg')}}
+ function auTable(){
+  if(!au)return;
+  $('auTbl').innerHTML='<table class="am-t pm-t"><tr><th>#</th><th>Name</th><th>Old sec</th><th>Old roll</th><th>Marks</th></tr>'+au.cands.map((x,i)=>'<tr><td>'+(i+1)+'</td><td class="l">'+esc(x.name)+'</td><td>'+esc(x.os||'—')+'</td><td>'+esc(x.or)+'</td><td><input type="number" step="any" value="'+esc(x.mk)+'" onchange="PROMO._au('+i+',this.value)"></td></tr>').join('')+'</table>'}
+ function _au(i,v){au.cands[i].mk=String(v).trim();au.plan=null}
+ function auApply(){
+  if(!au){msg('Press ① first.',true,'auMsg');return}
+  let ok=0,bad=0;
+  $('auPaste').value.split(/\r?\n/).forEach(line=>{const t=line.trim().split(/[\s,;\t]+/).filter(Boolean);if(t.length<2)return;
+   let sec,roll,m;if(t.length>=3){sec=t[0].toUpperCase();roll=t[1];m=t[2]}else{sec=au.oldSecs.length===1?au.oldSecs[0]:null;roll=t[0];m=t[1]}
+   const x=sec==null?null:au.cands.find(z=>z.os===sec&&String(z.or)===String(roll));
+   if(x&&num(m)!==null){x.mk=String(num(m));ok++}else bad++});
+  au.plan=null;auTable();msg(ok+' mark(s) applied'+(bad?' · '+bad+' line(s) not matched (check SEC and ROLL)':'')+'.',bad>0&&!ok,'auMsg')}
+ function auCompute(){
+  const secs=au.c==='XII'?null:$('auSecs').value.split(',');
+  const plan=mkPlan(au.cands,au.c,secs),err=[],seen={};
+  plan.forEach(p=>{const n=parseInt(p.roll,10),k=(p.sec||'')+'|'+n;
+   if(!(n>0))err.push(p.x.name+': invalid roll "'+p.roll+'"');
+   else if(seen[k])err.push(p.x.name+': duplicate roll '+n+' in '+label(au.c,p.sec));
+   else if(au.fx[k])err.push(p.x.name+': roll '+n+' in '+label(au.c,p.sec)+' is already used by '+au.fx[k]);
+   seen[k]=1});
+  return{plan,err}}
+ function auPreview(){
+  if(!au||!au.cands.length){msg('Press ① first.',true,'auMsg');return}
+  const r=auCompute();au.plan=r.plan;
+  const any=au.cands.some(x=>num(x.mk)!==null),cnt={};r.plan.forEach(p=>cnt[p.sec]=(cnt[p.sec]||0)+1);
+  $('auPrev').innerHTML='<p style="margin:6px 8px;font-size:13px"><b>'+(au.c==='XII'?'Same section, same roll':(any?'Merit list (by marks)':'No marks entered — previous roll order'))+'</b> · '+Object.keys(cnt).sort().map(s=>label(au.c,s)+': <b>'+cnt[s]+'</b>').join(' · ')+'</p>'+
+   '<table class="am-t"><tr><th>'+(au.c==='XII'?'#':'Merit')+'</th><th>Name</th><th>Old</th><th>Marks</th><th>→ New class-sec</th><th>New roll</th></tr>'+r.plan.map((p,i)=>'<tr><td>'+(p.rank||i+1)+'</td><td class="l">'+esc(p.x.name)+'</td><td>'+esc(p.x.oc+(p.x.os?'-'+p.x.os:'')+' / '+p.x.or)+'</td><td>'+esc(p.x.mk)+'</td><td><b>'+esc(label(au.c,p.sec))+'</b></td><td><b>'+esc(p.roll)+'</b></td></tr>').join('')+'</table>';
+  msg(r.err.length?r.err.slice(0,6).join('\n')+(r.err.length>6?'\n… and '+(r.err.length-6)+' more':''):'Preview ready. Press ③ to create the draft sheets (class teachers can then review and finalize).',r.err.length>0,'auMsg')}
+ async function auSave(){
+  if(!need('auMsg'))return;await roleP;if(!isAdmin()){msg('Admin only.',true,'auMsg');return}
+  if(!au||!au.cands.length){msg('Press ① first.',true,'auMsg');return}
+  const r=auCompute();au.plan=r.plan;if(r.err.length){auPreview();return}
+  const y=au.y,c=au.c,by={};r.plan.forEach(p=>(by[p.sec]=by[p.sec]||[]).push(p));
+  try{
+   const q=await db.collection('admAlloc').where('year','==',y).get(),ex={};q.docs.forEach(d=>ex[d.id]=d.data());
+   const secs=Object.keys(by),locked=secs.filter(s=>ex[keyOf(y,c,s)]&&ex[keyOf(y,c,s)].status==='final'),old=secs.filter(s=>ex[keyOf(y,c,s)]);
+   if(locked.length){msg('Class '+locked.map(s=>label(c,s)).join(', ')+' is locked. Unlock it first (All class-sections table below).',true,'auMsg');return}
+   if(!confirm('Create DRAFT sheets for '+secs.map(s=>label(c,s)+' ('+by[s].length+')').join(', ')+' — session '+ses(y)+'?'+(old.length?'\n\nExisting drafts of '+old.map(s=>label(c,s)).join(', ')+' will be REPLACED.':'')))return;
+   const b=db.batch();
+   secs.forEach(s=>{const rws=by[s].map(p=>Object.assign(clean(Object.assign({},p.x,{roll:p.roll})),{mk:p.x.mk}));
+    b.set(db.collection('admAlloc').doc(keyOf(y,c,s)),{year:y,cls:c,sec:s,status:'draft',count:rws.length,rows:rws,by:mail(),ts:ts(),createdBy:mail(),autoRule:c==='XII'?'same-sec-same-roll':(secs.length===2?'merit-odd-even':'merit-single')},{merge:true})});
+   await b.commit();await refreshSheets();
+   msg('Draft sheets created: '+secs.map(s=>label(c,s)).join(', ')+'. Class teachers can open them, adjust if needed and finalize.',false,'auMsg')}
+  catch(e){msg('Failed: '+(e.code||e.message),true,'auMsg')}}
+ function auPrint(){
+  if(!au||!au.plan){msg('Press ② Preview first.',true,'auMsg');return}
+  const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+  const any=au.cands.some(x=>num(x.mk)!==null);
+  w.document.write('<html><head><title>Merit list</title><style>@page{size:A4 portrait;margin:10mm}body{font-family:Arial,sans-serif;font-size:12px;color:#000}h2{text-align:center;margin:0}table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid #000;padding:3px 5px;text-align:left}th{background:#eee}</style></head><body><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><p style="text-align:center;margin:3px 0"><b>'+(au.c==='XII'?'Promotion list — Class XI to XII':'Combined merit list — Class '+au.old+' to '+au.c)+', session '+ses(au.y)+'</b></p><table><tr><th>'+(au.c==='XII'?'#':'Merit')+'</th><th>Name</th><th>Father</th><th>Old class-sec / roll</th><th>Marks</th><th>New class-sec</th><th>New roll</th></tr>'+au.plan.map((p,i)=>'<tr><td>'+(p.rank||i+1)+'</td><td>'+esc(p.x.name)+'</td><td>'+esc(p.x.father)+'</td><td>'+esc(p.x.oc+(p.x.os?'-'+p.x.os:'')+' / '+p.x.or)+'</td><td>'+esc(p.x.mk)+'</td><td><b>'+esc(label(au.c,p.sec))+'</b></td><td><b>'+esc(p.roll)+'</b></td></tr>').join('')+'</table>'+(au.c!=='XII'&&!any?'<p><i>Marks not entered — previous roll order used.</i></p>':'')+'<p style="margin-top:30px">Headmaster: ____________</p></body></html>');
+  w.document.close();w.focus();setTimeout(()=>w.print(),300)}
+
  /* ---------- init ---------- */
  const y0=new Date().getFullYear();$('pmYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('pmYear').addEventListener('change',()=>{refreshSheets();loadAdmin()});
  const nb=document.querySelector('.tf-side button[data-v=prom]');if(nb)nb.addEventListener('click',enter);
  if(auth)auth.onAuthStateChanged(u=>{cur=null;sheet=null;rows=[];$('pmSheetCard').style.display='none';$('pmBadge').innerHTML='';$('pmCur').textContent='';roleP=loadRole(u)});
- return{load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,isAdmin}
+ return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,isAdmin}
 })();
 </script>
 
