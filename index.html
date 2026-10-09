@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>if(/[?&]join=/.test(location.search))document.documentElement.className+=" join-mode"</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFHS Official Certificate System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -674,6 +673,7 @@
  .dv-b{border:0;border-radius:8px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:#145828;color:#fff}.dv-b.g{background:#e8efe9;color:#145828}
  body[data-view=cert] .dashboard-reports,body[data-view=cert] .wifs-panel,body[data-view=cert] .wifs-sheet,body[data-view=cert] #dataView{display:none!important}
  body[data-view=cert] .dashboard-panel h2{display:none}
+ body:not([data-view=cert]) #pmRegister{display:none!important}
  body[data-view=cert] .dashboard-panel{padding:10px 14px}
  body[data-view=cert]{display:grid!important;grid-template-columns:400px minmax(0,1fr);column-gap:18px;align-items:start;justify-content:center}
  body[data-view=cert] .dashboard-panel{position:sticky!important;top:84px;max-height:calc(100vh - 100px);overflow-y:auto;max-width:none!important;width:auto!important;margin:0!important;padding:12px 14px!important;border-top:4px solid #145828}
@@ -724,6 +724,22 @@
     <!-- CLASS XI DATABASE UPDATED FROM New Microsoft Excel Worksheet.xlsx -->
 
     <div class="dashboard-panel">
+ <div class="dv-c" id="pmRegister" style="border-top:5px solid #2878b5">
+  <h3>👩‍🏫 Staff self-registration — choose one class and section</h3>
+  <p class="am-msg" style="margin:0 0 10px;color:#333">Register directly from this main page. One e-mail can have one class-section assignment, and each class-section can have only one registered class teacher. Disabled registrations also reserve their assignment until an admin deletes them.</p>
+  <div class="am-grid">
+   <label>Full name <input id="srName" autocomplete="name"></label>
+   <label>Mobile number <input id="srMobile" inputmode="numeric" maxlength="10"></label>
+   <label>E-mail (login ID) <input id="srEmail" type="email" autocomplete="username"></label>
+   <label>Password (minimum 8 characters) <input id="srPass" type="password" autocomplete="new-password"></label>
+   <label>Confirm password <input id="srPass2" type="password" autocomplete="new-password"></label>
+   <label>Session <select id="srYear"></select></label>
+   <label>Class <select id="srCls"><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
+   <label>Section <select id="srSec"><option>A</option><option>B</option><option>C</option><option value="">No section</option></select></label>
+  </div>
+  <div class="am-row"><button class="dv-b" type="button" id="srGo" onclick="PROMO.registerTeacher()">Register as class teacher</button><span id="srMsg" class="am-msg" style="margin:0"></span></div>
+  <p class="am-msg" style="margin:8px 0 0;color:#555">If your e-mail already has a Firebase login but its registration was deleted, sign in first with the same e-mail/password, then submit this form again. Do not share your password.</p>
+ </div>
         <h2>Admission Control &amp; Verification Dashboard</h2>
 
         <div class="lookup-box" style="background:#eef8ef;border:1px solid #9bb29d;padding:10px;border-radius:6px;margin-bottom:10px;">
@@ -2742,12 +2758,10 @@ const ADM=(function(){
 .pm-err{background:#fdecea;border-left:4px solid #b00020;padding:8px 12px;border-radius:6px;margin-top:8px;font-size:13px;color:#7a0016;white-space:pre-line}
 .pm-lock{background:#fff4d6;border-left:4px solid #b78600;padding:8px 12px;border-radius:6px;margin-top:8px;font-size:13px}
 .dv-b.red{background:#b00020}.dv-b.amb{background:#8a5600}
-html.join-mode body>*:not(#joinView):not(script):not(style):not(link){display:none!important}
-html.join-mode body{padding:0!important;display:block!important;background:#eef3ee}
-html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16px}
 </style>
 
 <div id="promView">
+
  <div class="dv-c" style="border-top:5px solid #145828">
   <h3>🎓 Promotion &amp; roll allocation — new session <span id="pmBadge"></span></h3>
   <p class="am-msg" id="pmWho" style="margin:0 0 8px">Sign in (sidebar 👤) to start.</p>
@@ -2796,108 +2810,45 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
  </div>
  <div class="dv-c"><h3>📋 All class-sections — session status</h3><div id="pmSheets" class="am-box"></div></div>
  <div class="dv-c" id="pmAdmin" style="display:none;border-top:5px solid #9b5de5">
-  <h3>👩‍🏫 Class-teacher logins <small style="color:#555">(admin only)</small></h3>
-  <p class="am-msg" style="margin:0 0 8px;color:#333">Create a one-time link for a class-section and share it. The teacher opens it, enters name, e-mail and a password of their own, and gets access to <b>only that class-section</b>. Each link works once.</p>
-  <div class="am-grid">
-   <label>Class <select id="ivCls"><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
-   <label>Section <select id="ivSec"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
-   <label>Teacher name (optional hint)<input id="ivName"></label>
-  </div>
-  <div class="am-row"><button class="dv-b" type="button" onclick="PROMO.mkInvite()">🔗 Create link</button><button class="dv-b g" type="button" onclick="PROMO.loadAdmin()">⟳ Refresh lists</button></div>
+  <h3>👩‍🏫 Registered class teachers <small style="color:#555">(admin only)</small></h3>
+  <p class="am-msg" style="margin:0 0 8px;color:#333">Each active or disabled registration is listed here. Delete a registration to release its e-mail/class-section registration lock. Firebase Authentication accounts are not deleted by this browser-only page; the person can sign in with the same account and register again.</p>
+  <div class="am-row"><button class="dv-b g" type="button" onclick="PROMO.loadAdmin()">⟳ Refresh registered teachers</button></div>
   <p class="am-msg" id="ivMsg"></p>
-  <div id="ivNew"></div>
-  <h3 style="margin-top:14px">Invite links</h3><div id="ivList" class="am-box"></div>
-  <h3 style="margin-top:14px">Class teachers</h3><div id="ivTeach" class="am-box"></div>
-  <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules) — required for this screen</b></summary>
-   <p>Add / replace these blocks in your Firestore rules, then Publish. Without them class teachers cannot register or save, and the “locked” state is only enforced on screen.</p>
-   <pre>// ===== PROMOTION / CLASS-TEACHER ACCESS =====
-// Put these inside:  match /databases/{database}/documents { ... }
-// Uses your existing isAdmin() and isMarksStaff(). New role value in users/{uid}.role = 'classteacher'
-// (kept separate from 'teacher' so class teachers do NOT get your other marks/portal permissions).
-
-function uDoc() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
-function isCT() {
-  return request.auth != null
-    &amp;&amp; exists(/databases/$(database)/documents/users/$(request.auth.uid))
-    &amp;&amp; uDoc().role == 'classteacher'
-    &amp;&amp; uDoc().get('disabled', false) == false;
-}
-function ctOwns(c, s) { return isCT() &amp;&amp; uDoc().cls == c &amp;&amp; uDoc().sec == s; }
-function sheetKey(d) { return string(d.year) + '_' + d.cls + '_' + (d.sec == '' ? '-' : d.sec); }
-function sheetOf(d) { return get(/databases/$(database)/documents/admAlloc/$(sheetKey(d))).data; }
-function ctPlaces(d) {
-  return ctOwns(d.cls, d.sec) &amp;&amp; d.type == 'promoted'
-    &amp;&amp; d.get('allocKey', '') == sheetKey(d) &amp;&amp; sheetOf(d).status == 'draft';
-}
-
-// 1) Invite links created by admin; the public join page can read ONE invite by its secret code.
-match /teacherInvites/{code} {
+  <div id="ivTeach" class="am-box"></div>
+  <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules) — required for self-registration</b></summary>
+   <p>Merge these rules into your existing Firestore rules and publish them. Keep your existing admin/staff rules; these are additional rules for the self-registration locks.</p>
+   <pre>// Self-registration locks. Add inside match /databases/{database}/documents.
+// isAdmin() must be your existing admin predicate.
+match /teacherClassLocks/{id} {
   allow get: if true;
   allow list: if isAdmin();
-  allow create, delete: if isAdmin();
-  allow update: if isAdmin()
-    || (request.auth != null &amp;&amp; resource.data.status == 'open'
-        &amp;&amp; request.resource.data.status == 'used'
-        &amp;&amp; request.resource.data.uid == request.auth.uid
-        &amp;&amp; request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'uid', 'email', 'usedAt']));
+  allow create: if isAdmin() || (request.auth != null
+    &amp;&amp; request.resource.data.uid == request.auth.uid
+    &amp;&amp; !exists(/databases/$(database)/documents/teacherClassLocks/$(id)));
+  allow update: if isAdmin() || (request.auth != null &amp;&amp; resource.data.uid == request.auth.uid &amp;&amp; request.resource.data.uid == request.auth.uid);
+  allow delete: if isAdmin();
 }
-
-// 2) A teacher may create ONLY their own users/{uid} document, and only for an open invite.
-//    (This is added to your existing users rule - Firestore ORs matching rules.)
+match /teacherEmailLocks/{id} {
+  allow get: if true;
+  allow list: if isAdmin();
+  allow create: if isAdmin() || (request.auth != null
+    &amp;&amp; request.resource.data.uid == request.auth.uid
+    &amp;&amp; !exists(/databases/$(database)/documents/teacherEmailLocks/$(id)));
+  allow update: if isAdmin() || (request.auth != null &amp;&amp; resource.data.uid == request.auth.uid &amp;&amp; request.resource.data.uid == request.auth.uid);
+  allow delete: if isAdmin();
+}
+// Add this self-registration clause to your existing users/{uid} rule.
+// Existing users rules are OR-combined, so remove/replace the old invite-only create clause.
 match /users/{uid} {
-  allow read: if request.auth != null &amp;&amp; request.auth.uid == uid;
   allow create: if request.auth != null &amp;&amp; request.auth.uid == uid
-    &amp;&amp; request.resource.data.keys().hasOnly(['role', 'name', 'email', 'mobile', 'cls', 'sec', 'year', 'inviteCode'])
     &amp;&amp; request.resource.data.role == 'classteacher'
-    &amp;&amp; get(/databases/$(database)/documents/teacherInvites/$(request.resource.data.inviteCode)).data.status == 'open'
-    &amp;&amp; get(/databases/$(database)/documents/teacherInvites/$(request.resource.data.inviteCode)).data.cls == request.resource.data.cls
-    &amp;&amp; get(/databases/$(database)/documents/teacherInvites/$(request.resource.data.inviteCode)).data.sec == request.resource.data.sec
-    &amp;&amp; get(/databases/$(database)/documents/teacherInvites/$(request.resource.data.inviteCode)).data.year == request.resource.data.year;
-}
-
-// 3) Allocation sheets (draft -&gt; final). A class teacher can only touch THEIR class-section and
-//    only while it is a draft. Locked (final) sheets can be changed by admin only.
-match /admAlloc/{id} {
-  allow read: if isAdmin() || isCT();
-  allow create: if isAdmin()
-    || (ctOwns(request.resource.data.cls, request.resource.data.sec)
-        &amp;&amp; request.resource.data.status == 'draft' &amp;&amp; id == sheetKey(request.resource.data));
-  allow update: if isAdmin()
-    || (ctOwns(resource.data.cls, resource.data.sec) &amp;&amp; resource.data.status == 'draft'
-        &amp;&amp; request.resource.data.cls == resource.data.cls &amp;&amp; request.resource.data.sec == resource.data.sec
-        &amp;&amp; request.resource.data.status in ['draft', 'final']);
+    &amp;&amp; request.resource.data.keys().hasOnly(['role','name','email','mobile','cls','sec','year','disabled','classLockId','emailLockId'])
+    &amp;&amp; getAfter(/databases/$(database)/documents/teacherClassLocks/$(request.resource.data.classLockId)).data.uid == request.auth.uid
+    &amp;&amp; getAfter(/databases/$(database)/documents/teacherEmailLocks/$(request.resource.data.emailLockId)).data.uid == request.auth.uid;
   allow delete: if isAdmin();
 }
-
-// 4) REPLACE your existing admStudents and admCounters blocks with these two
-//    (staff can no longer write promoted students directly - promotion goes through the sheets).
-match /admStudents/{id} {
-  allow read: if isAdmin() || isMarksStaff() || isCT();
-  allow create: if isAdmin() || ctPlaces(request.resource.data);
-  allow update: if isAdmin()
-    || (ctPlaces(request.resource.data) &amp;&amp; resource.data.get('allocKey', '') == request.resource.data.allocKey);
-  allow delete: if isAdmin()
-    || (isCT() &amp;&amp; ctOwns(resource.data.cls, resource.data.sec)
-        &amp;&amp; resource.data.get('allocKey', '') != '' &amp;&amp; sheetOf(resource.data).status == 'draft');
-}
-match /admCounters/{id} {
-  allow read: if isAdmin() || isMarksStaff() || isCT();
-  allow create, update: if isAdmin()
-    || (isCT() &amp;&amp; !id.matches('REG_.*') &amp;&amp; ctOwns(request.resource.data.cls, request.resource.data.sec));
-  allow delete: if isAdmin();
-}
-
-// 5) In your existing certDb rule, change the read line to:   allow read: if isAdmin() || isMarksStaff() || isCT();
-//    so class teachers can load the student database for certificates and reports.
+// Admin may delete teacherClassLocks and teacherEmailLocks to release an assignment.
 </pre></details>
- </div>
-</div>
-
-<div id="joinView">
- <div class="ap-card">
-  <h1>Taldangra Fulmati High School [H.S.]</h1>
-  <p class="s" id="jnSub">Class-teacher registration</p>
-  <div id="jnBody"><p>Checking your link…</p></div>
  </div>
 </div>
 
@@ -3128,29 +3079,80 @@ const PROMO=(function(){
   w.document.write('<html><head><title>Class '+label(cur.c,cur.s)+'</title><style>@page{size:A4 portrait;margin:10mm}body{font-family:Arial,sans-serif;font-size:12px;color:#000}h2{text-align:center;margin:0}table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid #000;padding:3px 5px;text-align:left}th{background:#eee}</style></head><body><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><p style="text-align:center;margin:3px 0"><b>Class '+label(cur.c,cur.s)+' — roll list, session '+ses(cur.y)+'</b> ('+(status()==='final'?'FINAL':'DRAFT')+')</p><table><tr><th>Roll</th><th>Name</th><th>Sex</th><th>Father</th><th>Caste</th><th>Previous class-sec / roll</th></tr>'+on.map(r=>'<tr><td><b>'+esc(r.roll)+'</b></td><td>'+esc(r.name)+'</td><td>'+esc(r.sex)+'</td><td>'+esc(r.father)+'</td><td>'+esc(r.caste)+'</td><td>'+esc(r.oc+(r.os?'-'+r.os:'')+' / '+r.or)+'</td></tr>').join('')+'</table><p style="margin-top:30px">Total: '+on.length+' &nbsp;&nbsp;&nbsp; Class teacher: ____________ &nbsp;&nbsp;&nbsp; Headmaster: ____________</p></body></html>');
   w.document.close();w.focus();setTimeout(()=>w.print(),300)}
 
- /* ---------- admin: invite links + teachers ---------- */
- function rand(){const a=new Uint8Array(18);crypto.getRandomValues(a);return Array.from(a,b=>'abcdefghjkmnpqrstuvwxyz23456789'[b%31]).join('')}
- const joinLink=code=>location.href.split('#')[0].split('?')[0]+'?join='+code;
- async function mkInvite(){
-  if(!need('ivMsg'))return;await roleP;if(!isAdmin()){msg('Only admin can create links.',true,'ivMsg');return}
-  if(location.protocol==='file:'){msg('Open the portal from your website (https://…) first, otherwise the link will not work on other phones.',true,'ivMsg');return}
-  const y=+$('pmYear').value,c=$('ivCls').value,s=$('ivSec').value,code=rand();
-  try{await db.collection('teacherInvites').doc(code).set({code,year:y,cls:c,sec:s,hint:up($('ivName').value),status:'open',createdBy:mail(),ts:ts()});
-   const L=joinLink(code),m='*Taldangra Fulmati High School [H.S.]*\nClass teacher registration — Class '+label(c,s)+' ('+ses(y)+').\nOpen this link, enter your name, e-mail and make your own password:\n'+L+'\n(One-time link — do not forward.)';
-   $('ivNew').innerHTML='<div class="am-ok">✔ Link for <b>Class '+esc(label(c,s))+'</b><div class="am-row"><span class="am-link">'+esc(L)+'</span><button class="dv-b" onclick="PROMO.copy(\''+esc(L)+'\')">Copy</button><a class="dv-b g" target="_blank" href="https://wa.me/?text='+encodeURIComponent(m)+'">💬 WhatsApp</a></div></div>';
-   msg('Link created.',false,'ivMsg');loadAdmin()}
-  catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
- function copy(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Copied.',false,'ivMsg')).catch(()=>msg('Select and copy the link shown.',true,'ivMsg'))}
+ /* ---------- staff self-registration + admin registration list ---------- */
+ const classLockId=(y,c,s)=>'cls_'+c+'_'+(s||'NONE');
+ async function emailLockId(em){
+  const bytes=new TextEncoder().encode(String(em||'').trim().toLowerCase());
+  if(!(crypto&&crypto.subtle))throw new Error('Secure HTTPS connection is required for e-mail registration.');
+  const hash=await crypto.subtle.digest('SHA-256',bytes);
+  return 'em_'+Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');
+ }
+ function regMsg(t,bad){const e=$('srMsg');if(e){e.textContent=t;e.className='am-msg'+(bad?' bad':'')}}
+ async function registerTeacher(){
+  if(!db||!auth){regMsg('Firebase is unavailable. Open the published HTTPS portal and try again.',true);return}
+  const name=up($('srName').value),mobile=$('srMobile').value.trim(),em=$('srEmail').value.trim().toLowerCase(),pw=$('srPass').value,pw2=$('srPass2').value;
+  const y=+$('srYear').value,c=$('srCls').value,s=$('srSec').value;
+  if(!name)return regMsg('Enter your full name.',true);
+  if(mobile&&!/^\d{10}$/.test(mobile))return regMsg('Mobile number must contain 10 digits.',true);
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return regMsg('Enter a valid e-mail address.',true);
+  if(pw.length<8)return regMsg('Password must be at least 8 characters.',true);
+  if(pw!==pw2)return regMsg('Passwords do not match.',true);
+  const btn=$('srGo');btn.disabled=true;regMsg('Checking e-mail and class-section…',false);
+  let user=auth.currentUser;
+  try{
+   if(user&&String(user.email||'').toLowerCase()!==em){regMsg('You are signed in with a different e-mail. Sign out first, then register with the e-mail entered here.',true);return}
+   if(!user){
+    try{const cr=await auth.createUserWithEmailAndPassword(em,pw);user=cr.user}
+    catch(e){if(e.code==='auth/email-already-in-use'){regMsg('This e-mail already has a Firebase account. Sign in with that same e-mail/password, then submit this form to assign your class-section.',true);return}throw e}
+   }
+   const eid=await emailLockId(em),cid=classLockId(y,c,s),uRef=db.collection('users').doc(user.uid),eRef=db.collection('teacherEmailLocks').doc(eid),cRef=db.collection('teacherClassLocks').doc(cid);
+   await db.runTransaction(async tx=>{
+    const snaps=await Promise.all([tx.get(uRef),tx.get(eRef),tx.get(cRef)]);
+    const ud=snaps[0].exists?snaps[0].data():null,ed=snaps[1].exists?snaps[1].data():null,cd=snaps[2].exists?snaps[2].data():null;
+    if(ud&&ud.role==='classteacher')throw new Error('This e-mail is already registered as a class teacher. Ask admin to delete its registration before re-registering.');
+    if(ud&&ud.role&&ud.role!=='classteacher')throw new Error('This e-mail is already assigned another portal role. Ask admin for assistance.');
+    if(ed&&ed.uid!==user.uid)throw new Error('This e-mail is already registered. Only one class-section per e-mail is allowed.');
+    if(cd&&cd.uid!==user.uid)throw new Error('Class '+label(c,s)+' already has a registered teacher (active or disabled). Ask admin to delete the old registration first.');
+    tx.set(uRef,{role:'classteacher',name,email:em,mobile,cls:c,sec:s,year:y,disabled:false,classLockId:cid,emailLockId:eid});
+    tx.set(eRef,{uid:user.uid,year:y,cls:c,sec:s});
+    tx.set(cRef,{uid:user.uid,year:y,cls:c,sec:s});
+   });
+   try{await user.updateProfile({displayName:name})}catch(e){}
+   $('srPass').value='';$('srPass2').value='';regMsg('Registration successful. Class '+label(c,s)+' for session '+ses(y)+'. You are signed in.',false);
+   roleP=loadRole(user);await roleP;head();loadAdmin();
+  }catch(e){regMsg('Registration failed: '+(e.message||e.code||e),true)}
+  finally{btn.disabled=false}
+ }
  async function loadAdmin(){
-  if(!(db&&auth&&auth.currentUser)||!isAdmin())return;const y=+$('pmYear').value;
-  try{const r=await Promise.all([db.collection('teacherInvites').where('year','==',y).get(),db.collection('users').where('role','==','classteacher').get()]);
-   const inv=r[0].docs.map(d=>Object.assign({_id:d.id},d.data())).sort((a,b)=>(b.ts&&b.ts.seconds||0)-(a.ts&&a.ts.seconds||0));
-   $('ivList').innerHTML=inv.length?'<table class="am-t"><tr><th>Class-Sec</th><th>Teacher</th><th>Status</th><th></th></tr>'+inv.map(x=>'<tr><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td class="l">'+esc(x.status==='used'?(x.email||''):(x.hint||''))+'</td><td>'+(x.status==='used'?'<span class="pm-b pm-f">USED</span>':'<span class="pm-b pm-d">OPEN</span>')+'</td><td>'+(x.status==='open'?'<button class="dv-b g" onclick="PROMO.copy(\''+esc(joinLink(x._id))+'\')">Copy link</button> ':'')+'<button class="dv-b g" style="color:#b00020" onclick="PROMO.delInvite(\''+esc(x._id)+'\')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No links yet.</p>';
-   const tc=r[1].docs.map(d=>Object.assign({_id:d.id},d.data()));
-   $('ivTeach').innerHTML=tc.length?'<table class="am-t"><tr><th>Name</th><th>E-mail</th><th>Class-Sec</th><th>Access</th><th></th></tr>'+tc.map(x=>'<tr><td class="l">'+esc(x.name)+'</td><td class="l">'+esc(x.email)+'</td><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td>'+(x.disabled?'<span class="pm-b pm-n">DISABLED</span>':'<span class="pm-b pm-f">ACTIVE</span>')+'</td><td><button class="dv-b g" onclick="PROMO.toggleT(\''+esc(x._id)+'\','+(x.disabled?'false':'true')+')">'+(x.disabled?'Enable':'Disable')+'</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No class teacher has registered yet.</p>'}
-  catch(e){msg('Could not load lists: '+(e.code||e.message),true,'ivMsg')}}
- async function delInvite(id){if(!confirm('Delete this link? It will stop working.'))return;try{await db.collection('teacherInvites').doc(id).delete();loadAdmin()}catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
+  if(!(db&&auth&&auth.currentUser)||!isAdmin())return;
+  try{
+   const r=await db.collection('users').where('role','==','classteacher').get();
+   const tc=r.docs.map(d=>Object.assign({_id:d.id},d.data()));
+   // Migrate existing active AND disabled registrations to lock records so they also block duplicates.
+   for(const x of tc){
+    const cid=x.classLockId||classLockId(x.year||+$('pmYear').value,x.cls||'',x.sec||'');
+    const eid=x.emailLockId||await emailLockId(x.email||'');
+    const cRef=db.collection('teacherClassLocks').doc(cid),eRef=db.collection('teacherEmailLocks').doc(eid);
+    const cs=await cRef.get(),es=await eRef.get();
+    if(!cs.exists)await cRef.set({uid:x._id,year:x.year||+$('pmYear').value,cls:x.cls||'',sec:x.sec||''});
+    if(!es.exists)await eRef.set({uid:x._id,year:x.year||+$('pmYear').value,cls:x.cls||'',sec:x.sec||''});
+    if(!x.classLockId||!x.emailLockId)await db.collection('users').doc(x._id).update({classLockId:cid,emailLockId:eid});
+   }
+   $('ivTeach').innerHTML=tc.length?'<table class="am-t"><tr><th>Name</th><th>E-mail</th><th>Class-Sec</th><th>Session</th><th>Access</th><th>Action</th></tr>'+tc.map(x=>'<tr><td class="l">'+esc(x.name||'')+'</td><td class="l">'+esc(x.email||'')+'</td><td><b>'+esc(label(x.cls||'',x.sec||''))+'</b></td><td>'+esc(x.year==null?'':ses(+x.year))+'</td><td>'+(x.disabled?'<span class="pm-b pm-n">DISABLED</span>':'<span class="pm-b pm-f">ACTIVE</span>')+'</td><td><button class="dv-b g" onclick="PROMO.toggleT(\''+esc(x._id)+'\','+(x.disabled?'false':'true')+')">'+(x.disabled?'Enable':'Disable')+'</button> <button class="dv-b red" onclick="PROMO.deleteTeacher(\''+esc(x._id)+'\')">Delete registration</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No class teacher has registered yet.</p>';
+  }catch(e){msg('Could not load teacher list: '+(e.code||e.message),true,'ivMsg')}
+ }
  async function toggleT(uid,dis){try{await db.collection('users').doc(uid).update({disabled:dis});loadAdmin()}catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
+ async function deleteTeacher(uid){
+  if(!isAdmin())return;
+  if(!confirm('Delete this class-teacher registration, whether active or disabled? The e-mail and class-section locks will be released. The Firebase Authentication account remains and can sign in to register again.'))return;
+  try{
+   const ref=db.collection('users').doc(uid),sn=await ref.get();if(!sn.exists){msg('Registration already removed.',false,'ivMsg');return}
+   const d=sn.data(),cid=d.classLockId||classLockId(d.year||+$('pmYear').value,d.cls||'',d.sec||''),eid=d.emailLockId||(await emailLockId(d.email||''));
+   const cRef=db.collection('teacherClassLocks').doc(cid),eRef=db.collection('teacherEmailLocks').doc(eid),locks=await Promise.all([cRef.get(),eRef.get()]);
+   const b=db.batch();b.delete(ref);if(locks[0].exists&&locks[0].data().uid===uid)b.delete(cRef);if(locks[1].exists&&locks[1].data().uid===uid)b.delete(eRef);await b.commit();
+   msg('Registration deleted. Its e-mail/class-section locks are released where owned by this account. The Firebase login itself was not deleted.',false,'ivMsg');await loadAdmin();
+  }catch(e){msg('Delete failed: '+(e.code||e.message),true,'ivMsg')}
+ }
 
  function enter(){head();if(!(auth&&auth.currentUser)){msg('Sign in (sidebar 👤) to start.',true);return}
   roleP.then(()=>{head();refreshSheets();loadAdmin();if(!cur&&(isAdmin()||isCT()))load(true)})}
@@ -3248,54 +3250,12 @@ const PROMO=(function(){
  const y0=new Date().getFullYear();$('pmYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('pmYear').addEventListener('change',()=>{refreshSheets();loadAdmin()});
  const nb=document.querySelector('.tf-side button[data-v=prom]');if(nb)nb.addEventListener('click',enter);
+ const yopts=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');if($('srYear'))$('srYear').innerHTML=yopts;
  if(auth)auth.onAuthStateChanged(u=>{cur=null;sheet=null;rows=[];$('pmSheetCard').style.display='none';$('pmBadge').innerHTML='';$('pmCur').textContent='';roleP=loadRole(u)});
- return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,isAdmin}
+ return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,registerTeacher,loadAdmin,toggleT,deleteTeacher,isAdmin}
 })();
 </script>
 
-<script>
-/* ===== CLASS-TEACHER JOIN PAGE  (index.html?join=CODE) ===== */
-(function(){
- const m=location.search.match(/[?&]join=([^&]*)/);if(!m)return;
- const code=decodeURIComponent(m[1]),$=id=>document.getElementById(id);
- const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
- const up=s=>String(s||'').trim().replace(/\s+/g,' ').toUpperCase();
- const ses=y=>y+'-'+String(y+1).slice(-2);
- let db=null,auth=null,inv=null;
- try{const a=firebase.apps.find(x=>x.name==='tfdb');if(a){db=a.firestore();auth=a.auth()}}catch(e){}
- const body=$('jnBody');
- const fail=t=>{body.innerHTML='<div class="pm-err">'+esc(t)+'</div>'};
- if(!db){fail('Could not connect. Check your internet and reload this page.');return}
- db.collection('teacherInvites').doc(code).get().then(sn=>{
-  if(!sn.exists){fail('This link is not valid. Ask the admin for a new link.');return}
-  inv=sn.data();if(inv.status!=='open'){fail('This link has already been used. Ask the admin for a new link, or sign in from the portal if you already registered.');return}
-  const cl='Class '+inv.cls+(inv.sec?' – Section '+inv.sec:'');
-  $('jnSub').innerHTML='Class-teacher registration — <b>'+esc(cl)+'</b> · session '+ses(inv.year);
-  body.innerHTML='<label>Your full name<input id="jnN" value="'+esc(inv.hint||'')+'" autocomplete="name"></label>'+
-   '<label>Mobile number<input id="jnM" inputmode="numeric" maxlength="10"></label>'+
-   '<label>E-mail (this will be your login)<input id="jnE" type="email" autocomplete="username"></label>'+
-   '<label>Create a password (min. 8 characters)<input id="jnP" type="password" autocomplete="new-password"></label>'+
-   '<label>Repeat password<input id="jnP2" type="password" autocomplete="new-password"></label>'+
-   '<div id="jnErr"></div><button type="button" id="jnGo">Create my login</button>'+
-   '<p style="font-size:12px;color:#555;margin:10px 0 0">You will get access to <b>'+esc(cl)+'</b> only. The admin can disable the login at any time.</p>';
-  $('jnGo').onclick=go}).catch(e=>fail('Could not read the link: '+(e.code||e.message)));
- const err=t=>{$('jnErr').innerHTML='<div class="pm-err" style="margin:0 0 10px">'+esc(t)+'</div>'};
- async function go(){
-  const name=up($('jnN').value),mob=$('jnM').value.trim(),em=$('jnE').value.trim().toLowerCase(),pw=$('jnP').value;
-  if(!name)return err('Enter your name.');if(mob&&!/^\d{10}$/.test(mob))return err('Mobile must be 10 digits.');
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return err('Enter a valid e-mail.');
-  if(pw.length<8)return err('Password must be at least 8 characters.');if(pw!==$('jnP2').value)return err('The two passwords do not match.');
-  $('jnGo').disabled=true;$('jnErr').innerHTML='';let cred;
-  try{cred=await auth.createUserWithEmailAndPassword(em,pw)}
-  catch(e){$('jnGo').disabled=false;return err(e.code==='auth/email-already-in-use'?'This e-mail already has an account. Use another e-mail, or ask the admin.':e.code==='auth/weak-password'?'Choose a stronger password.':(e.code||e.message))}
-  try{const b=db.batch();
-   b.set(db.collection('users').doc(cred.user.uid),{role:'classteacher',name,email:em,mobile:mob,cls:inv.cls,sec:inv.sec,year:inv.year,inviteCode:code});
-   b.update(db.collection('teacherInvites').doc(code),{status:'used',uid:cred.user.uid,email:em,usedAt:Date.now()});
-   await b.commit();try{await cred.user.updateProfile({displayName:name})}catch(x){}
-   body.innerHTML='<div class="am-ok">✔ Your login is ready.<br>Class <b>'+esc(inv.cls+(inv.sec?'-'+inv.sec:''))+'</b> · '+esc(em)+'</div><p style="font-size:13px">Open the portal and sign in with this e-mail and your password (sidebar → 👤 Sign in).</p><button type="button" onclick="location.href=location.pathname">Open portal</button>'}
-  catch(e){try{await cred.user.delete()}catch(x){}$('jnGo').disabled=false;err('Could not complete registration: '+(e.code||e.message)+'. Ask the admin to check the link.')}}
-})();
-</script>
 
 </body>
 </html>
