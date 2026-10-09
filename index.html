@@ -2812,7 +2812,7 @@ const ADM=(function(){
  <div class="dv-c" id="pmAdmin" style="display:none;border-top:5px solid #9b5de5">
   <h3>👩‍🏫 Registered class teachers <small style="color:#555">(admin only)</small></h3>
   <p class="am-msg" style="margin:0 0 8px;color:#333">Each active or disabled registration is listed here. Delete a registration to release its e-mail/class-section registration lock. Firebase Authentication accounts are not deleted by this browser-only page; the person can sign in with the same account and register again.</p>
-  <div class="am-row"><button class="dv-b g" type="button" onclick="PROMO.loadAdmin()">⟳ Refresh registered teachers</button></div>
+  <div class="am-row"><button class="dv-b g" type="button" onclick="PROMO.loadAdmin()">⟳ Refresh registered teachers</button> <button class="dv-b red" type="button" onclick="PROMO.clearAllTeachers()">Delete ALL previous registrations</button></div>
   <p class="am-msg" id="ivMsg"></p>
   <div id="ivTeach" class="am-box"></div>
   <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules) — required for self-registration</b></summary>
@@ -3153,6 +3153,20 @@ const PROMO=(function(){
    msg('Registration deleted. Its e-mail/class-section locks are released where owned by this account. The Firebase login itself was not deleted.',false,'ivMsg');await loadAdmin();
   }catch(e){msg('Delete failed: '+(e.code||e.message),true,'ivMsg')}
  }
+ async function clearAllTeachers(){
+  if(!isAdmin()||!db)return;
+  if(!confirm('PERMANENT ACTION: Delete EVERY previously stored class-teacher registration, active and disabled, plus ALL teacher e-mail/class-section locks? Other users, students, marks, promotion sheets and Firebase Authentication accounts will NOT be deleted.'))return;
+  if(prompt('Type DELETE ALL TEACHER REGISTRATIONS to confirm:')!=='DELETE ALL TEACHER REGISTRATIONS'){msg('Bulk deletion cancelled.',false,'ivMsg');return}
+  try{
+   msg('Loading previous registrations and locks…',false,'ivMsg');
+   const qs=await Promise.all([db.collection('users').where('role','==','classteacher').get(),db.collection('teacherClassLocks').get(),db.collection('teacherEmailLocks').get()]);
+   const refs=[];qs.forEach(q=>q.docs.forEach(d=>refs.push(d.ref)));
+   let deleted=0;
+   for(let i=0;i<refs.length;i+=400){const batch=db.batch();refs.slice(i,i+400).forEach(r=>batch.delete(r));await batch.commit();deleted+=Math.min(400,refs.length-i)}
+   msg('Done. Deleted '+qs[0].size+' old class-teacher registration(s), '+qs[1].size+' class-section lock(s), and '+qs[2].size+' e-mail lock(s). The portal is ready for fresh registrations. Firebase Authentication accounts remain and are not deleted.',false,'ivMsg');
+   await loadAdmin();
+  }catch(e){msg('Bulk deletion failed: '+(e.code||e.message)+'. Check that Firestore rules allow admin deletion of teacher registrations and locks.',true,'ivMsg')}
+ }
 
  function enter(){head();if(!(auth&&auth.currentUser)){msg('Sign in (sidebar 👤) to start.',true);return}
   roleP.then(()=>{head();refreshSheets();loadAdmin();if(!cur&&(isAdmin()||isCT()))load(true)})}
@@ -3252,7 +3266,7 @@ const PROMO=(function(){
  const nb=document.querySelector('.tf-side button[data-v=prom]');if(nb)nb.addEventListener('click',enter);
  const yopts=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');if($('srYear'))$('srYear').innerHTML=yopts;
  if(auth)auth.onAuthStateChanged(u=>{cur=null;sheet=null;rows=[];$('pmSheetCard').style.display='none';$('pmBadge').innerHTML='';$('pmCur').textContent='';roleP=loadRole(u)});
- return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,registerTeacher,loadAdmin,toggleT,deleteTeacher,isAdmin}
+ return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,registerTeacher,loadAdmin,toggleT,deleteTeacher,clearAllTeachers,isAdmin}
 })();
 </script>
 
