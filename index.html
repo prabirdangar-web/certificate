@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>if(/[?&](join=|ctregister=1)/.test(location.search))document.documentElement.className+=" join-mode"</script>
+    <script>if(/[?&]join=/.test(location.search))document.documentElement.className+=" join-mode"</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFHS Official Certificate System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -715,7 +715,7 @@
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <div id="dataView">
  <div class="dv-c"><h3>Student database &amp; year</h3><div class="dv-r"><label>Year <select id="dvYear"></select></label>
-  <button class="dv-b" type="button" onclick="TFDB.load()">⬇ Load from Firebase</button><button class="dv-b" type="button" onclick="TFDB.upload()" style="background:#8a5600">⬆ Upload current DB to Firebase (admin)</button></div>
+  <button class="dv-b" type="button" onclick="TFDB.load()">⬇ Load from Firebase</button><button class="dv-b" type="button" onclick="TFDB.upload()" style="background:#8a5600">⬆ Upload current DB to Firebase (admin)</button><button class="dv-b g" type="button" onclick="TFDB.builtin()">Use built-in (offline)</button></div>
   <p id="dvMsg" style="margin:10px 0 0">Source: built-in database (offline).</p></div>
  <div class="dv-c"><h3>Class-wise strength (current database)</h3><div id="dvCls"></div></div>
 
@@ -2744,25 +2744,10 @@ const ADM=(function(){
 .dv-b.red{background:#b00020}.dv-b.amb{background:#8a5600}
 html.join-mode body>*:not(#joinView):not(script):not(style):not(link){display:none!important}
 html.join-mode body{padding:0!important;display:block!important;background:#eef3ee}
-body.ct-pending>*:not(#ctPendingScreen):not(script):not(style):not(link){display:none!important}
-#ctPendingScreen{display:none}
-body.ct-pending #ctPendingScreen{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;background:#eef3ee;font-family:Arial,sans-serif}
-#ctPendingScreen .inner{max-width:560px;background:#fff;padding:28px;border-radius:16px;box-shadow:0 8px 30px #0001;text-align:center;border-top:5px solid #c18b2d}
-#ctPendingScreen h2{color:#145828;margin-top:0}
 html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16px}
 </style>
 
-<div id="ctPendingScreen"><div class="inner"><h2>Registration submitted — approval pending</h2><p>Your class-teacher registration is waiting for approval by the Headmaster / Administrator.</p><p><b>The dashboard and student information will remain hidden until approval.</b></p><p>After approval, sign out and sign in again.</p><button class="dv-b g" onclick="TFDB.logout()">Sign out</button></div></div>
 <div id="promView">
- <div class="dv-c" style="border-left:5px solid #d4b18a;background:#fffdf5">
-  <h3>📌 Promotion duty plan — Class V to VII</h3>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px">
-   <div style="padding:12px;border:1px solid #e2d2b5;border-radius:9px;background:#fff"><b>Stage 1 · Class V → VI</b><p style="margin:6px 0;font-size:13px">Class V-A and V-B class teachers check their own section's student list, promotion eligibility and records. The administrator then combines eligible students and prepares the new VI-A / VI-B roll sheets. Do not reuse Class V roll numbers as the new VI roll numbers.</p></div>
-   <div style="padding:12px;border:1px solid #b9d8c0;border-radius:9px;background:#f6fff7"><b>Stage 2 · Class VI → VII</b><p style="margin:6px 0;font-size:13px">VI-A and VI-B class teachers verify their respective students and marks. The administrator creates <b>one combined merit list</b> from both sections. Rank 1, 3, 5… goes to VII-A; rank 2, 4, 6… goes to VII-B. Each section receives its own roll sequence 1, 2, 3…</p></div>
-   <div style="padding:12px;border:1px solid #c8c8e8;border-radius:9px;background:#f8f8ff"><b>Responsibility & approval</b><p style="margin:6px 0;font-size:13px">Class teachers verify source-class records; the administrator/headmaster runs the combined allocation, checks the preview and duplicate rolls, creates draft sheets, and authorizes finalization. Teachers then review and finalize only their assigned destination section.</p></div>
-  </div>
-  <p style="margin:9px 0 0;font-size:12px;color:#7a4a00"><b>Important:</b> The Class-teacher list below contains registered destination-sheet accounts, so source teachers of V-A/V-B may not appear there yet. Create separate destination accounts for VI-A and VI-B; use the combined-allocation tool for the central merit/rank decision.</p>
- </div>
  <div class="dv-c" style="border-top:5px solid #145828">
   <h3>🎓 Promotion &amp; roll allocation — new session <span id="pmBadge"></span></h3>
   <p class="am-msg" id="pmWho" style="margin:0 0 8px">Sign in (sidebar 👤) to start.</p>
@@ -2811,15 +2796,20 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
  </div>
  <div class="dv-c"><h3>📋 All class-sections — session status</h3><div id="pmSheets" class="am-box"></div></div>
  <div class="dv-c" id="pmAdmin" style="display:none;border-top:5px solid #9b5de5">
-  <h3>👩‍🏫 Class-teacher logins for destination roll sheets <small style="color:#555">(admin only)</small></h3>
-  <p class="am-msg" style="margin:0 0 8px;color:#333">Use the one shared registration link. Class teachers select their own class and section; all new requests remain pending until the administrator approves them. Approved teachers can access only their assigned class-section.</p>
-  <p class="am-msg">Share one main portal link. Each class teacher chooses their own class and section on the registration form and submits a request. The dashboard stays blank until an administrator approves the request.</p>
-  <div class="am-row"><button class="dv-b" type="button" onclick="PROMO.shareMainRegistration()">🔗 Share main registration link</button><button class="dv-b g" type="button" onclick="PROMO.loadAdmin()">⟳ Refresh requests</button></div>
-  <p class="am-msg" id="ivMsg"></p><div id="ivNew"></div>
-  <h3 style="margin-top:14px">Registration requests — approve here</h3><div id="ivRequests" class="am-box"></div>
-  <h3 style="margin-top:14px">Approved class teachers</h3><div id="ivTeach" class="am-box"></div>
+  <h3>👩‍🏫 Class-teacher logins <small style="color:#555">(admin only)</small></h3>
+  <p class="am-msg" style="margin:0 0 8px;color:#333">Create a one-time link for a class-section and share it. The teacher opens it, enters name, e-mail and a password of their own, and gets access to <b>only that class-section</b>. Each link works once.</p>
+  <div class="am-grid">
+   <label>Class <select id="ivCls"><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
+   <label>Section <select id="ivSec"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
+   <label>Teacher name (optional hint)<input id="ivName"></label>
+  </div>
+  <div class="am-row"><button class="dv-b" type="button" onclick="PROMO.mkInvite()">🔗 Create link</button><button class="dv-b g" type="button" onclick="PROMO.loadAdmin()">⟳ Refresh lists</button></div>
+  <p class="am-msg" id="ivMsg"></p>
+  <div id="ivNew"></div>
+  <h3 style="margin-top:14px">Invite links</h3><div id="ivList" class="am-box"></div>
+  <h3 style="margin-top:14px">Class teachers</h3><div id="ivTeach" class="am-box"></div>
   <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules) — required for this screen</b></summary>
-   <p>Publish the additional Firestore rules below before using registration approval. These rules are required; otherwise registration submissions or admin approval may be denied. The browser interface alone is not a security boundary.</p>
+   <p>Add / replace these blocks in your Firestore rules, then Publish. Without them class teachers cannot register or save, and the “locked” state is only enforced on screen.</p>
    <pre>// ===== PROMOTION / CLASS-TEACHER ACCESS =====
 // Put these inside:  match /databases/{database}/documents { ... }
 // Uses your existing isAdmin() and isMarksStaff(). New role value in users/{uid}.role = 'classteacher'
@@ -2851,22 +2841,6 @@ match /teacherInvites/{code} {
         &amp;&amp; request.resource.data.uid == request.auth.uid
         &amp;&amp; request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'uid', 'email', 'usedAt']));
 }
-
-// Registration requests: each signed-in applicant can submit only their own pending request;
-// only admin can review/approve/reject requests.
-match /ctRegistrationRequests/{uid} {
-  allow create: if request.auth != null && request.auth.uid == uid
-    && request.resource.data.uid == uid
-    && request.resource.data.status == 'pending'
-    && request.resource.data.keys().hasOnly(['uid','name','email','mobile','cls','sec','year','status','createdAt']);
-  allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
-  allow update, delete: if isAdmin();
-}
-// Add this create condition alongside the existing users/{uid} rules (Firestore ORs matching allows):
-// allow create: if request.auth != null && request.auth.uid == uid
-//   && request.resource.data.role == 'classteacher'
-//   && request.resource.data.status == 'pending' && request.resource.data.approved == false
-//   && request.resource.data.keys().hasOnly(['role','name','email','mobile','cls','sec','year','approved','status','disabled','createdAt']);
 
 // 2) A teacher may create ONLY their own users/{uid} document, and only for an open invite.
 //    (This is added to your existing users rule - Firestore ORs matching rules.)
@@ -2938,14 +2912,14 @@ const PROMO=(function(){
  let db=null,auth=null;
  try{if(typeof firebase!=='undefined'){const a=firebase.apps.find(x=>x.name==='tfdb');if(a){db=a.firestore();auth=a.auth()}}}catch(e){}
  const ts=()=>firebase.firestore.FieldValue.serverTimestamp();
- let me={ready:false,role:'',cls:'',sec:'',name:'',disabled:false,approved:false},roleP=Promise.resolve();
+ let me={ready:false,role:'',cls:'',sec:'',name:'',disabled:false},roleP=Promise.resolve();
  let cur=null,sheet=null,rows=[],fixed={},dirty=false,sheets=[];
  const sk=s=>s||'-';
  const keyOf=(y,c,s)=>y+'_'+c+'_'+sk(s);
  const docId=(y,c,s,r)=>y+'_'+c+'_'+sk(s)+'_'+r;
  const mail=()=>String(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase();
  const isAdmin=()=>['admin','administrator','headmaster'].indexOf(String(me.role||'').trim().toLowerCase())>=0||FADMIN.indexOf(mail())>=0;
- const isCT=()=>String(me.role).toLowerCase()==='classteacher'&&!me.disabled&&me.approved===true;
+ const isCT=()=>String(me.role).toLowerCase()==='classteacher'&&!me.disabled;
  const canEdit=(c,s)=>isAdmin()||(isCT()&&me.cls===c&&(me.sec||'')===(s||''));
  const label=(c,s)=>c+(s?'-'+s:'');
  const ses=y=>y+'-'+String(y+1).slice(-2);
@@ -2977,11 +2951,11 @@ const PROMO=(function(){
   if(isCT()){$('pmCls').value=me.cls;$('pmSec').value=me.sec||'';$('pmCls').disabled=$('pmSec').disabled=true}
   else $('pmCls').disabled=$('pmSec').disabled=false}
  function loadRole(u){
-  me={ready:false,role:'',cls:'',sec:'',name:'',disabled:false,approved:false};
+  me={ready:false,role:'',cls:'',sec:'',name:'',disabled:false};
   if(!u||!db){navGate();head();return Promise.resolve()}
   return db.collection('users').doc(u.uid).get().then(sn=>{const d=sn.exists?sn.data():{};
-    me={ready:true,role:String(d.role||''),cls:String(d.cls||''),sec:String(d.sec||''),name:d.name||'',disabled:!!d.disabled,approved:d.approved===true||d.status==='approved'}})
-   .catch(()=>{me={ready:true,role:'?',cls:'',sec:'',name:'',disabled:false,approved:false}})
+    me={ready:true,role:String(d.role||''),cls:String(d.cls||''),sec:String(d.sec||''),name:d.name||'',disabled:!!d.disabled}})
+   .catch(()=>{me={ready:true,role:'?',cls:'',sec:'',name:'',disabled:false}})
    .then(()=>{navGate();head();if(document.body.dataset.view==='prom')enter()})}
 
  /* ---------- duplicate / validation ---------- */
@@ -2994,7 +2968,7 @@ const PROMO=(function(){
  function validate(strict){
   const on=rows.filter(r=>r.on);if(!on.length)return['Tick at least one student.'];
   const err=[],bad=dupInfo();Object.keys(bad).forEach(i=>err.push(rows[i].name+': '+bad[i]));
-  on.forEach(r=>{const t=String(r.roll).trim();
+  on.forEach(r=>{const m=String(r.mk==null?'':r.mk).trim();if(m===''||!Number.isFinite(Number(m))||Number(m)<0||Number(m)>100)err.push(r.name+': enter marks percentage from 0 to 100.');const t=String(r.roll).trim();
    if(t!==''&&!/^[1-9]\d{0,3}$/.test(t))err.push(r.name+': invalid roll "'+r.roll+'"');
    if(strict&&t==='')err.push(r.name+': roll no. missing')});
   return err}
@@ -3037,17 +3011,18 @@ const PROMO=(function(){
 
  /* ---------- table ---------- */
  function draw(){
-  if(!cur)return;const st=status(),locked=st==='final',edit=canEdit(cur.c,cur.s)&&!locked,f=$('pmOld').value;
-  $('pmBadge').innerHTML='<span class="pm-b '+(st==='final'?'pm-f':st==='draft'?'pm-d':'pm-n')+'">'+(st==='final'?'🔒 FINAL — LOCKED':st==='draft'?'DRAFT':'NEW — not saved')+'</span>';
-  $('pmSave').style.display=$('pmFin').style.display=edit?'':'none';
+  if(!cur)return;const st=status(),locked=st==='final',edit=canEdit(cur.c,cur.s)&&!locked&&!(st==='pending'&&!isAdmin()),f=$('pmOld').value;
+  $('pmBadge').innerHTML='<span class="pm-b '+(st==='final'?'pm-f':st==='draft'?'pm-d':'pm-n')+'">'+(st==='final'?'🔒 FINAL — LOCKED':st==='pending'?'⏳ WAITING FOR ADMIN APPROVAL':st==='draft'?'DRAFT':'NEW — not saved')+'</span>';
+  $('pmSave').style.display=edit?'':'none';$('pmFin').style.display=(edit||(isAdmin()&&st==='pending'))?'':'none';$('pmFin').textContent=(isAdmin()&&st==='pending')?'✅ Admin approve & allocate':'📨 Submit for admin approval';
   $('pmUnl').style.display=(locked&&isAdmin())?'':'none';
   let note='';
+  if(st==='pending')note='<div class="pm-lock">⏳ Submitted by class teacher; awaiting admin approval and final section/roll allocation.</div>';
   if(locked)note='<div class="pm-lock">🔒 This sheet was finalized'+(sheet.finalBy?' by <b>'+esc(sheet.finalBy)+'</b>':'')+'. It cannot be edited. '+(isAdmin()?'Use <b>Unlock</b> to reopen it.':'Only the admin can unlock it.')+'</div>';
   else if(!canEdit(cur.c,cur.s))note='<div class="pm-lock">View only.</div>';
   note+='<p class="am-msg" id="pmCount" style="margin:8px 0 0"></p>';$('pmNote').innerHTML=note;
   const list=[];rows.forEach((r,i)=>{if(f==='*'||(f==='__'?!r.os:r.os===f))list.push(i)});
-  $('pmTbl').innerHTML='<table class="am-t pm-t" id="pmT"><tr><th>✓</th><th>#</th><th>Name</th><th>Sex</th><th>Father</th><th>Old class-sec</th><th>Old roll</th><th>Merit marks</th><th>→ New roll</th></tr>'+list.map((i,n)=>{const r=rows[i];
-   return '<tr data-i="'+i+'"'+(r.on?'':' class="pm-off"')+'><td><input type="checkbox" '+(r.on?'checked ':'')+(edit?'':'disabled ')+'onchange="PROMO._o('+i+',this.checked)"></td><td>'+(n+1)+'</td><td class="l">'+esc(r.name)+'</td><td>'+esc(r.sex)+'</td><td class="l">'+esc(r.father)+'</td><td>'+esc(r.oc)+(r.os?'-'+esc(r.os):'')+'</td><td>'+esc(r.or)+'</td><td><input type="number" step="any" value="'+esc(r.mk)+'" '+(edit?'':'disabled ')+'onchange="PROMO._m('+i+',this.value)"></td><td><input class="pm-roll" type="number" min="1" value="'+esc(r.roll)+'" '+(edit&&r.on?'':'disabled ')+'onchange="PROMO._r('+i+',this.value)"></td></tr>'}).join('')+'</table>';
+  $('pmTbl').innerHTML='<table class="am-t pm-t" id="pmT"><tr><th>✓</th><th>#</th><th>Name</th><th>Sex</th><th>Father</th><th>Old class-sec</th><th>Old roll</th><th>Marks %</th><th>→ New roll</th></tr>'+list.map((i,n)=>{const r=rows[i];
+   return '<tr data-i="'+i+'"'+(r.on?'':' class="pm-off"')+'><td><input type="checkbox" '+(r.on?'checked ':'')+(edit?'':'disabled ')+'onchange="PROMO._o('+i+',this.checked)"></td><td>'+(n+1)+'</td><td class="l">'+esc(r.name)+'</td><td>'+esc(r.sex)+'</td><td class="l">'+esc(r.father)+'</td><td>'+esc(r.oc)+(r.os?'-'+esc(r.os):'')+'</td><td>'+esc(r.or)+'</td><td><input type="number" step="any" min="0" max="100" value="'+esc(r.mk)+'" '+(edit?'':'disabled ')+'onchange="PROMO._m('+i+',this.value)"></td><td><input class="pm-roll" type="number" min="1" value="'+esc(r.roll)+'" '+(edit&&r.on?'':'disabled ')+'onchange="PROMO._r('+i+',this.value)"></td></tr>'}).join('')+'</table>';
   markDup()}
  function _o(i,v){rows[i].on=v;dirty=true;const tr=document.querySelector('#pmTbl tr[data-i="'+i+'"]');if(tr){tr.classList.toggle('pm-off',!v);const inp=tr.querySelector('input.pm-roll');if(inp)inp.disabled=!v}markDup()}
  function _m(i,v){rows[i].mk=String(v).trim();dirty=true}
@@ -3080,7 +3055,22 @@ const PROMO=(function(){
   catch(e){msg('Save failed: '+(e.code||e.message),true)}}
  async function finalize(){
   if(!need()||!cur)return;await roleP;
-  if(!canEdit(cur.c,cur.s)||status()==='final'){msg('This sheet cannot be edited.',true);return}
+  if(status()==='pending'&&isAdmin()){
+    /* Admin approval continues into final allocation below. */
+  } else {
+    if(!canEdit(cur.c,cur.s)||status()==='final'||status()==='pending'){msg('This sheet cannot be edited.',true);return}
+    const err0=validate(false);if(err0.length){msg(err0.slice(0,6).join('\n'),true);return}
+    if(!isAdmin()){
+      if(!isCT()){msg('Only the assigned class teacher can submit marks.',true);return}
+      if(!confirm('Submit marks percentages for admin approval? After submission, you cannot change this sheet until admin unlocks it.'))return;
+      try{
+        const {y,c,s,key}=cur,on=rows.filter(r=>r.on).map(clean),ref=db.collection('admAlloc').doc(key);
+        await ref.set({year:y,cls:c,sec:s,status:'pending',count:on.length,rows:on,by:mail(),submittedBy:mail(),submittedAt:ts(),createdBy:sheet?(sheet.createdBy||sheet.by||mail()):mail()},{merge:true});
+        sheet=Object.assign({},sheet||{},{year:y,cls:c,sec:s,status:'pending',count:on.length,rows:on,by:mail()});
+        draw();await refreshSheets();msg('Submitted ✔ — waiting for admin approval. Section and roll allocation will be finalized by admin.');
+      }catch(e){msg('Submission failed: '+(e.code||e.message),true)}return;
+    }
+  }
   const err=validate(true);if(err.length){msg(err.slice(0,6).join('\n')+(err.length>6?'\n… and '+(err.length-6)+' more':''),true);return}
   const on=rows.filter(r=>r.on);if(on.length>450){msg('Too many students for one sheet (max 450).',true);return}
   if(!confirm('FINALIZE class '+label(cur.c,cur.s)+' for '+ses(cur.y)+' with '+on.length+' student(s)?\n\nThe sheet will be LOCKED. Only the admin can unlock it afterwards.'))return;
@@ -3125,7 +3115,7 @@ const PROMO=(function(){
   const CI=['V','VI','VII','VIII','IX','X','XI','XII'],list=sheets.slice().sort((a,b)=>CI.indexOf(a.cls)-CI.indexOf(b.cls)||String(a.sec).localeCompare(String(b.sec)));
   const w=when=>{const t=when&&when.toDate?when.toDate():null;return t?t.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):''};
   $('pmSheets').innerHTML=list.length?'<table class="am-t"><tr><th>Class-Sec</th><th>Status</th><th>Students</th><th>Last saved by</th><th>Locked by</th><th></th></tr>'+list.map(x=>
-   '<tr><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td><span class="pm-b '+(x.status==='final'?'pm-f':'pm-d')+'">'+(x.status==='final'?'🔒 FINAL':'DRAFT')+'</span></td><td>'+(x.count||(x.rows||[]).length)+'</td><td class="l">'+esc(x.by||'')+'<br><small>'+esc(w(x.ts))+'</small></td><td class="l">'+esc(x.finalBy||'')+'</td><td>'+
+   '<tr><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td><span class="pm-b '+(x.status==='final'?'pm-f':x.status==='pending'?'pm-n':'pm-d')+'">'+(x.status==='final'?'🔒 FINAL':x.status==='pending'?'⏳ PENDING ADMIN':'DRAFT')+'</span></td><td>'+(x.count||(x.rows||[]).length)+'</td><td class="l">'+esc(x.by||'')+'<br><small>'+esc(w(x.ts))+'</small></td><td class="l">'+esc(x.finalBy||'')+'</td><td>'+
    (canEdit(x.cls,x.sec)||isAdmin()?'<button class="dv-b g" onclick="PROMO.open(\''+esc(x._id)+'\')">Open</button> ':'')+
    (x.status==='final'&&isAdmin()?'<button class="dv-b red" onclick="PROMO.unlock(\''+esc(x._id)+'\')">🔓 Unlock</button>':'')+'</td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No sheet started for this session yet.</p>'}
  function open(id){const x=sheets.find(s=>s._id===id);if(!x)return;$('pmYear').value=String(x.year);$('pmCls').value=x.cls;$('pmSec').value=x.sec||'';load()}
@@ -3153,28 +3143,12 @@ const PROMO=(function(){
  function copy(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Copied.',false,'ivMsg')).catch(()=>msg('Select and copy the link shown.',true,'ivMsg'))}
  async function loadAdmin(){
   if(!(db&&auth&&auth.currentUser)||!isAdmin())return;const y=+$('pmYear').value;
-  try{const r=await Promise.all([db.collection('users').where('role','==','classteacher').get(),db.collection('ctRegistrationRequests').get()]);
-
-   const requests=r[1].docs.map(d=>Object.assign({_id:d.id},d.data())).sort((a,b)=>(b.createdAt&&b.createdAt.seconds||0)-(a.createdAt&&a.createdAt.seconds||0));
-   const pending=requests.filter(x=>x.status==='pending');
-   $('ivRequests').innerHTML=pending.length?'<table class="am-t"><tr><th>Name</th><th>E-mail</th><th>Mobile</th><th>Class-Sec</th><th>Action</th></tr>'+pending.map(x=>'<tr><td class="l">'+esc(x.name)+'</td><td class="l">'+esc(x.email)+'</td><td>'+esc(x.mobile||'')+'</td><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td><button class="dv-b" onclick="PROMO.approveRequest(\''+esc(x._id)+'\')">Approve</button> <button class="dv-b red" onclick="PROMO.rejectRequest(\''+esc(x._id)+'\')">Reject</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No pending registration requests.</p>';
-   const tc=r[0].docs.map(d=>Object.assign({_id:d.id},d.data())).filter(x=>x.approved===true||x.status==='approved');
+  try{const r=await Promise.all([db.collection('teacherInvites').where('year','==',y).get(),db.collection('users').where('role','==','classteacher').get()]);
+   const inv=r[0].docs.map(d=>Object.assign({_id:d.id},d.data())).sort((a,b)=>(b.ts&&b.ts.seconds||0)-(a.ts&&a.ts.seconds||0));
+   $('ivList').innerHTML=inv.length?'<table class="am-t"><tr><th>Class-Sec</th><th>Teacher</th><th>Status</th><th></th></tr>'+inv.map(x=>'<tr><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td class="l">'+esc(x.status==='used'?(x.email||''):(x.hint||''))+'</td><td>'+(x.status==='used'?'<span class="pm-b pm-f">USED</span>':'<span class="pm-b pm-d">OPEN</span>')+'</td><td>'+(x.status==='open'?'<button class="dv-b g" onclick="PROMO.copy(\''+esc(joinLink(x._id))+'\')">Copy link</button> ':'')+'<button class="dv-b g" style="color:#b00020" onclick="PROMO.delInvite(\''+esc(x._id)+'\')">✕</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No links yet.</p>';
+   const tc=r[1].docs.map(d=>Object.assign({_id:d.id},d.data()));
    $('ivTeach').innerHTML=tc.length?'<table class="am-t"><tr><th>Name</th><th>E-mail</th><th>Class-Sec</th><th>Access</th><th></th></tr>'+tc.map(x=>'<tr><td class="l">'+esc(x.name)+'</td><td class="l">'+esc(x.email)+'</td><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td>'+(x.disabled?'<span class="pm-b pm-n">DISABLED</span>':'<span class="pm-b pm-f">ACTIVE</span>')+'</td><td><button class="dv-b g" onclick="PROMO.toggleT(\''+esc(x._id)+'\','+(x.disabled?'false':'true')+')">'+(x.disabled?'Enable':'Disable')+'</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No class teacher has registered yet.</p>'}
   catch(e){msg('Could not load lists: '+(e.code||e.message),true,'ivMsg')}}
- async function shareMainRegistration(){
-  const L=location.href.split('#')[0].split('?')[0]+'?ctregister=1';
-  const m='*Taldangra Fulmati High School [H.S.]*\nClass-teacher registration request\nOpen the main link, choose your class and section, and submit your details. Dashboard access begins only after admin approval.\n'+L;
-  $('ivNew').innerHTML='<div class="am-ok"><b>Main registration link</b><div class="am-row"><span class="am-link">'+esc(L)+'</span><button class="dv-b" onclick="PROMO.copy(\''+esc(L)+'\')">Copy link</button><a class="dv-b g" target="_blank" href="https://wa.me/?text='+encodeURIComponent(m)+'">Share on WhatsApp</a></div></div>';
-  msg('Main registration link ready.',false,'ivMsg');
- }
- async function approveRequest(uid){
-  if(!need('ivMsg'))return;await roleP;if(!isAdmin())return msg('Admin only.',true,'ivMsg');
-  try{const ref=db.collection('ctRegistrationRequests').doc(uid),sn=await ref.get();if(!sn.exists)return msg('Request not found.',true,'ivMsg');const d=sn.data();
-   const b=db.batch();b.update(db.collection('users').doc(uid),{approved:true,status:'approved',approvedBy:mail(),approvedAt:ts()});b.update(ref,{status:'approved',approvedBy:mail(),approvedAt:ts()});await b.commit();
-   msg('Approved '+d.name+' for '+label(d.cls,d.sec)+'. They must sign out and sign in again.',false,'ivMsg');loadAdmin();
-  }catch(e){msg('Approval failed: '+(e.code||e.message)+'. Check Firestore rules.',true,'ivMsg')}
- }
- async function rejectRequest(uid){if(!need('ivMsg'))return;await roleP;if(!isAdmin())return;try{await db.collection('ctRegistrationRequests').doc(uid).update({status:'rejected',reviewedBy:mail(),reviewedAt:ts()});await db.collection('users').doc(uid).update({approved:false,disabled:true,status:'rejected'});loadAdmin()}catch(e){msg('Reject failed: '+(e.code||e.message),true,'ivMsg')}}
  async function delInvite(id){if(!confirm('Delete this link? It will stop working.'))return;try{await db.collection('teacherInvites').doc(id).delete();loadAdmin()}catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
  async function toggleT(uid,dis){try{await db.collection('users').doc(uid).update({disabled:dis});loadAdmin()}catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
 
@@ -3184,7 +3158,9 @@ const PROMO=(function(){
  /* ---------- auto-allocate whole class by merit (admin) ---------- */
  const num=v=>{const n=parseFloat(String(v==null?'':v).trim());return isNaN(n)?null:n};
  let au=null;
- /* Rule: XII = same section, same roll carried from XI. VI-XI = ONE combined merit list across all old sections. For two new sections A,B: odd ranks (1,3,5...) go to A, even ranks (2,4,6...) go to B; each destination section gets its own roll sequence 1,2,3... No marks entered -> deterministic previous-roll order. */
+ /* Rule: XII = same section, same roll carried from XI.  VI-XI = ONE merit list of all old sections:
+    1 new section -> roll = merit rank;  2 new sections -> odd ranks to 1st section, even ranks to 2nd
+    (rolls 1,2,3.. inside each section).  No marks entered -> previous roll order (roll 1 of each old section first). */
  function mkPlan(list,c,secs){
   const L=list.slice();
   if(c==='XII')return L.map(x=>({x,rank:0,sec:x.os,roll:String(x.or)})).sort((a,b)=>String(a.sec).localeCompare(String(b.sec))||(parseInt(a.roll,10)||0)-(parseInt(b.roll,10)||0));
@@ -3272,31 +3248,52 @@ const PROMO=(function(){
  const y0=new Date().getFullYear();$('pmYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('pmYear').addEventListener('change',()=>{refreshSheets();loadAdmin()});
  const nb=document.querySelector('.tf-side button[data-v=prom]');if(nb)nb.addEventListener('click',enter);
- if(auth)auth.onAuthStateChanged(u=>{cur=null;sheet=null;rows=[];$('pmSheetCard').style.display='none';$('pmBadge').innerHTML='';$('pmCur').textContent='';roleP=loadRole(u).then(()=>{const pending=!!(u&&me.role==='classteacher'&&!me.approved&&!me.disabled);document.body.classList.toggle('ct-pending',pending);if(pending){const ps=document.getElementById('ctPendingScreen');if(ps)ps.style.display='flex'}else{const ps=document.getElementById('ctPendingScreen');if(ps)ps.style.display='none'}})});
- return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,shareMainRegistration,approveRequest,rejectRequest,isAdmin}
+ if(auth)auth.onAuthStateChanged(u=>{cur=null;sheet=null;rows=[];$('pmSheetCard').style.display='none';$('pmBadge').innerHTML='';$('pmCur').textContent='';roleP=loadRole(u)});
+ return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,isAdmin}
 })();
 </script>
 
 <script>
-/* ===== MAIN CLASS-TEACHER REGISTRATION: submit request, wait for admin approval ===== */
+/* ===== CLASS-TEACHER JOIN PAGE  (index.html?join=CODE) ===== */
 (function(){
- const isReg=/[?&]ctregister=1/.test(location.search);if(!isReg)return;
- const $=id=>document.getElementById(id),esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
- let db=null,auth=null;try{const a=firebase.apps.find(x=>x.name==='tfdb');if(a){db=a.firestore();auth=a.auth()}}catch(e){}
- const body=$('jnBody'),fail=t=>body.innerHTML='<div class="pm-err">'+esc(t)+'</div>';
- if(!db||!auth){fail('Could not connect to Firebase. Check internet and reload.');return}
- $('jnSub').textContent='Class-teacher registration request';
- body.innerHTML='<p>Choose the class-section assigned to you. Your request must be approved by the Headmaster / Administrator before any dashboard or student data is visible.</p>'+ 
- '<label>Full name<input id="jnN" autocomplete="name"></label><label>Mobile number<input id="jnM" inputmode="numeric" maxlength="10"></label><label>Class<select id="jnC"><option value="V">V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label><label>Section<select id="jnS"><option>A</option><option>B</option><option>C</option><option value="">No section</option></select></label><label>E-mail (login)<input id="jnE" type="email" autocomplete="username"></label><label>Create password (min. 8 characters)<input id="jnP" type="password" autocomplete="new-password"></label><label>Repeat password<input id="jnP2" type="password" autocomplete="new-password"></label><div id="jnErr"></div><button type="button" id="jnGo">Submit registration request</button>';
- $('jnGo').onclick=go;
- function err(t){$('jnErr').innerHTML='<div class="pm-err">'+esc(t)+'</div>'}
- async function go(){const name=$('jnN').value.trim(),mob=$('jnM').value.trim(),cls=$('jnC').value,sec=$('jnS').value,email=$('jnE').value.trim().toLowerCase(),pw=$('jnP').value;
-  if(!name)return err('Enter your full name.');if(mob&&!/^\d{10}$/.test(mob))return err('Mobile must be 10 digits.');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return err('Enter a valid e-mail.');if(pw.length<8)return err('Password must be at least 8 characters.');if(pw!==$('jnP2').value)return err('Passwords do not match.');
-  $('jnGo').disabled=true;let cred=null;try{cred=await auth.createUserWithEmailAndPassword(email,pw);const uid=cred.user.uid;const batch=db.batch();
-   batch.set(db.collection('users').doc(uid),{role:'classteacher',name,email,mobile:mob,cls,sec,year:new Date().getFullYear(),approved:false,status:'pending',disabled:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-   batch.set(db.collection('ctRegistrationRequests').doc(uid),{uid,name,email,mobile:mob,cls,sec,year:new Date().getFullYear(),status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});await batch.commit();
-   body.innerHTML='<div class="am-ok"><b>Registration request submitted.</b><p>Class '+esc(cls+(sec?'-'+sec:''))+' · '+esc(email)+'</p><p>Wait for admin approval. Until approval, the dashboard and student information remain hidden.</p><button type="button" onclick="TFDB.logout()">Sign out</button></div>';
-  }catch(e){if(cred&&cred.user){try{await cred.user.delete()}catch(x){}}$('jnGo').disabled=false;err('Could not submit request: '+(e.code||e.message)+'. Ask the administrator to check Firebase rules.')}}
+ const m=location.search.match(/[?&]join=([^&]*)/);if(!m)return;
+ const code=decodeURIComponent(m[1]),$=id=>document.getElementById(id);
+ const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const up=s=>String(s||'').trim().replace(/\s+/g,' ').toUpperCase();
+ const ses=y=>y+'-'+String(y+1).slice(-2);
+ let db=null,auth=null,inv=null;
+ try{const a=firebase.apps.find(x=>x.name==='tfdb');if(a){db=a.firestore();auth=a.auth()}}catch(e){}
+ const body=$('jnBody');
+ const fail=t=>{body.innerHTML='<div class="pm-err">'+esc(t)+'</div>'};
+ if(!db){fail('Could not connect. Check your internet and reload this page.');return}
+ db.collection('teacherInvites').doc(code).get().then(sn=>{
+  if(!sn.exists){fail('This link is not valid. Ask the admin for a new link.');return}
+  inv=sn.data();if(inv.status!=='open'){fail('This link has already been used. Ask the admin for a new link, or sign in from the portal if you already registered.');return}
+  const cl='Class '+inv.cls+(inv.sec?' – Section '+inv.sec:'');
+  $('jnSub').innerHTML='Class-teacher registration — <b>'+esc(cl)+'</b> · session '+ses(inv.year);
+  body.innerHTML='<label>Your full name<input id="jnN" value="'+esc(inv.hint||'')+'" autocomplete="name"></label>'+
+   '<label>Mobile number<input id="jnM" inputmode="numeric" maxlength="10"></label>'+
+   '<label>E-mail (this will be your login)<input id="jnE" type="email" autocomplete="username"></label>'+
+   '<label>Create a password (min. 8 characters)<input id="jnP" type="password" autocomplete="new-password"></label>'+
+   '<label>Repeat password<input id="jnP2" type="password" autocomplete="new-password"></label>'+
+   '<div id="jnErr"></div><button type="button" id="jnGo">Create my login</button>'+
+   '<p style="font-size:12px;color:#555;margin:10px 0 0">You will get access to <b>'+esc(cl)+'</b> only. The admin can disable the login at any time.</p>';
+  $('jnGo').onclick=go}).catch(e=>fail('Could not read the link: '+(e.code||e.message)));
+ const err=t=>{$('jnErr').innerHTML='<div class="pm-err" style="margin:0 0 10px">'+esc(t)+'</div>'};
+ async function go(){
+  const name=up($('jnN').value),mob=$('jnM').value.trim(),em=$('jnE').value.trim().toLowerCase(),pw=$('jnP').value;
+  if(!name)return err('Enter your name.');if(mob&&!/^\d{10}$/.test(mob))return err('Mobile must be 10 digits.');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return err('Enter a valid e-mail.');
+  if(pw.length<8)return err('Password must be at least 8 characters.');if(pw!==$('jnP2').value)return err('The two passwords do not match.');
+  $('jnGo').disabled=true;$('jnErr').innerHTML='';let cred;
+  try{cred=await auth.createUserWithEmailAndPassword(em,pw)}
+  catch(e){$('jnGo').disabled=false;return err(e.code==='auth/email-already-in-use'?'This e-mail already has an account. Use another e-mail, or ask the admin.':e.code==='auth/weak-password'?'Choose a stronger password.':(e.code||e.message))}
+  try{const b=db.batch();
+   b.set(db.collection('users').doc(cred.user.uid),{role:'classteacher',name,email:em,mobile:mob,cls:inv.cls,sec:inv.sec,year:inv.year,inviteCode:code});
+   b.update(db.collection('teacherInvites').doc(code),{status:'used',uid:cred.user.uid,email:em,usedAt:Date.now()});
+   await b.commit();try{await cred.user.updateProfile({displayName:name})}catch(x){}
+   body.innerHTML='<div class="am-ok">✔ Your login is ready.<br>Class <b>'+esc(inv.cls+(inv.sec?'-'+inv.sec:''))+'</b> · '+esc(em)+'</div><p style="font-size:13px">Open the portal and sign in with this e-mail and your password (sidebar → 👤 Sign in).</p><button type="button" onclick="location.href=location.pathname">Open portal</button>'}
+  catch(e){try{await cred.user.delete()}catch(x){}$('jnGo').disabled=false;err('Could not complete registration: '+(e.code||e.message)+'. Ask the admin to check the link.')}}
 })();
 </script>
 
