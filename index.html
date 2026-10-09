@@ -652,8 +652,41 @@
  body.print-wifs{padding:0}
 }
 </style>
+
+<style id="registrationGateStyles">
+#regGate{display:none;position:fixed;inset:0;z-index:100000;background:#f4f7f4;overflow:auto;padding:24px;box-sizing:border-box;font-family:Arial,sans-serif;color:#183321}
+#regGate .rg-wrap{max-width:720px;margin:5vh auto;background:#fff;border:1px solid #d9e5da;border-radius:18px;padding:28px;box-shadow:0 10px 40px #173b201c}
+#regGate h1{margin:0 0 8px;color:#145828;font-size:25px}#regGate p,#regGate li{line-height:1.55;font-size:14px}#regGate .rg-btn{background:#145828;color:#fff;border:0;border-radius:9px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer}
+#regGate .rg-rule{background:#f1f7f1;border-left:4px solid #145828;padding:12px 15px;border-radius:6px;margin:14px 0}
+body.reg-gated> :not(#regGate):not(script):not(style){display:none!important}
+body.reg-gated #regGate{display:block!important}
+body.reg-gated #regGate #pmRegister{display:block!important;box-shadow:none!important;padding:0!important;margin:18px 0 0!important;border:0!important;background:transparent!important}
+body.reg-gated #regGate #pmRegister h3{display:none}
+body.reg-gated #regGate #pmRegister .am-grid,body.reg-gated #regGate #pmRegister .am-row,body.reg-gated #regGate #pmRegister>p{display:none!important}
+body.reg-gated #regGate.rg-form #pmRegister .am-grid,body.reg-gated #regGate.rg-form #pmRegister .am-row,body.reg-gated #regGate.rg-form #pmRegister>p{display:flex!important}
+body.reg-gated #regGate.rg-form #pmRegister>p{display:block!important}
+body.reg-gated #regGate #pmRegister .am-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+body.reg-gated #regGate #pmRegister input,body.reg-gated #regGate #pmRegister select{width:100%;box-sizing:border-box;padding:9px;border:1px solid #c9d6cc;border-radius:8px}
+body.reg-gated #regGate #pmRegister .am-row{display:flex!important;align-items:center;gap:10px;margin-top:12px}
+#rgInstructions,#rgContinue,#rgPending{display:none}
+#regGate.rg-instructions #rgInstructions,#regGate.rg-instructions #rgContinue,#regGate.rg-pending #rgPending{display:block}
+#regGate.rg-pending #rgStart,#regGate.rg-pending #rgInstructions,#regGate.rg-pending #rgContinue{display:none!important}
+@media(max-width:600px){#regGate{padding:12px}#regGate .rg-wrap{margin:2vh auto;padding:18px}}
+</style>
+
 </head>
 <body>
+
+<div id="regGate" aria-live="polite"><div class="rg-wrap">
+ <h1>Taldangra Fulmati High School [H.S.]</h1>
+ <p>Class-teacher registration portal</p>
+ <button type="button" class="rg-btn" id="rgStart">REGISTER</button>
+ <div id="rgInstructions"><div class="rg-rule"><b>Instructions before registration</b><ul><li>Register with your own name and e-mail address. The e-mail will be your login ID.</li><li>Choose only one session, class and section. One e-mail can have only one class-section assignment.</li><li>A class-section can have only one registration, including inactive registrations, until the admin deletes the old registration.</li><li>After submission, your registration remains pending. You cannot use certificates or any other portal feature before admin approval.</li><li>After approval, the portal will be opened for your account. An e-mail approval notice requires the school’s Firebase email-notification service to be configured; without that service, this page cannot send automatic e-mails.</li><li>Never share your password. Use a valid e-mail account that you can access.</li></ul></div></div>
+ <button type="button" class="rg-btn" id="rgContinue">Continue to registration</button>
+ <div id="rgPending" class="rg-rule"><b>Registration pending admin approval.</b><p>Your account is not approved yet, so the certificate page and all other portal details remain hidden. Please wait for the admin to approve your registration.</p><p id="rgPendingEmail"></p></div>
+ <div id="rgFormHost"></div>
+</div></div>
+
 <style>
 @media screen{
  :root{--sw:232px}body.tf-c{--sw:68px}
@@ -726,7 +759,7 @@
     <div class="dashboard-panel">
  <div class="dv-c" id="pmRegister" style="border-top:5px solid #2878b5">
   <h3>👩‍🏫 Staff self-registration — choose one class and section</h3>
-  <p class="am-msg" style="margin:0 0 10px;color:#333">Register directly from this main page. One e-mail can have one class-section assignment, and each class-section can have only one registered class teacher. Disabled registrations also reserve their assignment until an admin deletes them.</p>
+  <p class="am-msg" style="margin:0 0 10px;color:#333">Your registration is sent to the admin for approval. Until approved, the certificate and every other portal feature remain hidden. One e-mail can have only one class-section assignment; active, pending and disabled registrations reserve the assignment until an admin deletes the old registration.</p>
   <div class="am-grid">
    <label>Full name <input id="srName" autocomplete="name"></label>
    <label>Mobile number <input id="srMobile" inputmode="numeric" maxlength="10"></label>
@@ -738,7 +771,7 @@
    <label>Section <select id="srSec"><option>A</option><option>B</option><option>C</option><option value="">No section</option></select></label>
   </div>
   <div class="am-row"><button class="dv-b" type="button" id="srGo" onclick="PROMO.registerTeacher()">Register as class teacher</button><span id="srMsg" class="am-msg" style="margin:0"></span></div>
-  <p class="am-msg" style="margin:8px 0 0;color:#555">If your e-mail already has a Firebase login but its registration was deleted, sign in first with the same e-mail/password, then submit this form again. Do not share your password.</p>
+  <p class="am-msg" style="margin:8px 0 0;color:#555">Approval notice: an automatic approval e-mail can be sent only after the school configures a Firebase email-notification service. Otherwise, sign in later to check whether the admin has approved your registration. Never share your password.</p>
  </div>
         <h2>Admission Control &amp; Verification Dashboard</h2>
 
@@ -2729,6 +2762,13 @@ const ADM=(function(){
    msg('Published '+rows.length+' students as database '+y+' ✔  (open Data & Year → choose '+y+' → Load from Firebase)')}
   catch(e){msg('Publish failed: '+(e.code||e.message),true)}}
 
+ /* ---------- registration gate UI ---------- */
+ const rg=$('regGate'),pmReg=$('pmRegister');
+ if(rg&&pmReg){$('rgFormHost').appendChild(pmReg);pmReg.style.display='block';
+  $('rgStart').addEventListener('click',()=>{if(auth&&auth.currentUser){rg.classList.add('rg-pending');return}rg.classList.remove('rg-pending');rg.classList.add('rg-instructions');$('rgStart').style.display='none'});
+  $('rgContinue').addEventListener('click',()=>{rg.classList.remove('rg-instructions');rg.classList.add('rg-form');$('rgContinue').style.display='none';pmReg.querySelectorAll('.am-grid,.am-row, p').forEach(e=>e.style.setProperty('display',e.tagName==='P'?'block':'','important'));});
+ }
+ syncRegistrationGate();
  /* ---------- init ---------- */
  const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amLinkXI').textContent=link(true);
@@ -2903,11 +2943,22 @@ const PROMO=(function(){
   else $('pmCls').disabled=$('pmSec').disabled=false}
  function loadRole(u){
   me={ready:false,role:'',cls:'',sec:'',name:'',disabled:false};
-  if(!u||!db){navGate();head();return Promise.resolve()}
+  if(!u||!db){navGate();head();syncRegistrationGate();return Promise.resolve()}
   return db.collection('users').doc(u.uid).get().then(sn=>{const d=sn.exists?sn.data():{};
     me={ready:true,role:String(d.role||''),cls:String(d.cls||''),sec:String(d.sec||''),name:d.name||'',disabled:!!d.disabled}})
    .catch(()=>{me={ready:true,role:'?',cls:'',sec:'',name:'',disabled:false}})
-   .then(()=>{navGate();head();if(document.body.dataset.view==='prom')enter()})}
+   .then(()=>{navGate();head();syncRegistrationGate();if(document.body.dataset.view==='prom')enter()})}
+
+ function syncRegistrationGate(){
+  const gate=$('regGate');if(!gate)return;
+  const u=auth&&auth.currentUser;
+  const admin=!!(u&&me.ready&&String(me.role).toLowerCase()==='admin');
+  const approved=!!(u&&me.ready&&String(me.role).toLowerCase()==='classteacher'&&!me.disabled);
+  if(admin||approved){document.body.classList.remove('reg-gated');gate.style.display='none';return}
+  document.body.classList.add('reg-gated');gate.style.display='block';
+  if(u){gate.classList.remove('rg-instructions','rg-form');gate.classList.add('rg-pending');$('rgPendingEmail').textContent='Signed in as '+(u.email||'your registered e-mail')+'.';}
+  else gate.classList.remove('rg-pending');
+ }
 
  /* ---------- duplicate / validation ---------- */
  function dupInfo(){
@@ -3113,12 +3164,12 @@ const PROMO=(function(){
     if(ud&&ud.role&&ud.role!=='classteacher')throw new Error('This e-mail is already assigned another portal role. Ask admin for assistance.');
     if(ed&&ed.uid!==user.uid)throw new Error('This e-mail is already registered. Only one class-section per e-mail is allowed.');
     if(cd&&cd.uid!==user.uid)throw new Error('Class '+label(c,s)+' already has a registered teacher (active or disabled). Ask admin to delete the old registration first.');
-    tx.set(uRef,{role:'classteacher',name,email:em,mobile,cls:c,sec:s,year:y,disabled:false,classLockId:cid,emailLockId:eid});
+    tx.set(uRef,{role:'classteacher',name,email:em,mobile,cls:c,sec:s,year:y,disabled:true,approvalStatus:'pending',registeredAt:Date.now(),classLockId:cid,emailLockId:eid});
     tx.set(eRef,{uid:user.uid,year:y,cls:c,sec:s});
     tx.set(cRef,{uid:user.uid,year:y,cls:c,sec:s});
    });
    try{await user.updateProfile({displayName:name})}catch(e){}
-   $('srPass').value='';$('srPass2').value='';regMsg('Registration successful. Class '+label(c,s)+' for session '+ses(y)+'. You are signed in.',false);
+   $('srPass').value='';$('srPass2').value='';regMsg('Registration submitted successfully. Your account is PENDING ADMIN APPROVAL. All portal features remain hidden until approval.',false);
    roleP=loadRole(user);await roleP;head();loadAdmin();
   }catch(e){regMsg('Registration failed: '+(e.message||e.code||e),true)}
   finally{btn.disabled=false}
@@ -3138,10 +3189,10 @@ const PROMO=(function(){
     if(!es.exists)await eRef.set({uid:x._id,year:x.year||+$('pmYear').value,cls:x.cls||'',sec:x.sec||''});
     if(!x.classLockId||!x.emailLockId)await db.collection('users').doc(x._id).update({classLockId:cid,emailLockId:eid});
    }
-   $('ivTeach').innerHTML=tc.length?'<table class="am-t"><tr><th>Name</th><th>E-mail</th><th>Class-Sec</th><th>Session</th><th>Access</th><th>Action</th></tr>'+tc.map(x=>'<tr><td class="l">'+esc(x.name||'')+'</td><td class="l">'+esc(x.email||'')+'</td><td><b>'+esc(label(x.cls||'',x.sec||''))+'</b></td><td>'+esc(x.year==null?'':ses(+x.year))+'</td><td>'+(x.disabled?'<span class="pm-b pm-n">DISABLED</span>':'<span class="pm-b pm-f">ACTIVE</span>')+'</td><td><button class="dv-b g" onclick="PROMO.toggleT(\''+esc(x._id)+'\','+(x.disabled?'false':'true')+')">'+(x.disabled?'Enable':'Disable')+'</button> <button class="dv-b red" onclick="PROMO.deleteTeacher(\''+esc(x._id)+'\')">Delete registration</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No class teacher has registered yet.</p>';
+   $('ivTeach').innerHTML=tc.length?'<table class="am-t"><tr><th>Name</th><th>E-mail</th><th>Class-Sec</th><th>Session</th><th>Access</th><th>Action</th></tr>'+tc.map(x=>'<tr><td class="l">'+esc(x.name||'')+'</td><td class="l">'+esc(x.email||'')+'</td><td><b>'+esc(label(x.cls||'',x.sec||''))+'</b></td><td>'+esc(x.year==null?'':ses(+x.year))+'</td><td>'+(x.approvalStatus==='pending'?'<span class="pm-b pm-n">PENDING APPROVAL</span>':x.disabled?'<span class="pm-b pm-n">DISABLED</span>':'<span class="pm-b pm-f">APPROVED / ACTIVE</span>')+'</td><td><button class="dv-b g" onclick="PROMO.toggleT(\''+esc(x._id)+'\','+(x.disabled?'false':'true')+')">'+(x.disabled?(x.approvalStatus==='pending'?'Approve':'Enable'):'Disable')+'</button> <button class="dv-b red" onclick="PROMO.deleteTeacher(\''+esc(x._id)+'\')">Delete registration</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No class teacher has registered yet.</p>';
   }catch(e){msg('Could not load teacher list: '+(e.code||e.message),true,'ivMsg')}
  }
- async function toggleT(uid,dis){try{await db.collection('users').doc(uid).update({disabled:dis});loadAdmin()}catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
+ async function toggleT(uid,dis){try{const patch={disabled:dis};if(!dis){patch.approvalStatus='approved';patch.approvedAt=Date.now();patch.approvedBy=mail()}else{patch.approvalStatus='disabled';patch.disabledAt=Date.now()}await db.collection('users').doc(uid).update(patch);loadAdmin();if(!dis)msg('Teacher approved. Automatic e-mail notification still requires a configured Firebase email service.',false,'ivMsg')}catch(e){msg('Failed: '+(e.code||e.message),true,'ivMsg')}}
  async function deleteTeacher(uid){
   if(!isAdmin())return;
   if(!confirm('Delete this class-teacher registration, whether active or disabled? The e-mail and class-section locks will be released. The Firebase Authentication account remains and can sign in to register again.'))return;
