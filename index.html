@@ -668,9 +668,11 @@ body.reg-gated #regGate.rg-form #pmRegister>p{display:block!important}
 body.reg-gated #regGate #pmRegister .am-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 body.reg-gated #regGate #pmRegister input,body.reg-gated #regGate #pmRegister select{width:100%;box-sizing:border-box;padding:9px;border:1px solid #c9d6cc;border-radius:8px}
 body.reg-gated #regGate #pmRegister .am-row{display:flex!important;align-items:center;gap:10px;margin-top:12px}
-#rgInstructions,#rgContinue,#rgPending{display:none}
-#regGate.rg-instructions #rgInstructions,#regGate.rg-instructions #rgContinue,#regGate.rg-pending #rgPending{display:block}
-#regGate.rg-pending #rgStart,#regGate.rg-pending #rgInstructions,#regGate.rg-pending #rgContinue{display:none!important}
+#rgInstructions,#rgContinue,#rgPending,#rgLoginBox{display:none}
+#regGate.rg-instructions #rgInstructions,#regGate.rg-instructions #rgContinue,#regGate.rg-pending #rgPending,#regGate.rg-login #rgLoginBox{display:block}
+#regGate.rg-pending #rgStart,#regGate.rg-pending #rgLoginStart,#regGate.rg-pending #rgInstructions,#regGate.rg-pending #rgContinue{display:none!important}
+#regGate #rgLoginBox input{width:100%;box-sizing:border-box;padding:10px;border:1px solid #c9d6cc;border-radius:8px;margin:5px 0 9px}
+#regGate #rgLoginBox button{margin:4px 5px 0 0}
 @media(max-width:600px){#regGate{padding:12px}#regGate .rg-wrap{margin:2vh auto;padding:18px}}
 </style>
 
@@ -680,7 +682,8 @@ body.reg-gated #regGate #pmRegister .am-row{display:flex!important;align-items:c
 <div id="regGate" aria-live="polite"><div class="rg-wrap">
  <h1>Taldangra Fulmati High School [H.S.]</h1>
  <p>Class-teacher registration portal</p>
- <button type="button" class="rg-btn" id="rgStart">REGISTER</button>
+ <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0"><button type="button" class="rg-btn" id="rgStart">REGISTER</button><button type="button" class="rg-btn" id="rgLoginStart" style="background:#174a79">ADMIN / TEACHER LOGIN</button></div>
+ <div id="rgLoginBox" class="rg-rule"><b>Admin / Class Teacher Login</b><p>Use your existing approved Firebase e-mail and password. New staff must register first and wait for admin approval.</p><label for="rgLoginEmail">E-mail</label><input id="rgLoginEmail" type="email" autocomplete="username" placeholder="Registered e-mail"><label for="rgLoginPass">Password</label><input id="rgLoginPass" type="password" autocomplete="current-password" placeholder="Password"><div><button type="button" class="rg-btn" id="rgLoginSubmit">Sign in</button><button type="button" class="rg-btn" id="rgLoginCancel" style="background:#59675d">Cancel</button></div><p id="rgLoginMsg" role="status" style="margin-bottom:0"></p></div>
  <div id="rgInstructions"><div class="rg-rule"><b>Instructions before registration</b><ul><li>Register with your own name and e-mail address. The e-mail will be your login ID.</li><li>Choose only one session, class and section. One e-mail can have only one class-section assignment.</li><li>A class-section can have only one registration, including inactive registrations, until the admin deletes the old registration.</li><li>After submission, your registration remains pending. You cannot use certificates or any other portal feature before admin approval.</li><li>After approval, the portal will be opened for your account. An e-mail approval notice requires the school’s Firebase email-notification service to be configured; without that service, this page cannot send automatic e-mails.</li><li>Never share your password. Use a valid e-mail account that you can access.</li></ul></div></div>
  <button type="button" class="rg-btn" id="rgContinue">Continue to registration</button>
  <div id="rgPending" class="rg-rule"><b>Registration pending admin approval.</b><p>Your account is not approved yet, so the certificate page and all other portal details remain hidden. Please wait for the admin to approve your registration.</p><p id="rgPendingEmail"></p></div>
@@ -2765,7 +2768,10 @@ const ADM=(function(){
  /* ---------- registration gate UI ---------- */
  const rg=$('regGate'),pmReg=$('pmRegister');
  if(rg&&pmReg){$('rgFormHost').appendChild(pmReg);pmReg.style.display='block';
-  $('rgStart').addEventListener('click',()=>{if(auth&&auth.currentUser){rg.classList.add('rg-pending');return}rg.classList.remove('rg-pending');rg.classList.add('rg-instructions');$('rgStart').style.display='none'});
+  $('rgStart').addEventListener('click',()=>{if(auth&&auth.currentUser){rg.classList.add('rg-pending');return}rg.classList.remove('rg-pending','rg-login');rg.classList.add('rg-instructions');$('rgStart').style.display='none';$('rgLoginStart').style.display='none'});
+  $('rgLoginStart').addEventListener('click',()=>{rg.classList.remove('rg-instructions','rg-form','rg-pending');rg.classList.add('rg-login');$('rgLoginMsg').textContent='';});
+  $('rgLoginCancel').addEventListener('click',()=>{rg.classList.remove('rg-login');});
+  $('rgLoginSubmit').addEventListener('click',()=>{const em=$('rgLoginEmail').value.trim(),pw=$('rgLoginPass').value;if(!em||!pw){$('rgLoginMsg').textContent='Enter both e-mail and password.';return}if(!auth){$('rgLoginMsg').textContent='Firebase authentication is not configured.';return}$('rgLoginMsg').textContent='Signing in…';auth.signInWithEmailAndPassword(em,pw).then(()=>{$('rgLoginMsg').textContent='Signed in. Checking approval…';}).catch(e=>{$('rgLoginMsg').textContent='Sign-in failed: '+(e.code||e.message);});});
   $('rgContinue').addEventListener('click',()=>{rg.classList.remove('rg-instructions');rg.classList.add('rg-form');$('rgContinue').style.display='none';pmReg.querySelectorAll('.am-grid,.am-row, p').forEach(e=>e.style.setProperty('display',e.tagName==='P'?'block':'','important'));});
  }
  syncRegistrationGate();
