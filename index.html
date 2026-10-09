@@ -2748,6 +2748,15 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
 </style>
 
 <div id="promView">
+ <div class="dv-c" style="border-left:5px solid #d4b18a;background:#fffdf5">
+  <h3>📌 Promotion duty plan — Class V to VII</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px">
+   <div style="padding:12px;border:1px solid #e2d2b5;border-radius:9px;background:#fff"><b>Stage 1 · Class V → VI</b><p style="margin:6px 0;font-size:13px">Class V-A and V-B class teachers check their own section's student list, promotion eligibility and records. The administrator then combines eligible students and prepares the new VI-A / VI-B roll sheets. Do not reuse Class V roll numbers as the new VI roll numbers.</p></div>
+   <div style="padding:12px;border:1px solid #b9d8c0;border-radius:9px;background:#f6fff7"><b>Stage 2 · Class VI → VII</b><p style="margin:6px 0;font-size:13px">VI-A and VI-B class teachers verify their respective students and marks. The administrator creates <b>one combined merit list</b> from both sections. Rank 1, 3, 5… goes to VII-A; rank 2, 4, 6… goes to VII-B. Each section receives its own roll sequence 1, 2, 3…</p></div>
+   <div style="padding:12px;border:1px solid #c8c8e8;border-radius:9px;background:#f8f8ff"><b>Responsibility & approval</b><p style="margin:6px 0;font-size:13px">Class teachers verify source-class records; the administrator/headmaster runs the combined allocation, checks the preview and duplicate rolls, creates draft sheets, and authorizes finalization. Teachers then review and finalize only their assigned destination section.</p></div>
+  </div>
+  <p style="margin:9px 0 0;font-size:12px;color:#7a4a00"><b>Important:</b> The Class-teacher list below contains registered destination-sheet accounts, so source teachers of V-A/V-B may not appear there yet. Create separate destination accounts for VI-A and VI-B; use the combined-allocation tool for the central merit/rank decision.</p>
+ </div>
  <div class="dv-c" style="border-top:5px solid #145828">
   <h3>🎓 Promotion &amp; roll allocation — new session <span id="pmBadge"></span></h3>
   <p class="am-msg" id="pmWho" style="margin:0 0 8px">Sign in (sidebar 👤) to start.</p>
@@ -2796,8 +2805,8 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
  </div>
  <div class="dv-c"><h3>📋 All class-sections — session status</h3><div id="pmSheets" class="am-box"></div></div>
  <div class="dv-c" id="pmAdmin" style="display:none;border-top:5px solid #9b5de5">
-  <h3>👩‍🏫 Class-teacher logins <small style="color:#555">(admin only)</small></h3>
-  <p class="am-msg" style="margin:0 0 8px;color:#333">Create a one-time link for a class-section and share it. The teacher opens it, enters name, e-mail and a password of their own, and gets access to <b>only that class-section</b>. Each link works once.</p>
+  <h3>👩‍🏫 Class-teacher logins for destination roll sheets <small style="color:#555">(admin only)</small></h3>
+  <p class="am-msg" style="margin:0 0 8px;color:#333">Create a one-time link for a <b>new/destination class-section</b> and share it. For V → VI, create VI-A and VI-B accounts; for VI → VII, create VII-A and VII-B accounts. Source-class teachers verify their old-section records; the administrator prepares the combined allocation. Each teacher gets access to <b>only that destination class-section</b>. Each link works once.</p>
   <div class="am-grid">
    <label>Class <select id="ivCls"><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
    <label>Section <select id="ivSec"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
@@ -3142,9 +3151,7 @@ const PROMO=(function(){
  /* ---------- auto-allocate whole class by merit (admin) ---------- */
  const num=v=>{const n=parseFloat(String(v==null?'':v).trim());return isNaN(n)?null:n};
  let au=null;
- /* Rule: XII = same section, same roll carried from XI.  VI-XI = ONE merit list of all old sections:
-    1 new section -> roll = merit rank;  2 new sections -> odd ranks to 1st section, even ranks to 2nd
-    (rolls 1,2,3.. inside each section).  No marks entered -> previous roll order (roll 1 of each old section first). */
+ /* Rule: XII = same section, same roll carried from XI. VI-XI = ONE combined merit list across all old sections. For two new sections A,B: odd ranks (1,3,5...) go to A, even ranks (2,4,6...) go to B; each destination section gets its own roll sequence 1,2,3... No marks entered -> deterministic previous-roll order. */
  function mkPlan(list,c,secs){
   const L=list.slice();
   if(c==='XII')return L.map(x=>({x,rank:0,sec:x.os,roll:String(x.or)})).sort((a,b)=>String(a.sec).localeCompare(String(b.sec))||(parseInt(a.roll,10)||0)-(parseInt(b.roll,10)||0));
