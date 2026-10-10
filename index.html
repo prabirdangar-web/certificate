@@ -970,6 +970,19 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 <label>Auto Computed Memo</label>
                 <input type="text" id="memoNo" class="form-control auto-memo" readonly>
             </div>
+            <div class="form-group" style="grid-column:1/-1;background:#eef7ff;border:2px solid #9cc3e6;border-radius:8px;padding:9px 11px">
+                <label style="color:#0b4f8a;font-weight:bold">PREVIOUS RESULT (manual entry, any year) &mdash; certificate with / without result</label>
+                <select id="prrMode" class="form-control" onchange="prr_apply()">
+                    <option value="none">Generate certificate WITHOUT result</option>
+                    <option value="with">Generate certificate WITH result (passed class &amp; %)</option>
+                </select>
+                <div id="prrBox" style="display:none;margin-top:6px">
+                    <div id="prrRows"></div>
+                    <button type="button" class="print-btn" style="margin:4px 0;padding:5px 12px;font-size:12px" onclick="prr_add()">+ Add another year / class</button>
+                    <div id="prrWarn" style="font-size:12px;font-weight:bold;color:#b00020"></div>
+                    <small style="color:#555">Select class, type year and % of marks. Only complete rows are printed. Remembered in this browser for this student.</small>
+                </div>
+            </div>
             <button class="print-btn" onclick="window.print()">Print A4 Page Sheet</button>
 
         
@@ -1145,7 +1158,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Subhas Chandra Bhuin</span>; an inhabitant of Village : <span id="vVillage" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.O. : <span id="vPo" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.S. : <span id="vPs" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; District : <span id="vDist" style="font-style:normal; font-weight:1100;" class="field-underline">Bankura</span>, PIN-<span id="vPin" style="font-style:normal; font-weight:900;" class="field-underline">722152</span> is a bonafide student of this school. 
             
             <span id="lblPronounCaps">He</span> is reading now in Class: <span class="field-underline" id="vClass" style="min-width:35px;">VI</span> 
-            [Sec-<span class="field-underline" id="vSec" style="min-width:35px;">A</span>; Roll No-<span class="field-underline" id="vRoll" style="min-width:35px;">6</span>]. 
+            [Sec-<span class="field-underline" id="vSec" style="min-width:35px;">A</span>; Roll No-<span class="field-underline" id="vRoll" style="min-width:35px;">6</span>]. <span id="vPrevRes"></span> 
             
             <span id="lblPossessiveCaps">His</span> date of birth recorded in the Admission Register is 
             <span class="field-underline" id="vDob" style="min-width:90px;">07-12-2014</span> 
@@ -1183,6 +1196,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 <div><strong>Mobile No:</strong> <span id="cMobile" style="border-bottom: 1px dotted #333;">________________</span></div>
                 <div><strong>Memo Reference:</strong> <span id="cMemo" style="border-bottom: 1px dotted #333;">TFHS-26/VI-A-6</span></div>
                 <div><strong>Date Issued:</strong> <span id="cDate" style="border-bottom: 1px dotted #333;">30-06-2026</span></div>
+                <div id="cPrevWrap" style="display:none;grid-column:1/-1"><strong>Previous Result:</strong> <span id="cPrev" style="border-bottom: 1px dotted #333;"></span></div>
             </div>
             
             <div class="counterpart-signatures">
@@ -1449,6 +1463,61 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             else setLookupStatus('Select Class, Section and enter Roll No.', true);
         }
 
+        /* ===== PREVIOUS RESULT (manual, any year) — certificate WITH / WITHOUT result ===== */
+        var PREVRES = [];
+        var PRR_CLS = ['IV','V','VI','VII','VIII','IX','X','XI','XII'];
+        function prr_prevCls(c) { const i = PRR_CLS.indexOf(c); return i > 0 ? PRR_CLS[i - 1] : ''; }
+        function prr_key() {
+            const id = normalizeStudentId(document.getElementById('sikshaId').value);
+            const k = (id && String(id).length === 14) ? id : [document.getElementById('class').value, document.getElementById('sec').value, document.getElementById('rollNo').value].join('|');
+            return 'tfPrevRes:' + k;
+        }
+        function prr_store() { try { localStorage.setItem(prr_key(), JSON.stringify(PREVRES)); } catch (e) {} }
+        function prr_load() {
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem(prr_key()) || 'null'); } catch (e) {}
+            if (Array.isArray(saved) && saved.length) PREVRES = saved;
+            else {
+                const pc = prr_prevCls(document.getElementById('class').value);
+                PREVRES = pc ? [{ c: pc, y: document.getElementById('session').value || '2026', p: '' }] : [];
+            }
+            prr_draw(); prr_apply();
+        }
+        function prr_draw() {
+            const box = document.getElementById('prrRows'); if (!box) return;
+            const opts = c => PRR_CLS.map(x => `<option ${x === c ? 'selected' : ''}>${x}</option>`).join('');
+            box.innerHTML = PREVRES.map((r, i) => `<div style="display:flex;gap:6px;margin:4px 0;align-items:center">
+                <select class="form-control" style="width:80px" onchange="prr_set(${i},'c',this.value)">${opts(r.c)}</select>
+                <input class="form-control" style="width:85px" maxlength="4" inputmode="numeric" placeholder="Year" value="${r.y}" oninput="prr_set(${i},'y',this.value.replace(/\D/g,''))">
+                <input class="form-control" style="width:95px" inputmode="decimal" placeholder="% marks" value="${r.p}" oninput="prr_set(${i},'p',this.value)">
+                <button type="button" class="print-btn" style="margin:0;padding:4px 9px;background:#b00020" onclick="prr_del(${i})">&#10005;</button></div>`).join('');
+        }
+        function prr_set(i, k, v) { if (!PREVRES[i]) return; PREVRES[i][k] = v; prr_store(); prr_apply(); }
+        function prr_del(i) { PREVRES.splice(i, 1); prr_store(); prr_draw(); prr_apply(); }
+        function prr_add() {
+            const last = PREVRES[PREVRES.length - 1];
+            PREVRES.push(last
+                ? { c: prr_prevCls(last.c) || last.c, y: String((parseInt(last.y, 10) || 2026) - 1), p: '' }
+                : { c: prr_prevCls(document.getElementById('class').value) || 'V', y: document.getElementById('session').value || '2026', p: '' });
+            prr_store(); prr_draw(); prr_apply();
+        }
+        function prr_apply() {
+            const w = document.getElementById('vPrevRes'), cw = document.getElementById('cPrevWrap'), cs = document.getElementById('cPrev');
+            if (!w) return;
+            const on = (document.getElementById('prrMode') || {}).value === 'with';
+            const box = document.getElementById('prrBox'); if (box) box.style.display = on ? 'block' : 'none';
+            const ok = r => r.c && /^\d{4}$/.test(String(r.y)) && String(r.p).trim() !== '' && !isNaN(+r.p) && +r.p >= 0 && +r.p <= 100;
+            const rows = on ? PREVRES.filter(ok).sort((a, b) => a.y - b.y) : [];
+            const warn = document.getElementById('prrWarn');
+            if (warn) warn.textContent = (on && PREVRES.length && rows.length < PREVRES.length) ? 'Incomplete row(s) are not printed (need class, 4-digit year, % between 0 and 100).' : '';
+            if (!rows.length) { w.innerHTML = ''; if (cw) cw.style.display = 'none'; return; }
+            const parts = rows.map(r => `Class ${r.c} in the year ${r.y} with <b>${(+r.p).toFixed(2)}%</b> marks`);
+            const list = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0];
+            const pron = document.getElementById('lblPronounCaps').innerText || 'He';
+            w.innerHTML = `${pron} passed ${list}.`;
+            if (cw) { cw.style.display = ''; cs.innerText = rows.map(r => `${r.c}/${r.y}: ${(+r.p).toFixed(2)}%`).join(', '); }
+        }
+
         function lookupStudent() {
             if (document.getElementById('manualMode')?.checked) {
                 syncData();
@@ -1500,6 +1569,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 true
             );
             syncData();
+            prr_load();
         }
 
         function syncData() {
@@ -1575,6 +1645,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 document.getElementById('vDob').innerText = '__________';
                 document.getElementById('vDobWords').innerText = '[________________________________________]';
             }
+            if (typeof prr_apply === 'function') prr_apply();
         }
 
         syncData();
@@ -3692,12 +3763,11 @@ function pt_runProm(c){
  const m=meritOf(c);if(!m.ok)return alert('All sections must be finalised first.');
  const p=ND(c)?0:+$('passMark').value,f=x=>({...x,from:`${c}-${x.sec}-${x.roll}`});
  if(!confirm('Apply promotion for Class '+c+' with pass mark '+p+'%?'))return;
- W({pass:p,prom:{[c]:{pass:m.L.filter(x=>!x.ab&&x.p>=p).map(f),fail:m.L.filter(x=>x.ab||x.p<p).map(f),ts:Date.now()}}}); // AB (absent) = FAILED
+ W({pass:p,prom:{[c]:{pass:m.L.filter(x=>x.p>=p).map(f),fail:m.L.filter(x=>x.p<p).map(f),ts:Date.now()}}});
 }
 function pt_runXI(){
- const isAB=s=>{const r=(((D.marks||{})['XI-'+s.sec]||{}).rows||{})[s.roll];return !!(r&&r.ab)}; // AB (absent) = FAILED, not promoted
- const all=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:s.medium||'Bengali',sec:s.sec,roll:+s.roll,ab:isAB(s)?1:0})),L=all.filter(x=>!x.ab),F=all.filter(x=>x.ab).map(x=>({...x,from:'XI-'+x.sec+'-'+x.roll}));
- confirm('Promote '+L.length+' students XI → XII (same sec & roll)?'+(F.length?'\n'+F.length+' student(s) ABSENT (AB / FAILED) will NOT be promoted.':''))&&W({prom:{XI:{pass:L,fail:F,ts:Date.now()}}});
+ const L=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:s.medium||'Bengali',sec:s.sec,roll:+s.roll}));
+ confirm('Promote '+L.length+' students XI → XII (same sec & roll)?')&&W({prom:{XI:{pass:L,fail:[],ts:Date.now()}}});
 }
 function pt_lockReg(T){
  const P=CL[CL.indexOf(T)-1],pr=D.prom||{};let list;
@@ -3724,7 +3794,7 @@ function pt_printMerit(){pt_printHTML('Merit List Class '+PC,$('meritOut').inner
 function pt_saveSess(){W({session:+$('sess').value})}
 function pt_setPass(v){D.pass=+v;R.merit()}
 
-Object.assign(window,{pt_R:R,pt_gv,pt_executeLogin,pt_submitTeacherReg,pt_logout,pt_go,pt_tAct,pt_tDel,pt_unlockM,pt_secLock,pt_saveMarks,pt_abTog,pt_mk,pt_setPC,pt_runProm,pt_runXI,pt_lockReg,pt_unlockReg,pt_printReg2,pt_printHTML,pt_printMerit,pt_saveSess,pt_setPass});
+Object.assign(window,{pt_R:R,pt_gv,pt_executeLogin,pt_submitTeacherReg,pt_logout,pt_go,pt_tAct,pt_tDel,pt_unlockM,pt_secLock,pt_saveMarks,pt_mk,pt_setPC,pt_runProm,pt_runXI,pt_lockReg,pt_unlockReg,pt_printReg2,pt_printHTML,pt_printMerit,pt_saveSess,pt_setPass});
 })();
 </script>
 </body>
