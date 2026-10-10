@@ -208,6 +208,11 @@
         table.marks-table input { width: 60px; padding: 4px; border: 1px solid #888; border-radius: 4px; }
     
 /* ===== NEW DESIGN LAYER ===== */
+body[data-view=cert] .dashboard-main-row{display:block!important}
+body[data-view=cert] .dashboard-panel{overflow-x:hidden!important}
+body[data-view=cert] .lookup-box .form-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+body[data-view=cert] :is(#class,#sec,#rollNo){width:100%;min-width:0;box-sizing:border-box;font-size:13px!important;padding:7px 4px!important}
+body[data-view=cert] .page{height:auto!important;min-height:272mm}
 #gatekeeper{overflow:auto;justify-content:safe center;background:linear-gradient(135deg,#0b3319,#145828 55%,#2c7a45);font-family:'Segoe UI',Arial,sans-serif}
 .gt-hero{text-align:center;color:#fff;margin-bottom:22px}.gt-hero h1{margin:10px 0 4px;font-size:clamp(18px,4vw,28px)}.gt-hero p{margin:0;opacity:.85;font-size:13px}
 .gt-logo{width:64px;height:64px;margin:0 auto;border-radius:18px;background:#d4b18a;display:grid;place-items:center;font-size:32px}
@@ -426,7 +431,7 @@ body[data-view=home] #homePanel,body[data-view=setup] #setupPanel{display:block}
         <div class="cert-title">To whom it may concern</div>
         Certified that <span id="lblHonorific" style="font-weight:900;">Sri</span> 
         <span class="field-underline" id="vName" style="min-width:180px;">Student Name</span>, 
-        <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Father Name</span>...
+        <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Father Name</span> and <span class="field-underline" id="vMother" style="min-width:170px;">Mother Name</span>, is a bona fide student of this school and is reading in Class <b id="vCls">__</b> (Sec <b id="vSec">_</b>), Roll No. <b id="vRoll">__</b>, in the session <b id="vSess"></b>. To the best of my knowledge <span id="lblHe">he</span> bears a good moral character.
         <br><br>
         <div class="signature-area">
             <div class="vcard-box"><div id="qrcode"></div><div class="vcard-title">Scan to Verify</div></div>
@@ -471,7 +476,7 @@ body[data-view=home] #homePanel,body[data-view=setup] #setupPanel{display:block}
     let ME={role:null,email:'',uid:'',cls:null,sec:null},D={},ref=null,unsub=null,fbOk=false,REG=false,PC='V';
 const ADMIN='prabir.dangar@gmail.com', USERM='vtc5006@gmail.com';
 // >>> PASTE your tfhs-portal web-app keys here (Firebase Console > Project settings > Your apps)
-const FIREBASE_CONFIG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
+const FIREBASE_CONFIG={apiKey:"PASTE_API_KEY",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",appId:"PASTE_APP_ID"};
 try{if(FIREBASE_CONFIG.apiKey.startsWith('PASTE'))throw 0;firebase.initializeApp(FIREBASE_CONFIG);fbOk=true;ref=firebase.firestore().collection('tfhs').doc('portal');}catch(e){}
 const CL=['V','VI','VII','VIII','IX','X','XI','XII'],C6=CL.slice(0,6),nxt=c=>CL[CL.indexOf(c)+1];
 const $=id=>document.getElementById(id),R={};
@@ -593,14 +598,15 @@ function assign(list,S){ // Bengali alternate A,B,A,B… ; Santali -> last secti
  const sa=S.length>1?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
  return list.map(x=>{const sec=(x.med=='Santali'&&sa)?sa:bn[i++%bn.length];return{...x,sec,roll:++cnt[sec]}});
 }
+const ND=c=>['V','VI','VII','VIII'].includes(c);
 function setPC(c){PC=c;R.prom()}
 R.prom=()=>{
- const CH=['V','VI','VII','VIII','IX','XI'],t=nxt(PC),pr=(D.prom||{})[PC],pm=D.pass||30,sk=D.secs||{};
+ const CH=['V','VI','VII','VIII','IX','XI'],t=nxt(PC),pr=(D.prom||{})[PC],pm=ND(PC)?0:(D.pass||30),sk=D.secs||{};
  let h=`<h2>🔁 Merit List & Promotion</h2><div class="row">${CH.map(c=>`<button class="chip ${c==PC?'on':''}" onclick="setPC('${c}')">Class ${c}</button>`).join('')}</div>`;
  if(PC=='XI')h+=`<p class="mut">XI → XII keeps the <b>same section and same roll</b>.</p><button class="dv-b" onclick="runXI()">Promote all XI → XII</button> ${pr?B('Done · '+pr.pass.length+' students','ok'):''}`;
  else{const m=meritOf(PC);
   h+=chk((sk[PC]||{}).lock,'Sections of Class '+PC+' locked (Approvals & Setup)')+chk((sk[t]||{}).lock,'Sections of Class '+t+' locked (Approvals & Setup)')+chk(m.ok,'All sections finalised by Class Teachers ('+m.secs.filter(s=>((D.marks||{})[PC+'-'+s]||{}).st=='final').length+'/'+m.secs.length+')');
-  h+=`<div class="row">Pass mark % <input id="passMark" type="number" value="${pm}" style="width:70px;padding:6px" onchange="D.pass=+this.value;R.prom()"> <button class="dv-b" ${m.ok?'':'disabled'} onclick="runProm('${PC}')">⚙ Apply Promotion ${pr?'(re-run)':''}</button> <button class="dv-b g" onclick="printHTML('Merit List Class ${PC}',$('meritOut').innerHTML)">🖨 Print Merit List</button> ${pr?B('Applied','ok'):''}</div>`;
+  h+=`<div class="row">${ND(PC)?'<input id="passMark" type="hidden" value="0">'+B('No-detention policy: all promoted','ok'):'Pass mark % <input id="passMark" type="number" value="'+pm+'" style="width:70px;padding:6px" onchange="D.pass=+this.value;R.prom()">'} <button class="dv-b" ${m.ok?'':'disabled'} onclick="runProm('${PC}')">⚙ Apply Promotion ${pr?'(re-run)':''}</button> <button class="dv-b g" onclick="printHTML('Merit List Class ${PC}',$('meritOut').innerHTML)">🖨 Print Merit List</button> ${pr?B('Applied','ok'):''}</div>`;
   h+='<div id="meritOut">'+['Bengali','Santali'].map(md=>{const L=m.L.filter(x=>x.med==md);return L.length?`<h3>Class ${PC} — ${md} Medium Merit List</h3><div class="tw"><table class="marks-table"><tr><th>Rank</th><th>Name</th><th>Sec–Roll</th><th>%</th><th>Result</th></tr>`+L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.n)}</td><td>${x.sec}-${x.roll}</td><td>${x.p}</td><td>${x.p>=pm?B('Promote → '+t,'ok'):B('Repeat '+PC,'er')}</td></tr>`).join('')+'</table></div>':''}).join('')+'</div>';
  }
  h+=`<h2>📒 New-Session Registers — lock class-wise</h2><div class="tw"><table class="marks-table"><tr><th>Class</th><th>Students</th><th>Status</th><th></th></tr>`+['V','VI','VII','VIII','IX','X','XII'].map(c=>`<tr><td><b>${c}</b></td><td>${((D.reg||{})[c]||[]).length}</td><td>${(D.plock||{})[c]?B('LOCKED · admissions active','ok'):B('Open','wa')}</td><td>${(D.plock||{})[c]?`<button class="dv-b g" onclick="unlockReg('${c}')">🔓 Unlock</button> <button class="dv-b g" onclick="printReg2('${c}')">🖨 Roll list</button>`:`<button class="dv-b" onclick="lockReg('${c}')">🔒 Assign Rolls & Lock</button>`}</td></tr>`).join('')+'</table></div><p class="mut">Order: promoted students (merit order) first, then repeaters; Bengali alternate A,B…, Santali to last section.</p>';
@@ -608,7 +614,7 @@ R.prom=()=>{
 };
 function runProm(c){
  const m=meritOf(c);if(!m.ok)return alert('All sections must be finalised first.');
- const p=+$('passMark').value,f=x=>({...x,from:`${c}-${x.sec}-${x.roll}`});
+ const p=ND(c)?0:+$('passMark').value,f=x=>({...x,from:`${c}-${x.sec}-${x.roll}`});
  if(!confirm('Apply promotion for Class '+c+' with pass mark '+p+'%?'))return;
  W({pass:p,prom:{[c]:{pass:m.L.filter(x=>x.p>=p).map(f),fail:m.L.filter(x=>x.p<p).map(f),ts:Date.now()}}});
 }
@@ -622,8 +628,8 @@ function lockReg(T){
  else{const S=(D.secs||{})[T];
   if(!S||!S.lock)return alert('Create & lock sections of Class '+T+' first (Approvals & Setup).');
   if(T!='V'&&!pr[P])return alert('Run promotion of Class '+P+' first.');
-  if(T!='X'&&!pr[T])return alert('Run promotion of Class '+T+' first (to know repeaters).');
-  list=assign([...(T=='V'?[]:pr[P].pass),...(T=='X'?[]:pr[T].fail).map(x=>({...x,rep:1}))],S.list)}
+  if(T!='X'&&!ND(T)&&!pr[T])return alert('Run promotion of Class '+T+' first (to know repeaters).');
+  list=assign([...(T=='V'?[]:pr[P].pass),...(T=='X'||ND(T)?[]:(pr[T]||{}).fail||[]).map(x=>({...x,rep:1}))],S.list)}
  if(!confirm('Assign rolls and LOCK Class '+T+' ('+list.length+' students)? New admission approval for this class will become active.'))return;
  W({reg:{[T]:list},plock:{[T]:true}});
 }
@@ -661,27 +667,16 @@ function printReg(){const c=$('rcC').value,s=$('rcS').value,r=+$('rcR').value,x=
 
 // 6. CERTIFICATE LOOKUP (Original Logic Adaptation)
     // =========================================================
-    function lookupStudent() {
-        const c = document.getElementById('class').value;
-        const s = document.getElementById('sec').value;
-        const r = document.getElementById('rollNo').value;
-        
-        const st = STUDENT_DB.find(x => x.cls === c && x.sec === s && x.roll === String(r));
-        if(st) {
-            document.getElementById('studentName').value = st.name;
-            document.getElementById('fatherName').value = st.father || "";
-            document.getElementById('motherName').value = st.mother || "";
-            
-            // Populate A4 Sheet
-            document.getElementById('vName').innerText = st.name;
-            document.getElementById('vFather').innerText = st.father || "N/A";
-            document.getElementById('cName').innerText = st.name;
-            document.getElementById('cClassSec').innerText = `${st.cls} (${st.sec})`;
-            document.getElementById('cRoll').innerText = st.roll;
-        } else {
-            document.getElementById('studentName').value = "Not Found";
-        }
-    }
+    function lookupStudent(){
+ const c=$('class').value,sc=$('sec').value,r=$('rollNo').value,set=(i,v)=>{const e=$(i);if(e)e.textContent=v};
+ const st=STUDENT_DB.find(x=>x.cls===c&&x.sec===sc&&String(x.roll)===String(r));
+ if(st){const f=/^f/i.test(st.sex||'');
+  $('studentName').value=st.name;$('fatherName').value=st.father||'';$('motherName').value=st.mother||'';
+  set('lblHonorific',f?'Kumari':'Sri');set('lblParentage',f?'daughter of':'son of');set('lblHe',f?'she':'he');
+  set('vName',st.name);set('vFather',st.father||'N/A');set('vMother',st.mother||'N/A');set('vCls',st.cls);set('vSec',st.sec);set('vRoll',st.roll);set('vSess',new Date().getFullYear());
+  set('cName',st.name);set('cClassSec',st.cls+' ('+st.sec+')');set('cRoll',st.roll);
+ }else{$('studentName').value=r?'Not Found':'';$('fatherName').value='';$('motherName').value=''}
+}
 </script>
 
 </body>
