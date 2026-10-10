@@ -3647,14 +3647,15 @@ R.marks=()=>{
  const k=pc+'-'+ps,m=(D.marks||{})[k]||{},fin=m.st=='final',rows=m.rows||{};
  $('teacherClassInfo').textContent=`Class ${pc} – Sec ${ps}`;
  const S=STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).sort((a,b)=>a.roll-b.roll);
- $('marksTableContainer').innerHTML=S.length?'<div class="tw"><table class="marks-table"><tr><th>Roll</th><th>Name</th><th>Medium</th><th>% of Marks</th></tr>'+S.map(s=>{const r=rows[s.roll]||{};return `<tr class="mk-row" data-roll="${s.roll}"><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${fin?'disabled':''}>${opt(['Bengali','Santali'],r.m||s.medium||'Bengali')}</select></td><td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${r.p==null?'':r.p}" ${fin?'disabled':''}></td></tr>`}).join('')+'</table></div>':'<p class="mut">No students found for this class-section.</p>';
+ $('marksTableContainer').innerHTML=S.length?'<div class="tw"><table class="marks-table"><tr><th>Roll</th><th>Name</th><th>Medium</th>'+(ABR(pc)?'<th>Absent (AB)</th>':'')+'<th>% of Marks</th>'+(ABR(pc)?'<th>Result</th>':'')+'</tr>'+S.map(s=>{const r=rows[s.roll]||{},ab=ABR(pc)&&r.ab;return `<tr class="mk-row" data-roll="${s.roll}"${ab?' style="background:#fdeaea"':''}><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${fin?'disabled':''}>${opt(['Bengali','Santali'],r.m||s.medium||'Bengali')}</select></td>${ABR(pc)?`<td style="text-align:center"><input class="mk-ab" type="checkbox" ${ab?'checked':''} ${fin?'disabled':''} onchange="pt_abTog(this)"></td>`:''}<td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${ab||r.p==null?'':r.p}" ${fin||ab?'disabled':''}></td>${ABR(pc)?`<td class="mk-res">${ab?B('AB / FAILED','er'):''}</td>`:''}</tr>`}).join('')+'</table></div>':'<p class="mut">No students found for this class-section.</p>';
  $('mkBtns').style.display=fin?'none':'flex';$('lockStatusMsg').style.display=fin?'block':'none';$('mkUnlock').style.display=fin&&adm?'inline-block':'none';
  $('marksStat').innerHTML=fin?B('FINAL · LOCKED','ok'):m.st?B('Draft saved','wa'):B('Not started','er');
 };
+function pt_abTog(cb){const r=cb.closest('tr'),p=r.querySelector('.mk-p'),x=r.querySelector('.mk-res');if(cb.checked){p.value='';p.disabled=true;r.style.background='#fdeaea';if(x)x.innerHTML=B('AB / FAILED','er')}else{p.disabled=false;r.style.background='';if(x)x.innerHTML=''}}
 function pt_saveMarks(fin){
  const k=pt_mk();if(ME.role=='teacher'&&((D.marks||{})[k]||{}).st=='final')return;
  const rows={};let miss=0,bad=0,n=0;
- document.querySelectorAll('.mk-row').forEach(r=>{n++;const v=r.querySelector('.mk-p').value;if(v==='')miss++;else if(+v<0||+v>100)bad++;rows[r.dataset.roll]={p:v===''?null:+v,m:r.querySelector('.mk-m').value}});
+ document.querySelectorAll('.mk-row').forEach(r=>{n++;const cb=r.querySelector('.mk-ab'),ab=!!(cb&&cb.checked),v=ab?'':r.querySelector('.mk-p').value;if(!ab){if(v==='')miss++;else if(+v<0||+v>100)bad++}rows[r.dataset.roll]={p:v===''?null:+v,m:r.querySelector('.mk-m').value,ab:ab?1:0}});
  if(!n)return alert('No students in this class-section.');
  if(bad)return alert('% must be between 0 and 100.');
  if(fin){if(miss)return alert('Enter % for every student ('+miss+' missing) before Final & Lock.');if(!confirm('Finalise and LOCK '+k+'? No edits until Admin unlocks.'))return}
@@ -3664,14 +3665,16 @@ function pt_saveMarks(fin){
 /* ---------- MERIT & PROMOTION (ADMIN) ---------- */
 function meritOf(c){
  const secs=secsOf(c),M=D.marks||{},ok=secs.length>0&&secs.every(s=>(M[c+'-'+s]||{}).st=='final');
- const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+s.sec]||{}).rows||{})[s.roll]||{};return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:+r.p||0,med:r.m||s.medium||'Bengali'}});
- L.sort((a,b)=>b.p-a.p||a.n.localeCompare(b.n));return{secs,ok,L};
+ const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+s.sec]||{}).rows||{})[s.roll]||{};const ab=ABR(c)&&r.ab?1:0;return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:ab?0:+r.p||0,ab,med:r.m||s.medium||'Bengali'}});
+ L.sort((a,b)=>(a.ab-b.ab)||b.p-a.p||a.n.localeCompare(b.n));return{secs,ok,L};
 }
 function assign(list,S){ // Bengali alternate A,B,A,B… ; Santali -> last section (if 2+ sections)
  const sa=S.length>1?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
  return list.map(x=>{const sec=(x.med=='Santali'&&sa)?sa:bn[i++%bn.length];return{...x,sec,roll:++cnt[sec]}});
 }
 const ND=c=>['V','VI','VII','VIII'].includes(c);
+/* RULE: Class IX-XII — a student ABSENT in the examination is recorded as AB and the result is FAILED (not promoted / repeater) */
+const ABR=c=>['IX','X','XI','XII'].includes(c);
 function pt_setPC(c){PC=c;R.merit()}
 R.merit=()=>{
  const CH=['V','VI','VII','VIII','IX','XI'],t=nxt(PC),pr=(D.prom||{})[PC],pm=ND(PC)?0:(D.pass||30),sk=D.secs||{};
@@ -3680,7 +3683,7 @@ R.merit=()=>{
  else{const m=meritOf(PC);
   h+=chk((sk[PC]||{}).lock,'Sections of Class '+PC+' locked (Approvals & Setup)')+chk((sk[t]||{}).lock,'Sections of Class '+t+' locked (Approvals & Setup)')+chk(m.ok,'All sections finalised by Class Teachers ('+m.secs.filter(s=>((D.marks||{})[PC+'-'+s]||{}).st=='final').length+'/'+m.secs.length+')');
   h+=`<div class="row">${ND(PC)?'<input id="passMark" type="hidden" value="0">'+B('No-detention policy: all promoted','ok'):'Pass mark % <input id="passMark" type="number" value="'+pm+'" style="width:70px;padding:6px" onchange="pt_setPass(this.value)">'} <button class="dv-b" ${m.ok?'':'disabled'} onclick="pt_runProm('${PC}')">⚙ Apply Promotion ${pr?'(re-run)':''}</button> <button class="dv-b g" onclick="pt_printMerit()">🖨 Print Merit List</button> ${pr?B('Applied','ok'):''}</div>`;
-  h+='<div id="meritOut">'+['Bengali','Santali'].map(md=>{const L=m.L.filter(x=>x.med==md);return L.length?`<h3>Class ${PC} — ${md} Medium Merit List</h3><div class="tw"><table class="marks-table"><tr><th>Rank</th><th>Name</th><th>Sec–Roll</th><th>%</th><th>Result</th></tr>`+L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.n)}</td><td>${x.sec}-${x.roll}</td><td>${x.p}</td><td>${x.p>=pm?B('Promote → '+t,'ok'):B('Repeat '+PC,'er')}</td></tr>`).join('')+'</table></div>':''}).join('')+'</div>';
+  h+='<div id="meritOut">'+['Bengali','Santali'].map(md=>{const L=m.L.filter(x=>x.med==md);return L.length?`<h3>Class ${PC} — ${md} Medium Merit List</h3><div class="tw"><table class="marks-table"><tr><th>Rank</th><th>Name</th><th>Sec–Roll</th><th>%</th><th>Result</th></tr>`+L.map((x,i)=>`<tr><td>${x.ab?'—':i+1}</td><td>${esc(x.n)}</td><td>${x.sec}-${x.roll}</td><td>${x.ab?'AB':x.p}</td><td>${x.ab?B('AB / FAILED → Repeat '+PC,'er'):x.p>=pm?B('Promote → '+t,'ok'):B('Repeat '+PC,'er')}</td></tr>`).join('')+'</table></div>':''}).join('')+'</div>';
  }
  h+=`<h2>📒 New-Session Registers — lock class-wise</h2><div class="tw"><table class="marks-table"><tr><th>Class</th><th>Students</th><th>Status</th><th></th></tr>`+['V','VI','VII','VIII','IX','X','XII'].map(c=>`<tr><td><b>${c}</b></td><td>${((D.reg||{})[c]||[]).length}</td><td>${(D.plock||{})[c]?B('LOCKED','ok'):B('Open','wa')}</td><td>${(D.plock||{})[c]?`<button class="dv-b g" onclick="pt_unlockReg('${c}')">🔓 Unlock</button> <button class="dv-b g" onclick="pt_printReg2('${c}')">🖨 Roll list</button>`:`<button class="dv-b" onclick="pt_lockReg('${c}')">🔒 Assign Rolls & Lock</button>`}</td></tr>`).join('')+'</table></div><p class="mut">Order: promoted students (merit order) first, then repeaters; Bengali alternate A,B…, Santali to last section.</p>';
  $('promBody').innerHTML=h;
@@ -3689,11 +3692,12 @@ function pt_runProm(c){
  const m=meritOf(c);if(!m.ok)return alert('All sections must be finalised first.');
  const p=ND(c)?0:+$('passMark').value,f=x=>({...x,from:`${c}-${x.sec}-${x.roll}`});
  if(!confirm('Apply promotion for Class '+c+' with pass mark '+p+'%?'))return;
- W({pass:p,prom:{[c]:{pass:m.L.filter(x=>x.p>=p).map(f),fail:m.L.filter(x=>x.p<p).map(f),ts:Date.now()}}});
+ W({pass:p,prom:{[c]:{pass:m.L.filter(x=>!x.ab&&x.p>=p).map(f),fail:m.L.filter(x=>x.ab||x.p<p).map(f),ts:Date.now()}}}); // AB (absent) = FAILED
 }
 function pt_runXI(){
- const L=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:s.medium||'Bengali',sec:s.sec,roll:+s.roll}));
- confirm('Promote '+L.length+' students XI → XII (same sec & roll)?')&&W({prom:{XI:{pass:L,fail:[],ts:Date.now()}}});
+ const isAB=s=>{const r=(((D.marks||{})['XI-'+s.sec]||{}).rows||{})[s.roll];return !!(r&&r.ab)}; // AB (absent) = FAILED, not promoted
+ const all=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:s.medium||'Bengali',sec:s.sec,roll:+s.roll,ab:isAB(s)?1:0})),L=all.filter(x=>!x.ab),F=all.filter(x=>x.ab).map(x=>({...x,from:'XI-'+x.sec+'-'+x.roll}));
+ confirm('Promote '+L.length+' students XI → XII (same sec & roll)?'+(F.length?'\n'+F.length+' student(s) ABSENT (AB / FAILED) will NOT be promoted.':''))&&W({prom:{XI:{pass:L,fail:F,ts:Date.now()}}});
 }
 function pt_lockReg(T){
  const P=CL[CL.indexOf(T)-1],pr=D.prom||{};let list;
@@ -3720,7 +3724,7 @@ function pt_printMerit(){pt_printHTML('Merit List Class '+PC,$('meritOut').inner
 function pt_saveSess(){W({session:+$('sess').value})}
 function pt_setPass(v){D.pass=+v;R.merit()}
 
-Object.assign(window,{pt_R:R,pt_gv,pt_executeLogin,pt_submitTeacherReg,pt_logout,pt_go,pt_tAct,pt_tDel,pt_unlockM,pt_secLock,pt_saveMarks,pt_mk,pt_setPC,pt_runProm,pt_runXI,pt_lockReg,pt_unlockReg,pt_printReg2,pt_printHTML,pt_printMerit,pt_saveSess,pt_setPass});
+Object.assign(window,{pt_R:R,pt_gv,pt_executeLogin,pt_submitTeacherReg,pt_logout,pt_go,pt_tAct,pt_tDel,pt_unlockM,pt_secLock,pt_saveMarks,pt_abTog,pt_mk,pt_setPC,pt_runProm,pt_runXI,pt_lockReg,pt_unlockReg,pt_printReg2,pt_printHTML,pt_printMerit,pt_saveSess,pt_setPass});
 })();
 </script>
 </body>
