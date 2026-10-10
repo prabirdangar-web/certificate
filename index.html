@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <script>if(/[?&]join=/.test(location.search))document.documentElement.className+=" join-mode"</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFHS Official Certificate System</title>
+    <title>TFHS Official Portal</title>
     
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -206,80 +206,100 @@
         table.marks-table th, table.marks-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
         table.marks-table th { background-color: #145828; color: white; }
         table.marks-table input { width: 60px; padding: 4px; border: 1px solid #888; border-radius: 4px; }
-    </style>
+    
+/* ===== NEW DESIGN LAYER ===== */
+#gatekeeper{overflow:auto;justify-content:safe center;background:linear-gradient(135deg,#0b3319,#145828 55%,#2c7a45);font-family:'Segoe UI',Arial,sans-serif}
+.gt-hero{text-align:center;color:#fff;margin-bottom:22px}.gt-hero h1{margin:10px 0 4px;font-size:clamp(18px,4vw,28px)}.gt-hero p{margin:0;opacity:.85;font-size:13px}
+.gt-logo{width:64px;height:64px;margin:0 auto;border-radius:18px;background:#d4b18a;display:grid;place-items:center;font-size:32px}
+.gate-box{border-radius:18px!important;padding:24px!important;max-width:420px}.gate-box.wide{max-width:520px}
+.gate-box input,.gate-box select{width:100%;box-sizing:border-box;margin-bottom:10px;padding:10px;border:1px solid #9bb29d;border-radius:8px;font-size:14px}
+.two{display:flex;gap:10px}
+.dv-b.big{display:block;width:100%;padding:14px;font-size:15px;margin-bottom:12px}
+.guide{background:#f3f8f4;border-left:4px solid #145828;border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:#234;margin-bottom:14px}
+.gmsg{display:none;max-width:420px;width:100%;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600;box-sizing:border-box}.gmsg.ok{background:#dff3e3;color:#145828}.gmsg.err{background:#fde4e4;color:#b00020}
+body:not([data-role=admin]):not([data-role=teacher]):not([data-role=user]) :is(.tf-side,.tf-top){display:none!important}
+body[data-role=admin] [data-r]:not([data-r*=a]),body[data-role=teacher] [data-r]:not([data-r*=t]),body[data-role=user] [data-r]:not([data-r*=u]){display:none!important}
+body:not([data-view=cert]):not([data-view=reports]):not([data-view=wifs]):not([data-view=data]):not([data-view=fees]) :is(.dashboard-panel,.page,.wifs-panel,.wifs-sheet,#dataView){display:none!important}
+body[data-view=home] #homePanel,body[data-view=setup] #setupPanel{display:block}
+.tf-new-panel{max-width:1040px!important;font-family:'Segoe UI',Arial,sans-serif;border:0!important;border-radius:16px!important;padding:20px 22px!important}
+.tf-new-panel h2{display:flex;align-items:center;gap:8px;margin:24px 0 10px}.tf-new-panel>h2:first-child,.tf-new-panel>div>h2:first-child{margin-top:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:16px 0}
+.tile{background:linear-gradient(135deg,#f3f8f4,#e4f1e7);border-radius:14px;padding:16px;border-left:5px solid #145828}.tile i{font-style:normal;font-size:22px}.tile b{display:block;font-size:26px;color:#145828;margin:2px 0}.tile span{font-size:12px;color:#555}
+.banner{background:linear-gradient(120deg,#145828,#2c7a45);color:#fff;border-radius:14px;padding:18px 20px}.banner h3{margin:0 0 4px}.banner p{margin:0;opacity:.9;font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}.qa{display:flex;flex-wrap:wrap;gap:10px}.tw{overflow-x:auto}
+.marks-table tr:nth-child(even) td{background:#f7faf7}.marks-table select,.marks-table input{padding:5px;border:1px solid #888;border-radius:6px}
+.bdg{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap}.bdg.ok{background:#dff3e3;color:#145828}.bdg.wa{background:#fff1d6;color:#9a5a00}.bdg.er{background:#fde4e4;color:#b00020}
+.dv-b.er{background:#b00020}.dv-b:disabled{opacity:.4;cursor:not-allowed}
+.chip{border:1px solid #cfe0d3;background:#fff;padding:7px 14px;border-radius:99px;cursor:pointer;font-weight:600;color:#145828}.chip.on{background:#145828;color:#fff}
+.st{padding:6px 10px;border-radius:8px;background:#f4f4f4;margin:4px 0;font-size:13px}.st.ok{background:#e8f5ea}.mut{color:#666;font-size:12.5px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.fgrid input,.fgrid select{padding:8px;border:1px solid #9bb29d;border-radius:8px;width:100%;box-sizing:border-box}
+@media screen and (max-width:860px){
+ :root{--sw:0px}
+ body{padding:78px 8px 78px!important}
+ .tf-top{left:0!important;padding:0 12px!important}.tf-top h1{font-size:16px!important}.tf-top p,#roleChip{display:none}
+ .tf-side{top:auto!important;width:auto!important;right:0;height:62px;flex-direction:row!important;padding:5px 6px!important;overflow-x:auto;gap:2px!important}
+ .tf-side .br,.tf-side .gp,.tf-side .fo{display:none!important}
+ .tf-side button{flex-direction:column;gap:2px!important;font-size:10px!important;padding:6px 10px!important;min-width:58px;justify-content:center}
+ body[data-view=cert]{display:flex!important;flex-direction:column}
+ body[data-view=cert] .dashboard-panel{position:static!important;max-height:none!important;width:100%!important}
+ .page{zoom:.48}.tf-new-panel{padding:14px!important}
+}
+</style>
 </head>
-<body data-view="cert">
+<body data-view="home" data-role="">
 
 <!-- 1. AUTHENTICATION GATEWAY -->
 <div id="gatekeeper">
-    <div style="text-align:center; margin-bottom:20px;">
-        <h1 style="color:var(--primary-color); margin:0;">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h1>
-        <p style="color:#b65e00; font-weight:bold; margin-top:5px;">Official Portal</p>
-    </div>
-
-    <div id="authMenu" class="gate-box">
-        <button class="dv-b" onclick="toggleAuthView('loginGuide')" style="width:100%; margin-bottom:12px;">Login</button>
-        <button class="dv-b g" onclick="toggleAuthView('regGuide')" style="width:100%;">New Registration</button>
-    </div>
-
-    <div id="loginGuide" class="gate-box" style="display:none;">
-        <h3 style="color:#145828; margin-top:0;">Login Guide</h3>
-        <input type="email" id="loginEmail" class="form-control" placeholder="Email Address" style="width:100%; margin-bottom:10px; box-sizing:border-box;">
-        <input type="password" id="loginPass" class="form-control" placeholder="Password" style="width:100%; margin-bottom:15px; box-sizing:border-box;">
-        <button class="dv-b" onclick="executeLogin()" style="width:100%; margin-bottom:10px;">Sign In</button>
-        <button class="dv-b g" onclick="toggleAuthView('authMenu')" style="width:100%;">Back</button>
-    </div>
-
-    <div id="regGuide" class="gate-box" style="display:none; max-width: 450px;">
-        <h3 style="color:#b65e00; margin-top:0;">নতুন ক্লাস টিচার রেজিস্ট্রেশন<br><small style="color:#555;">(New Class Teacher Registration)</small></h3>
-        <p style="font-size:12px; line-height:1.4; color:#333;">
-            আপনার ইমেল (Email) এবং নিজের পছন্দমতো পাসওয়ার্ড (Password) দিন। ড্রপডাউন থেকে আপনার ক্লাস (Class) এবং সেকশন (Section) বেছে নিয়ে সাবমিট করুন। অ্যাডমিন (Admin) অ্যাপ্রুভ করার পরেই আপনি মার্কস এন্ট্রি করতে পারবেন।
-        </p>
-        <input type="email" id="regEmail" class="form-control" placeholder="Email Address" style="width:100%; margin-bottom:10px; box-sizing:border-box;">
-        <input type="password" id="regPass" class="form-control" placeholder="Create Password" style="width:100%; margin-bottom:10px; box-sizing:border-box;">
-        
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <select id="regClass" class="form-control" style="width:50%;">
-                <option value="">-- Class --</option>
-                <option value="V">V</option><option value="VI">VI</option>
-                <option value="VII">VII</option><option value="VIII">VIII</option>
-                <option value="IX">IX</option><option value="X">X</option>
-            </select>
-            <select id="regSec" class="form-control" style="width:50%;">
-                <option value="">-- Sec --</option>
-                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
-            </select>
-        </div>
-        <button class="dv-b" onclick="submitTeacherReg()" style="width:100%; margin-bottom:10px;">Submit Request for Approval</button>
-        <button class="dv-b g" onclick="toggleAuthView('authMenu')" style="width:100%;">Back</button>
-    </div>
+ <div class="gt-hero"><div class="gt-logo">🎓</div><h1>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h1><p>Official Portal · তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</p></div>
+ <div id="authMenu" class="gate-box">
+  <button class="dv-b big" onclick="gv('loginGuide')">🔐 Login · লগইন</button>
+  <button class="dv-b big g" style="margin:0" onclick="gv('regGuide')">📝 New Registration · নতুন রেজিস্ট্রেশন</button>
+ </div>
+ <div id="loginGuide" class="gate-box wide" style="display:none">
+  <h3 style="color:#145828;margin-top:0">Login · লগইন</h3>
+  <div class="guide"><b>Guide:</b> Class Teacher · User · Admin — all use the same login.<br>১) নিবন্ধিত ইমেল ও পাসওয়ার্ড দিন &nbsp;২) <b>Sign In</b> চাপুন — সিস্টেম নিজেই আপনার ভূমিকা (Class Teacher / User / Admin) চিনে নেবে।<br>New Class Teacher? Use <b>New Registration</b> first; you can log in only after Admin approval.</div>
+  <input type="email" id="loginEmail" placeholder="Email Address">
+  <input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key=='Enter')executeLogin()">
+  <button class="dv-b big" onclick="executeLogin()">Sign In</button>
+  <button class="dv-b big g" style="margin:0" onclick="gv('authMenu')">← Back</button>
+ </div>
+ <div id="regGuide" class="gate-box wide" style="display:none">
+  <h3 style="color:#b65e00;margin-top:0">নতুন ক্লাস টিচার রেজিস্ট্রেশন<br><small style="color:#555">New Class Teacher Registration</small></h3>
+  <div class="guide"><b>নিয়ম / Guide:</b><br>১) আপনার নাম ও ইমেল দিন।<br>২) নিজের পছন্দমতো পাসওয়ার্ড দিন (কমপক্ষে ৬ অক্ষর)।<br>৩) ড্রপডাউন থেকে নিজের ক্লাস ও সেকশন বেছে নিন।<br>৪) <b>Submit Request</b> চাপুন — অ্যাডমিন অনুমোদন করলে লগইন করে শুধু নিজের ক্লাস-সেকশনের ফাইনাল পরীক্ষার % নম্বর তুলতে পারবেন।<br>৫) Save Draft → Final &amp; Lock করার পর অ্যাডমিন আনলক না করা পর্যন্ত আর পরিবর্তন করা যাবে না।</div>
+  <input type="text" id="regName" placeholder="Full Name · পূর্ণ নাম">
+  <input type="email" id="regEmail" placeholder="Email Address">
+  <input type="password" id="regPass" placeholder="Create Password (min 6)">
+  <div class="two"><select id="regClass"><option value="">-- Class --</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option></select>
+  <select id="regSec"><option value="">-- Sec --</option><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+  <button class="dv-b big" onclick="submitTeacherReg()">Submit Request for Approval</button>
+  <button class="dv-b big g" style="margin:0" onclick="gv('authMenu')">← Back</button>
+ </div>
+ <div id="gMsg" class="gmsg"></div>
 </div>
 
 <header class="tf-top">
-    <div><h1 id="tfT">Certificate & Management</h1><p id="tfS">Role-Based System Active</p></div>
-    <div><button class="dv-b g" onclick="logout()">Sign Out</button></div>
+ <div><h1 id="tfT">Dashboard</h1><p id="tfS"></p></div>
+ <div style="display:flex;gap:10px;align-items:center"><span class="tf-chip on" id="roleChip"></span><button class="dv-b g" onclick="logout()">Sign Out</button></div>
 </header>
 
 <nav class="tf-side">
-    <div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
-    
-    <div class="gp">DAILY</div>
-    <button data-v="cert" class="user-only admin-only on"><span class="ic">📜</span><span class="l">Certificate</span></button>
-    
-    <div class="gp">ON DEMAND</div>
-    <button data-v="reports" class="user-only admin-only"><span class="ic">📊</span><span class="l">Student Reports</span></button>
-    <button data-v="wifs" class="user-only admin-only"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button>
-    <button data-v="fees" class="user-only admin-only"><span class="ic">🧾</span><span class="l">Fee Receipts</span></button>
-    <button data-v="data" class="user-only admin-only"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
-    
-    <div class="gp">ADMIN & TEACHER TASKS</div>
-    <button data-v="adm" class="user-only admin-only"><span class="ic">🎓</span><span class="l">Admission</span></button>
-    <button data-v="prom" class="admin-only"><span class="ic">🔁</span><span class="l">Promotion / Merit</span></button>
-    <button data-v="marks" class="teacher-only admin-only"><span class="ic">📝</span><span class="l">Marks Entry</span></button>
-    
-    <div class="fo"><div id="tfMode">Secure Mode</div></div>
+ <div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
+ <div class="gp" data-r="atu">MAIN</div>
+ <button data-v="home" data-r="atu" class="on"><span class="ic">🏠</span><span class="l">Dashboard</span></button>
+ <div class="gp" data-r="au">DAILY</div>
+ <button data-v="cert" data-r="au"><span class="ic">📜</span><span class="l">Certificate</span></button>
+ <div class="gp" data-r="au">ON DEMAND</div>
+ <button data-v="reports" data-r="au"><span class="ic">📊</span><span class="l">Student Reports</span></button>
+ <button data-v="wifs" data-r="au"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button>
+ <button data-v="fees" data-r="au"><span class="ic">🧾</span><span class="l">Fee Receipts</span></button>
+ <button data-v="data" data-r="au"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
+ <div class="gp" data-r="atu">TASKS</div>
+ <button data-v="adm" data-r="au"><span class="ic">🎓</span><span class="l">Admission</span></button>
+ <button data-v="marks" data-r="at"><span class="ic">✏️</span><span class="l">Marks Entry</span></button>
+ <button data-v="setup" data-r="a"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button>
+ <button data-v="prom" data-r="a"><span class="ic">🔁</span><span class="l">Merit / Promotion</span></button>
+ <div class="fo"><div id="tfMode">Secure Mode</div></div>
 </nav>
-
 
 <!-- 2. DATA VIEW (Original) -->
 <div id="dataView">
@@ -341,72 +361,37 @@
     </div>
 </div>
 
-<!-- 4. NEW: TEACHER MARKS ENTRY PANEL -->
-<div id="marksPanel" class="tf-new-panel teacher-only admin-only">
-    <h2>Class Marks Entry <span id="teacherClassInfo" style="float:right; font-size:14px; color:#b65e00;"></span></h2>
-    <p style="font-size:12px; color:#555;">Enter the % of Marks for your allotted class. You can save drafts. Once Finalized & Locked, no further edits can be made without admin approval.</p>
-    
-    <div id="marksTableContainer">
-        <!-- Table generated by JS -->
-    </div>
+<!-- NEW PANELS -->
+<div id="homePanel" class="tf-new-panel"><div id="homeBody"></div></div>
+<div id="setupPanel" class="tf-new-panel"><div id="setupBody"></div></div>
 
-    <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="dv-b g" onclick="saveMarks(false)" id="btnSaveDraft">Save Draft</button>
-        <button class="dv-b" onclick="saveMarks(true)" id="btnFinalLock" style="background:#b00020;">Final & Lock</button>
-    </div>
-    <p id="lockStatusMsg" style="color:#b00020; font-weight:bold; margin-top:10px; display:none;">MARKS ARE LOCKED. Contact Admin to unlock.</p>
+<div id="marksPanel" class="tf-new-panel">
+ <h2>✏️ Final Exam — % of Marks <span id="teacherClassInfo" style="margin-left:auto;font-size:14px;color:#b65e00"></span></h2>
+ <div id="marksSel"></div>
+ <p class="mut">Enter only the % of marks and (if needed) the medium. Save Draft any time. After <b>Final &amp; Lock</b> nothing can be changed until Admin unlocks. &nbsp;<span id="marksStat"></span></p>
+ <div id="marksTableContainer"></div>
+ <div class="row" id="mkBtns" style="margin-top:16px"><button class="dv-b g" onclick="saveMarks(false)">💾 Save Draft</button><button class="dv-b er" onclick="saveMarks(true)">🔒 Final &amp; Lock</button></div>
+ <p id="lockStatusMsg" style="display:none;color:#b00020;font-weight:700">🔒 MARKS ARE LOCKED. Contact Admin to unlock.</p>
+ <button id="mkUnlock" class="dv-b g" style="display:none" onclick="unlockM(mk())">🔓 Unlock this class</button>
 </div>
 
-<!-- 5. NEW: PROMOTION & MERIT LIST PANEL -->
-<div id="promotionPanel" class="tf-new-panel admin-only">
-    <h2>Generate Merit List & Promote Class</h2>
-    <p style="font-size:12px; color:#555;">Select a class to process. System will rank by %, promote passing students to next class, allocate rolls alternating A and B (Bengali), and push Santali medium to the last section.</p>
-    
-    <div class="form-grid">
-        <div class="form-group">
-            <label>Select Class to Promote</label>
-            <select id="promoteClassSelect" class="form-control">
-                <option value="V">Class V</option><option value="VI">Class VI</option>
-                <option value="VII">Class VII</option><option value="VIII">Class VIII</option>
-                <option value="IX">Class IX</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Target Sections (Comma separated, last = Santali)</label>
-            <input type="text" id="targetSections" class="form-control" value="A, B, C">
-        </div>
-    </div>
-    <button class="dv-b" style="margin-top:15px; width:100%;" onclick="executePromotionAlgorithm()">Generate Merit & Lock Promotion</button>
-    
-    <div id="promotionResults" style="margin-top: 20px; display:none; padding:15px; background:#e8f2e9; border:1px solid #145828; border-radius:5px;">
-        <h3 style="color:#145828; margin-top:0;">Promotion Complete</h3>
-        <p>New rolls assigned. New Admission processing is now active for this class.</p>
-    </div>
-</div>
+<div id="promotionPanel" class="tf-new-panel"><div id="promBody"></div></div>
 
-<!-- 6. NEW: ADMISSION PANEL -->
-<div id="admissionPanel" class="tf-new-panel user-only admin-only">
-    <h2>New Admission Management</h2>
-    
-    <div class="user-only admin-only">
-        <h3 style="color:#145828; font-size:15px;">1. Enter New Admission</h3>
-        <p style="font-size:12px;">Enter details of new students here and submit for admin verification.</p>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="text" placeholder="Student Name" class="form-control" style="flex:1;">
-            <select class="form-control" style="width:100px;">
-                <option>Class V</option><option>Class VI</option>
-            </select>
-        </div>
-        <button class="dv-b" onclick="alert('Admission Submitted for Admin Approval.')">Submit Admission</button>
-    </div>
-    
-    <hr style="margin:20px 0; border:0; border-top:1px dashed #ccc;">
-    
-    <div class="admin-only">
-        <h3 style="color:#b65e00; font-size:15px;">2. Approve Pending Admissions (Admin Only)</h3>
-        <p style="font-size:12px;">Review and assign next available Roll Number based on locked class limits.</p>
-        <button class="dv-b" style="background:#b65e00" onclick="alert('Pending admissions approved. Rolls assigned.')">Approve Pending Admissions</button>
-    </div>
+<div id="admissionPanel" class="tf-new-panel">
+ <h2>🎓 New Admission</h2>
+ <p class="mut">Admission approval opens class-wise only after Admin locks that class register. <span id="admLockInfo"></span></p>
+ <div class="fgrid">
+  <input id="aN" placeholder="Student Name"><input id="aF" placeholder="Father's Name"><input id="aM" placeholder="Mother's Name">
+  <input id="aD" type="date" title="Date of Birth"><select id="aS"><option>Male</option><option>Female</option></select>
+  <select id="aC"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option></select>
+  <select id="aMed"><option>Bengali</option><option>Santali</option></select><input id="aP" placeholder="Guardian Mobile">
+ </div>
+ <div class="row"><button class="dv-b" onclick="submitAdm()">Submit Admission</button></div>
+ <h2>📋 Admission Requests</h2><div id="admList" class="tw"></div>
+ <h2>🧾 Receipt — Existing / Promoted Student</h2>
+ <div class="row">Class <select id="rcC"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XII</option></select>
+ Sec <select id="rcS"><option>A</option><option>B</option><option>C</option><option>D</option></select>
+ Roll <input id="rcR" type="number" min="1" style="width:80px"><button class="dv-b" onclick="printReg()">🖨 Print Receipt</button></div>
 </div>
 
 <!-- 7. WIFS PANEL (Original) -->
@@ -483,166 +468,198 @@
     // =========================================================
     // 2. AUTHENTICATION & ROLE LOGIC
     // =========================================================
-    let currentUserRole = null; 
-    let currentUserClass = null;
-    let currentUserSec = null;
+    let ME={role:null,email:'',uid:'',cls:null,sec:null},D={},ref=null,unsub=null,fbOk=false,REG=false,PC='V';
+const ADMIN='prabir.dangar@gmail.com', USERM='vtc5006@gmail.com';
+// >>> PASTE your tfhs-portal web-app keys here (Firebase Console > Project settings > Your apps)
+const FIREBASE_CONFIG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
+try{if(FIREBASE_CONFIG.apiKey.startsWith('PASTE'))throw 0;firebase.initializeApp(FIREBASE_CONFIG);fbOk=true;ref=firebase.firestore().collection('tfhs').doc('portal');}catch(e){}
+const CL=['V','VI','VII','VIII','IX','X','XI','XII'],C6=CL.slice(0,6),nxt=c=>CL[CL.indexOf(c)+1];
+const $=id=>document.getElementById(id),R={};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const W=o=>ref.set(o,{merge:true}),DEL=()=>firebase.firestore.FieldValue.delete();
+const B=(t,c)=>`<span class="bdg ${c}">${t}</span>`,chk=(o,t)=>`<div class="st ${o?'ok':''}">${o?'✅':'⬜'} ${t}</div>`;
+const opt=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
+const secsOf=c=>[...new Set(STUDENT_DB.filter(s=>s.cls==c).map(s=>s.sec))].sort();
+const allSecs=()=>C6.flatMap(c=>secsOf(c).map(s=>c+'-'+s));
+const recNo=(c,s,r)=>`${D.session||2027}/${c}-${s}/${String(r).padStart(3,'0')}`;
+const TT={home:'Dashboard',cert:'Certificate',reports:'Student Reports',wifs:'WIFS Data Entry',fees:'Fee Receipts',data:'Data & Year',adm:'Admission',marks:'Marks Entry — Final Exam',setup:'Approvals & Setup',prom:'Merit List & Promotion'};
+function msg(t,ok){const m=$('gMsg');m.textContent=t;m.className='gmsg '+(ok?'ok':'err');m.style.display='block'}
+function gv(id){['authMenu','loginGuide','regGuide'].forEach(x=>$(x).style.display=x==id?'block':'none');$('gMsg').style.display='none'}
+const needFb=()=>{if(!fbOk){msg('Firebase keys missing — paste apiKey & appId in FIREBASE_CONFIG (see comment in code).');return true}};
+async function executeLogin(){
+ if(needFb())return;
+ const e=$('loginEmail').value.trim().toLowerCase(),p=$('loginPass').value;
+ if(!e||!p)return msg('Email & password required · ইমেল ও পাসওয়ার্ড দিন');
+ try{await firebase.auth().signInWithEmailAndPassword(e,p)}catch(x){msg('Login failed ('+x.code+') · ভুল ইমেল/পাসওয়ার্ড')}
+}
+async function submitTeacherReg(){
+ if(needFb())return;
+ const n=$('regName').value.trim(),e=$('regEmail').value.trim().toLowerCase(),p=$('regPass').value,c=$('regClass').value,s=$('regSec').value;
+ if(!n||!e||p.length<6||!c||!s)return msg('Fill all fields (password min 6) · সব ঘর পূরণ করুন');
+ REG=true;
+ try{
+  const cr=await firebase.auth().createUserWithEmailAndPassword(e,p);
+  await W({teachers:{[cr.user.uid]:{name:n,email:e,cls:c,sec:s,status:'pending',ts:Date.now()}}});
+  await firebase.auth().signOut();gv('authMenu');
+  msg('Request submitted ✔ Wait for Admin approval, then log in. · অ্যাডমিন অনুমোদনের পর লগইন করুন।',true);
+ }catch(x){msg('Registration failed ('+x.code+')')}
+ REG=false;
+}
+function logout(){fbOk&&firebase.auth().signOut()}
+function showGate(){unsub&&unsub();unsub=null;D={};ME={role:null,email:'',uid:'',cls:null,sec:null};document.body.dataset.role='';$('gatekeeper').style.display='flex';if($('authMenu').style.display=='none'&&$('loginGuide').style.display=='none'&&$('regGuide').style.display=='none')gv('authMenu')}
+function deny(t){firebase.auth().signOut().then(()=>{gv('loginGuide');msg(t)})}
+if(fbOk)firebase.auth().onAuthStateChanged(u=>{
+ if(REG)return;
+ if(!u||u.isAnonymous){if(u)firebase.auth().signOut();else showGate();return}
+ ME.email=(u.email||'').toLowerCase();ME.uid=u.uid;unsub&&unsub();
+ unsub=ref.onSnapshot(s=>{if(!s.exists){W({session:2027});return}D=s.data();resolve()},e=>msg('Data error: '+e.code));
+});
+function resolve(){
+ let r;
+ if(ME.email==ADMIN)r='admin';else if(ME.email==USERM)r='user';
+ else{const t=(D.teachers||{})[ME.uid];
+  if(!t)return deny('This account is not registered as Class Teacher.');
+  if(t.status=='pending')return deny('Awaiting Admin approval · অ্যাডমিন অনুমোদনের অপেক্ষায়');
+  if(t.status!='approved')return deny('Request rejected. Contact Admin.');
+  r='teacher';ME.cls=t.cls;ME.sec=t.sec}
+ if(ME.role!=r)enter(r);else render();
+}
+function enter(r){ME.role=r;document.body.dataset.role=r;$('gatekeeper').style.display='none';
+ $('roleChip').textContent={admin:'👑 Admin',user:'🧑‍💼 User',teacher:'👩‍🏫 Class Teacher'}[r]+' · '+ME.email;go('home')}
+function go(v){document.body.dataset.view=v;
+ document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==v));
+ $('tfT').textContent=TT[v]||v;$('tfS').textContent='Taldangra Fulmati H.S. · Session '+(D.session||2027);render(true);scrollTo(0,0)}
+function render(f){const a=document.activeElement;
+ if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
+ (R[document.body.dataset.view]||(()=>{}))()}
+document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
 
-    function toggleAuthView(viewId) {
-        document.getElementById('authMenu').style.display = 'none';
-        document.getElementById('loginGuide').style.display = 'none';
-        document.getElementById('regGuide').style.display = 'none';
-        document.getElementById(viewId).style.display = 'block';
-    }
+/* ---------- HOME ---------- */
+R.home=()=>{
+ const T=Object.entries(D.teachers||{}),M=D.marks||{},A=Object.values(D.adm||{}),pa=A.filter(a=>a.status=='pending').length,fin=Object.values(M).filter(m=>m.st=='final').length,me=ME.role;
+ const tl=(i,v,l)=>`<div class="tile"><i>${i}</i><b>${v}</b><span>${l}</span></div>`;let tiles,qa;
+ if(me=='admin'){tiles=tl('👩‍🏫',T.filter(x=>x[1].status=='approved').length,'Class teachers approved')+tl('⏳',T.filter(x=>x[1].status=='pending').length,'Teacher requests pending')+tl('🔒',fin+' / '+allSecs().length,'Sections finalised (marks)')+tl('📥',pa,'Admissions awaiting approval')+tl('📒',Object.values(D.plock||{}).filter(Boolean).length+' / 7','Class registers locked');
+  qa=[['setup','✅ Approvals & Setup'],['prom','🔁 Merit & Promotion'],['adm','🎓 Admission'],['cert','📜 Certificate']]}
+ else if(me=='user'){tiles=tl('📥',pa,'Admissions pending Admin approval')+tl('✅',A.filter(a=>a.status=='ok').length,'Admissions approved')+tl('🎓',STUDENT_DB.length,'Students in database');
+  qa=[['cert','📜 Issue Certificate'],['reports','📊 Reports'],['adm','🎓 New Admission']]}
+ else{const k=ME.cls+'-'+ME.sec,m=M[k];tiles=tl('🏫',ME.cls+' – '+ME.sec,'Your allotted class')+tl(m&&m.st=='final'?'🔒':'✏️',m?(m.st=='final'?'Locked':'Draft'):'Not started','Final exam % status')+tl('🎓',STUDENT_DB.filter(s=>s.cls==ME.cls&&s.sec==ME.sec).length,'Students in class');qa=[['marks','✏️ Enter % of Marks']]}
+ $('homeBody').innerHTML=`<div class="banner"><h3>Welcome 👋</h3><p>${esc(ME.email)} · Session ${D.session||2027}</p></div><div class="tiles">${tiles}</div><div class="qa">${qa.map(([v,t])=>`<button class="dv-b" onclick="go('${v}')">${t}</button>`).join('')}</div>`;
+};
 
-    function executeLogin() {
-        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-        
-        // MOCK LOGIN FOR DEMONSTRATION:
-        if(email === "vtc5006@gmail.com") {
-            routeUser("user");
-        } else if(email === "prabir.dangar@gmail.com") { // The Admin Email
-            routeUser("admin");
-        } else if(email.includes("teacher")) {
-            routeUser("teacher", "VI", "A"); // Mock teacher allotted to VI-A
-        } else {
-            alert("Invalid login. Try prabir.dangar@gmail.com, vtc5006@gmail.com, or teacher@tfhs.com");
-        }
-    }
+/* ---------- ADMIN SETUP ---------- */
+R.setup=()=>{
+ const T=Object.entries(D.teachers||{}),M=D.marks||{},TB='<div class="tw"><table class="marks-table">';
+ let h=`<h2>👩‍🏫 Class Teacher Requests</h2>`+(T.length?TB+'<tr><th>Name / Email</th><th>Class</th><th>Sec</th><th>Status</th><th>Action</th></tr>'+T.map(([u,t])=>`<tr><td><b>${esc(t.name)}</b><br><small>${esc(t.email)}</small></td><td><select id="tc_${u}">${opt(C6.slice(0,6),t.cls)}</select></td><td><select id="ts_${u}">${opt(['A','B','C','D'],t.sec)}</select></td><td>${B(t.status,t.status=='approved'?'ok':t.status=='pending'?'wa':'er')}</td><td><button class="dv-b" onclick="tAct('${u}','approved')">Approve</button> <button class="dv-b g" onclick="tAct('${u}','rejected')">Reject</button> <button class="dv-b er" onclick="tDel('${u}')">✕</button></td></tr>`).join('')+'</table></div>':'<p class="mut">No requests yet.</p>');
+ h+=`<h2>🔒 Marks Status — Final Exam</h2>${TB}<tr><th>Class-Sec</th><th>Students</th><th>Teacher</th><th>Status</th><th></th></tr>`+allSecs().map(k=>{const [c,s]=k.split('-'),m=M[k],tc=T.find(([,t])=>t.cls==c&&t.sec==s&&t.status=='approved');
+  return `<tr><td><b>${k}</b></td><td>${STUDENT_DB.filter(x=>x.cls==c&&x.sec==s).length}</td><td>${tc?esc(tc[1].email):'—'}</td><td>${m&&m.st=='final'?B('FINAL · LOCKED','ok'):m?B('Draft','wa'):B('Not started','er')}</td><td>${m&&m.st=='final'?`<button class="dv-b g" onclick="unlockM('${k}')">🔓 Unlock</button>`:''}</td></tr>`}).join('')+'</table></div>';
+ h+=`<h2>🏫 New Session — Sections (Class V–X)</h2><div class="row">Session <input id="sess" type="number" value="${D.session||2027}" style="width:90px;padding:6px"> <button class="dv-b g" onclick="W({session:+$('sess').value})">Save</button></div><p class="mut">With 2+ sections the <b>last section is Santali medium</b> (3 → C, 2 → B). Create and lock before promotion.</p>${TB}<tr><th>Class</th><th>No. of sections</th><th>Sections</th><th></th></tr>`+C6.map(c=>{const S=(D.secs||{})[c]||{},n=S.n||2,L=S.list||'ABCD'.slice(0,n).split('');
+  return `<tr><td><b>${c}</b></td><td><select id="sn_${c}" ${S.lock?'disabled':''}>${opt([1,2,3,4],n)}</select></td><td>${L.map((x,i)=>x+(S.lock&&L.length>1&&i==L.length-1?' (Santali)':'')).join(', ')}</td><td>${S.lock?B('LOCKED','ok')+' <button class="dv-b g" onclick="secLock(\''+c+'\',0)">🔓</button>':`<button class="dv-b" onclick="secLock('${c}',1)">🔒 Create & Lock</button>`}</td></tr>`}).join('')+'</table></div>';
+ $('setupBody').innerHTML=h;
+};
+function tAct(u,s){W({teachers:{[u]:{status:s,cls:$('tc_'+u).value,sec:$('ts_'+u).value}}})}
+function tDel(u){confirm('Remove this teacher record?')&&W({teachers:{[u]:DEL()}})}
+function unlockM(k){confirm('Unlock '+k+' for editing?')&&W({marks:{[k]:{st:'draft'}}})}
+function secLock(c,l){if(l){const n=+$('sn_'+c).value;W({secs:{[c]:{n,list:'ABCD'.slice(0,n).split(''),lock:true}}})}else if(confirm('Unlock sections of Class '+c+'?'))W({secs:{[c]:{lock:false}}})}
 
-    function submitTeacherReg() {
-        const email = document.getElementById('regEmail').value;
-        const cls = document.getElementById('regClass').value;
-        if(!email || !cls) return alert("Please fill all fields.");
-        alert("Registration request submitted. Wait for Admin approval.");
-        toggleAuthView('authMenu');
-    }
+/* ---------- MARKS (CLASS TEACHER) ---------- */
+function mk(){return ME.role=='admin'?($('mkC')?$('mkC').value:'VI')+'-'+($('mkS')?$('mkS').value:'A'):ME.cls+'-'+ME.sec}
+R.marks=()=>{
+ const adm=ME.role=='admin',pc=adm?($('mkC')?$('mkC').value:'VI'):ME.cls,ps=adm?($('mkS')?$('mkS').value:'A'):ME.sec;
+ $('marksSel').innerHTML=adm?`<div class="row">Class <select id="mkC" onchange="R.marks()">${opt(C6,pc)}</select> Sec <select id="mkS" onchange="R.marks()">${opt(['A','B','C','D'],ps)}</select></div>`:'';
+ const k=pc+'-'+ps,m=(D.marks||{})[k]||{},fin=m.st=='final',rows=m.rows||{};
+ $('teacherClassInfo').textContent=`Class ${pc} – Sec ${ps}`;
+ const S=STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).sort((a,b)=>a.roll-b.roll);
+ $('marksTableContainer').innerHTML=S.length?'<div class="tw"><table class="marks-table"><tr><th>Roll</th><th>Name</th><th>Medium</th><th>% of Marks</th></tr>'+S.map(s=>{const r=rows[s.roll]||{};return `<tr class="mk-row" data-roll="${s.roll}"><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${fin?'disabled':''}>${opt(['Bengali','Santali'],r.m||s.medium||'Bengali')}</select></td><td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${r.p==null?'':r.p}" ${fin?'disabled':''}></td></tr>`}).join('')+'</table></div>':'<p class="mut">No students found for this class-section.</p>';
+ $('mkBtns').style.display=fin?'none':'flex';$('lockStatusMsg').style.display=fin?'block':'none';$('mkUnlock').style.display=fin&&adm?'inline-block':'none';
+ $('marksStat').innerHTML=fin?B('FINAL · LOCKED','ok'):m.st?B('Draft saved','wa'):B('Not started','er');
+};
+function saveMarks(fin){
+ const k=mk();if(ME.role=='teacher'&&((D.marks||{})[k]||{}).st=='final')return;
+ const rows={};let miss=0,bad=0,n=0;
+ document.querySelectorAll('.mk-row').forEach(r=>{n++;const v=r.querySelector('.mk-p').value;if(v==='')miss++;else if(+v<0||+v>100)bad++;rows[r.dataset.roll]={p:v===''?null:+v,m:r.querySelector('.mk-m').value}});
+ if(!n)return alert('No students in this class-section.');
+ if(bad)return alert('% must be between 0 and 100.');
+ if(fin){if(miss)return alert('Enter % for every student ('+miss+' missing) before Final & Lock.');if(!confirm('Finalise and LOCK '+k+'? No edits until Admin unlocks.'))return}
+ W({marks:{[k]:{st:fin?'final':'draft',rows,by:ME.email,ts:Date.now()}}}).then(()=>alert(fin?'Marks locked ✔':'Draft saved ✔'));
+}
 
-    function routeUser(role, allottedClass = null, allottedSec = null) {
-        currentUserRole = role;
-        currentUserClass = allottedClass;
-        currentUserSec = allottedSec;
+/* ---------- MERIT & PROMOTION (ADMIN) ---------- */
+function meritOf(c){
+ const secs=secsOf(c),M=D.marks||{},ok=secs.length>0&&secs.every(s=>(M[c+'-'+s]||{}).st=='final');
+ const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+s.sec]||{}).rows||{})[s.roll]||{};return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:+r.p||0,med:r.m||s.medium||'Bengali'}});
+ L.sort((a,b)=>b.p-a.p||a.n.localeCompare(b.n));return{secs,ok,L};
+}
+function assign(list,S){ // Bengali alternate A,B,A,B… ; Santali -> last section (if 2+ sections)
+ const sa=S.length>1?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
+ return list.map(x=>{const sec=(x.med=='Santali'&&sa)?sa:bn[i++%bn.length];return{...x,sec,roll:++cnt[sec]}});
+}
+function setPC(c){PC=c;R.prom()}
+R.prom=()=>{
+ const CH=['V','VI','VII','VIII','IX','XI'],t=nxt(PC),pr=(D.prom||{})[PC],pm=D.pass||30,sk=D.secs||{};
+ let h=`<h2>🔁 Merit List & Promotion</h2><div class="row">${CH.map(c=>`<button class="chip ${c==PC?'on':''}" onclick="setPC('${c}')">Class ${c}</button>`).join('')}</div>`;
+ if(PC=='XI')h+=`<p class="mut">XI → XII keeps the <b>same section and same roll</b>.</p><button class="dv-b" onclick="runXI()">Promote all XI → XII</button> ${pr?B('Done · '+pr.pass.length+' students','ok'):''}`;
+ else{const m=meritOf(PC);
+  h+=chk((sk[PC]||{}).lock,'Sections of Class '+PC+' locked (Approvals & Setup)')+chk((sk[t]||{}).lock,'Sections of Class '+t+' locked (Approvals & Setup)')+chk(m.ok,'All sections finalised by Class Teachers ('+m.secs.filter(s=>((D.marks||{})[PC+'-'+s]||{}).st=='final').length+'/'+m.secs.length+')');
+  h+=`<div class="row">Pass mark % <input id="passMark" type="number" value="${pm}" style="width:70px;padding:6px" onchange="D.pass=+this.value;R.prom()"> <button class="dv-b" ${m.ok?'':'disabled'} onclick="runProm('${PC}')">⚙ Apply Promotion ${pr?'(re-run)':''}</button> <button class="dv-b g" onclick="printHTML('Merit List Class ${PC}',$('meritOut').innerHTML)">🖨 Print Merit List</button> ${pr?B('Applied','ok'):''}</div>`;
+  h+='<div id="meritOut">'+['Bengali','Santali'].map(md=>{const L=m.L.filter(x=>x.med==md);return L.length?`<h3>Class ${PC} — ${md} Medium Merit List</h3><div class="tw"><table class="marks-table"><tr><th>Rank</th><th>Name</th><th>Sec–Roll</th><th>%</th><th>Result</th></tr>`+L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.n)}</td><td>${x.sec}-${x.roll}</td><td>${x.p}</td><td>${x.p>=pm?B('Promote → '+t,'ok'):B('Repeat '+PC,'er')}</td></tr>`).join('')+'</table></div>':''}).join('')+'</div>';
+ }
+ h+=`<h2>📒 New-Session Registers — lock class-wise</h2><div class="tw"><table class="marks-table"><tr><th>Class</th><th>Students</th><th>Status</th><th></th></tr>`+['V','VI','VII','VIII','IX','X','XII'].map(c=>`<tr><td><b>${c}</b></td><td>${((D.reg||{})[c]||[]).length}</td><td>${(D.plock||{})[c]?B('LOCKED · admissions active','ok'):B('Open','wa')}</td><td>${(D.plock||{})[c]?`<button class="dv-b g" onclick="unlockReg('${c}')">🔓 Unlock</button> <button class="dv-b g" onclick="printReg2('${c}')">🖨 Roll list</button>`:`<button class="dv-b" onclick="lockReg('${c}')">🔒 Assign Rolls & Lock</button>`}</td></tr>`).join('')+'</table></div><p class="mut">Order: promoted students (merit order) first, then repeaters; Bengali alternate A,B…, Santali to last section.</p>';
+ $('promBody').innerHTML=h;
+};
+function runProm(c){
+ const m=meritOf(c);if(!m.ok)return alert('All sections must be finalised first.');
+ const p=+$('passMark').value,f=x=>({...x,from:`${c}-${x.sec}-${x.roll}`});
+ if(!confirm('Apply promotion for Class '+c+' with pass mark '+p+'%?'))return;
+ W({pass:p,prom:{[c]:{pass:m.L.filter(x=>x.p>=p).map(f),fail:m.L.filter(x=>x.p<p).map(f),ts:Date.now()}}});
+}
+function runXI(){
+ const L=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:s.medium||'Bengali',sec:s.sec,roll:+s.roll}));
+ confirm('Promote '+L.length+' students XI → XII (same sec & roll)?')&&W({prom:{XI:{pass:L,fail:[],ts:Date.now()}}});
+}
+function lockReg(T){
+ const P=CL[CL.indexOf(T)-1],pr=D.prom||{};let list;
+ if(T=='XII'){if(!pr.XI)return alert('Run XI promotion first.');list=pr.XI.pass.map(x=>({...x,from:'XI-'+x.sec+'-'+x.roll}))}
+ else{const S=(D.secs||{})[T];
+  if(!S||!S.lock)return alert('Create & lock sections of Class '+T+' first (Approvals & Setup).');
+  if(T!='V'&&!pr[P])return alert('Run promotion of Class '+P+' first.');
+  if(T!='X'&&!pr[T])return alert('Run promotion of Class '+T+' first (to know repeaters).');
+  list=assign([...(T=='V'?[]:pr[P].pass),...(T=='X'?[]:pr[T].fail).map(x=>({...x,rep:1}))],S.list)}
+ if(!confirm('Assign rolls and LOCK Class '+T+' ('+list.length+' students)? New admission approval for this class will become active.'))return;
+ W({reg:{[T]:list},plock:{[T]:true}});
+}
+function unlockReg(T){
+ if(Object.values(D.adm||{}).some(a=>a.status=='ok'&&a.cls==T))return alert('Approved admissions exist in Class '+T+'; cannot unlock.');
+ confirm('Unlock register of Class '+T+'? Assigned rolls will be cleared.')&&W({reg:{[T]:DEL()},plock:{[T]:false}});
+}
+function printReg2(c){
+ const L=[...((D.reg||{})[c]||[])].sort((a,b)=>a.sec.localeCompare(b.sec)||a.roll-b.roll);
+ printHTML('Class '+c+' Roll List',`<h3>Class ${c} — Session ${D.session||2027} Roll List</h3><table><tr><th>Sec</th><th>Roll</th><th>Name</th><th>Medium</th><th>Previous</th></tr>${L.map(x=>`<tr><td>${x.sec}</td><td>${x.roll}</td><td>${esc(x.n)}</td><td>${x.med}</td><td>${x.from||''}${x.rep?' (Repeater)':''}</td></tr>`).join('')}</table>`);
+}
 
-        document.getElementById('gatekeeper').style.display = 'none'; // Unlock screen
-        
-        // Reset Views based on role
-        document.querySelectorAll('.admin-only, .teacher-only, .user-only').forEach(el => el.style.display = 'none');
+/* ---------- ADMISSION ---------- */
+R.adm=()=>{
+ const A=Object.entries(D.adm||{}).sort((a,b)=>b[1].ts-a[1].ts),ad=ME.role=='admin',pl=D.plock||{};
+ $('admLockInfo').innerHTML=C6.map(c=>B(c+(pl[c]?' · open':' · waiting'),pl[c]?'ok':'wa')).join(' ');
+ $('admList').innerHTML=A.length?'<table class="marks-table"><tr><th>Student</th><th>Class</th><th>Medium</th><th>Status</th><th>Receipt No.</th><th></th></tr>'+A.map(([id,a])=>`<tr><td><b>${esc(a.n)}</b><br><small>${esc(a.f)}</small></td><td>${a.cls}${a.sec?'-'+a.sec+' / '+a.roll:''}</td><td>${a.med}</td><td>${B(a.status=='ok'?'Approved':a.status=='rejected'?'Rejected':'Pending',a.status=='ok'?'ok':a.status=='rejected'?'er':'wa')}</td><td>${a.rec||'—'}</td><td>${a.status=='ok'?`<button class="dv-b g" onclick="printAdm('${id}')">🖨 Receipt</button>`:ad&&a.status=='pending'?`<button class="dv-b" ${pl[a.cls]?'':'disabled title="Lock this class register first"'} onclick="approveAdm('${id}')">Approve</button> <button class="dv-b er" onclick="W({adm:{'${id}':{status:'rejected'}}})">✕</button>`:''}</td></tr>`).join('')+'</table>':'<p class="mut">No admission requests yet.</p>';
+};
+function submitAdm(){
+ const g=i=>$(i).value.trim(),n=g('aN');if(!n||!g('aF'))return alert('Student & father name required.');
+ W({adm:{['a'+Date.now()]:{n,f:g('aF'),mo:g('aM'),dob:g('aD'),sx:g('aS'),cls:g('aC'),med:g('aMed'),ph:g('aP'),status:'pending',by:ME.email,ts:Date.now()}}}).then(()=>{['aN','aF','aM','aD','aP'].forEach(i=>$(i).value='');alert('Submitted for Admin approval ✔')});
+}
+function approveAdm(id){
+ const a=D.adm[id],T=a.cls,S=((D.secs||{})[T]||{}).list;if(!(D.plock||{})[T]||!S)return alert('Lock the class register first.');
+ const ap=Object.values(D.adm).filter(x=>x.status=='ok'&&x.cls==T),sa=S.length>1?S[S.length-1]:null,bn=sa?S.slice(0,-1):S;
+ const sec=(a.med=='Santali'&&sa)?sa:bn[ap.filter(x=>!(x.med=='Santali'&&sa)).length%bn.length];
+ const roll=Math.max(0,...((D.reg||{})[T]||[]).filter(x=>x.sec==sec).map(x=>x.roll),...ap.filter(x=>x.sec==sec).map(x=>x.roll))+1;
+ W({adm:{[id]:{status:'ok',sec,roll,rec:recNo(T,sec,roll),ap:ME.email,at:Date.now()}}});
+}
+function recHTML(o){const one=t=>`<div class="rc"><div class="rh"><b style="font-size:16px">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</b><br>তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]<br><small>P.O. Taldangra · Dist. Bankura · PIN 722152 · H.S. Code 114071</small></div><h3>ADMISSION RECEIPT — SESSION ${o.y} <i>(${t})</i></h3><table><tr><td>Receipt No.</td><td><b>${o.rec}</b></td><td>Date</td><td>${new Date().toLocaleDateString('en-GB')}</td></tr><tr><td>Student</td><td colspan="3"><b>${esc(o.n)}</b></td></tr><tr><td>Father</td><td colspan="3">${esc(o.f)}</td></tr><tr><td>Class–Sec</td><td>${o.cls}-${o.sec}</td><td>Roll</td><td>${o.roll}</td></tr><tr><td>Medium</td><td>${o.med}</td><td>Amount ₹</td><td></td></tr></table><div class="sg"><span>Guardian</span><span>Headmaster</span></div></div>`;return one('Student Copy')+one('Office Copy')}
+function printHTML(t,b){const w=open('','_blank');if(!w)return alert('Allow pop-ups to print.');w.document.write(`<html><head><title>${t}</title><style>body{font-family:Arial;margin:14px}.rc{border:2px solid #145828;border-radius:8px;padding:12px;margin-bottom:16px;max-width:640px}.rh{text-align:center;color:#145828}h3{text-align:center;margin:8px 0}table{width:100%;border-collapse:collapse;margin-bottom:8px}td,th{border:1px solid #999;padding:5px;font-size:13px;text-align:left}th{background:#e8f2e9}.sg{display:flex;justify-content:space-between;margin-top:34px;font-size:12px}</style></head><body>${b}</body></html>`);w.document.close();w.focus();setTimeout(()=>w.print(),400)}
+function printAdm(id){const a=D.adm[id];printHTML('Receipt',recHTML({...a,y:D.session||2027}))}
+function printReg(){const c=$('rcC').value,s=$('rcS').value,r=+$('rcR').value,x=((D.reg||{})[c]||[]).find(e=>e.sec==s&&e.roll==r);
+ if(!x)return alert('Not found in the locked new-session register of Class '+c+'.');printHTML('Receipt',recHTML({...x,cls:c,y:D.session||2027,rec:recNo(c,s,r)}))}
 
-        if(role === "admin") {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.user-only').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'block');
-            document.body.setAttribute('data-view', 'cert');
-        } else if(role === "user") {
-            document.querySelectorAll('.user-only').forEach(el => el.style.display = 'block');
-            document.body.setAttribute('data-view', 'cert');
-        } else if(role === "teacher") {
-            document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'block');
-            document.getElementById('teacherClassInfo').innerText = `[ Allotted: Class ${currentUserClass} - Sec ${currentUserSec} ]`;
-            document.body.setAttribute('data-view', 'marks');
-            buildMarksTable(); 
-        }
-    }
-
-    function logout() {
-        currentUserRole = null;
-        document.getElementById('gatekeeper').style.display = 'flex';
-        toggleAuthView('authMenu');
-    }
-
-    // =========================================================
-    // 3. SIDEBAR NAVIGATION CONTROLLER
-    // =========================================================
-    document.querySelectorAll('.tf-side button[data-v]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tf-side button').forEach(b => b.classList.remove('on'));
-            btn.classList.add('on');
-            document.body.setAttribute('data-view', btn.getAttribute('data-v'));
-        });
-    });
-
-    // =========================================================
-    // 4. TEACHER MARKS LOGIC
-    // =========================================================
-    function buildMarksTable() {
-        const container = document.getElementById('marksTableContainer');
-        let html = '<table class="marks-table"><tr><th>Roll</th><th>Name</th><th>Caste</th><th>Medium</th><th>% Marks</th></tr>';
-        
-        // Filter DB for teacher's class and sec
-        const students = STUDENT_DB.filter(s => s.cls === currentUserClass && s.sec === currentUserSec);
-        
-        students.forEach(s => {
-            html += `<tr>
-                <td>${s.roll}</td>
-                <td>${s.name}</td>
-                <td>${s.caste}</td>
-                <td>${s.medium || 'Bengali'}</td>
-                <td><input type="number" class="student-mark-input" data-roll="${s.roll}" min="0" max="100" placeholder="%"></td>
-            </tr>`;
-        });
-        html += '</table>';
-        container.innerHTML = html;
-    }
-
-    function saveMarks(isFinal) {
-        if(isFinal && !confirm("Are you sure you want to Finalize and Lock? You cannot edit marks after this.")) return;
-        
-        const inputs = document.querySelectorAll('.student-mark-input');
-        if(isFinal) {
-            document.getElementById('btnSaveDraft').style.display = 'none';
-            document.getElementById('btnFinalLock').style.display = 'none';
-            document.getElementById('lockStatusMsg').style.display = 'block';
-            inputs.forEach(inp => inp.disabled = true);
-            alert("Marks have been securely locked.");
-        } else {
-            alert("Draft saved successfully.");
-        }
-    }
-
-    // =========================================================
-    // 5. ADMIN PROMOTION ALGORITHM
-    // =========================================================
-    function executePromotionAlgorithm() {
-        const cls = document.getElementById('promoteClassSelect').value;
-        const secsInput = document.getElementById('targetSections').value.split(',').map(s => s.trim());
-        
-        const allStudents = STUDENT_DB.filter(s => s.cls === cls);
-        allStudents.forEach(s => s.percentage = Math.floor(Math.random() * 100)); // Mock Marks
-        
-        allStudents.sort((a, b) => b.percentage - a.percentage);
-
-        const passList = allStudents.filter(s => s.percentage >= 30);
-        
-        // Split Mediums
-        const santaliStudents = passList.filter(s => s.medium === 'Santali' || s.caste === 'ST'); // Mocking criteria
-        const bengaliStudents = passList.filter(s => s.medium !== 'Santali' && s.caste !== 'ST');
-
-        const santaliSec = secsInput[secsInput.length - 1]; // Last section is Santali
-        const bengaliSecs = secsInput.slice(0, secsInput.length - 1); 
-
-        let rollCounters = {};
-        secsInput.forEach(sec => rollCounters[sec] = 1);
-        
-        let promotedList = [];
-
-        // Distribute Santali
-        santaliStudents.forEach(s => {
-            promotedList.push({ name: s.name, sec: santaliSec, roll: rollCounters[santaliSec]++ });
-        });
-
-        // Distribute Bengali alternating
-        bengaliStudents.forEach((s, i) => {
-            const tSec = bengaliSecs[i % bengaliSecs.length];
-            promotedList.push({ name: s.name, sec: tSec, roll: rollCounters[tSec]++ });
-        });
-
-        console.log("Promoted Merit List:", promotedList);
-        console.log("Next Available Rolls for Admissions:", rollCounters);
-
-        document.getElementById('promotionResults').style.display = 'block';
-    }
-
-    // =========================================================
-    // 6. CERTIFICATE LOOKUP (Original Logic Adaptation)
+// 6. CERTIFICATE LOOKUP (Original Logic Adaptation)
     // =========================================================
     function lookupStudent() {
         const c = document.getElementById('class').value;
