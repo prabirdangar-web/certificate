@@ -1,14 +1,14 @@
 {
   "id": "./index.html",
-  "name": "Pension Application & Certificate Generator",
-  "short_name": "Certificates",
-  "description": "TFHS Official Certificate System - pension application and certificate generator",
+  "name": "TFHS Smart School Portal",
+  "short_name": "TFHS Portal",
+  "description": "Taldangra Fulmati High School - Smart School Portal",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#fdfcf9",
-  "theme_color": "#1b3a5c",
+  "orientation": "any",
+  "background_color": "#ecefe6",
+  "theme_color": "#145828",
   "icons": [
     {
       "src": "icons/icon-192.png",

@@ -1,6 +1,6 @@
 // Service worker: network-first for the app page so updates always show up,
 // cached copy used when offline. Cross-origin requests (Firebase etc.) are never touched.
-const CACHE = 'certificate-v1';
+const CACHE = 'tfhs-portal-v1';
 const SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
