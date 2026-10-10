@@ -3034,7 +3034,7 @@ html.join-mode #joinView{display:block;max-width:560px;margin:0 auto;padding:16p
   <div id="auTbl" class="am-box" style="max-height:340px"></div>
   <div id="auPrev" class="am-box" style="max-height:420px;margin-top:10px"></div>
  </div>
- <div class="dv-c"><h3>📋 All class-sections — session status</h3><div id="pmSheets" class="am-box"></div></div>
+ <div class="dv-c"><h3>📋 All class-sections — session status</h3><div class="am-row"><button class="dv-b red" type="button" onclick="PROMO.delDrafts()" title="Admin only: remove every DRAFT sheet of the selected year">🗑 Delete all DRAFT sheets (admin)</button></div><div id="pmSheets" class="am-box"></div></div>
  <div class="dv-c" id="pmAdmin" style="display:none;border-top:5px solid #9b5de5">
   <h3>👩‍🏫 Class-teacher logins <small style="color:#555">(admin only)</small></h3>
   <p class="am-msg" style="margin:0 0 8px;color:#333">Create a one-time link for a class-section and share it. The teacher opens it, enters name, e-mail and a password of their own, and gets access to <b>only that class-section</b>. Each link works once.</p>
@@ -3330,6 +3330,24 @@ const PROMO=(function(){
    if(cur&&cur.key===key)await load(true);else await refreshSheets();msg('Unlocked. The sheet is a draft again.')}
   catch(e){msg('Unlock failed: '+(e.code||e.message),true)}}
 
+ /* ---------- delete draft sheets (admin only) ---------- */
+ const WARN='\n\nOnly the sheet entry is removed. Students already placed in the new class are NOT removed — use Admission → “↩ Revert promotion (admin)” for those.';
+ async function delSheet(id){
+  if(!need())return;await roleP;if(!isAdmin()){msg('Only admin can delete a sheet.',true);alert('Only an ADMIN login can delete a sheet.');return}
+  const sh=sheets.find(x=>x._id===id);if(!sh)return;
+  if(sh.status==='final'){msg('This sheet is FINAL (locked) — press 🔓 Unlock first, then delete.',true);return}
+  if(!confirm('Delete the DRAFT sheet of class '+label(sh.cls,sh.sec)+' ('+(sh.count||(sh.rows||[]).length)+' students)?'+WARN))return;
+  try{await db.collection('admAlloc').doc(id).delete();if(cur&&cur.key===id){cur=null;sheet=null;rows=[]}await refreshSheets();msg('Sheet '+label(sh.cls,sh.sec)+' deleted ✔')}
+  catch(e){msg('Delete failed: '+(e.code||e.message),true)}}
+ async function delDrafts(){
+  if(!need())return;await roleP;if(!isAdmin()){msg('Only admin can delete sheets.',true);alert('Only an ADMIN login can delete sheets.');return}
+  await refreshSheets();const d=sheets.filter(x=>x.status!=='final');
+  if(!d.length){msg('No DRAFT sheet to delete (FINAL sheets must be unlocked first).',true);return}
+  if(!confirm('Delete ALL '+d.length+' DRAFT sheet(s) of this year ('+d.map(x=>label(x.cls,x.sec)).join(', ')+')?'+WARN))return;
+  try{for(let i=0;i<d.length;i+=400){const b=db.batch();d.slice(i,i+400).forEach(x=>b.delete(db.collection('admAlloc').doc(x._id)));await b.commit()}
+   if(cur&&d.some(x=>x._id===cur.key)){cur=null;sheet=null;rows=[]}await refreshSheets();msg(d.length+' draft sheet(s) deleted ✔')}
+  catch(e){msg('Delete failed: '+(e.code||e.message),true)}}
+
  /* ---------- overview of all sheets ---------- */
  async function refreshSheets(){
   if(!(db&&auth&&auth.currentUser))return;const y=+$('pmYear').value;
@@ -3341,7 +3359,7 @@ const PROMO=(function(){
   $('pmSheets').innerHTML=list.length?'<table class="am-t"><tr><th>Class-Sec</th><th>Status</th><th>Students</th><th>Last saved by</th><th>Locked by</th><th></th></tr>'+list.map(x=>
    '<tr><td><b>'+esc(label(x.cls,x.sec))+'</b></td><td><span class="pm-b '+(x.status==='final'?'pm-f':'pm-d')+'">'+(x.status==='final'?'🔒 FINAL':'DRAFT')+'</span></td><td>'+(x.count||(x.rows||[]).length)+'</td><td class="l">'+esc(x.by||'')+'<br><small>'+esc(w(x.ts))+'</small></td><td class="l">'+esc(x.finalBy||'')+'</td><td>'+
    (canEdit(x.cls,x.sec)||isAdmin()?'<button class="dv-b g" onclick="PROMO.open(\''+esc(x._id)+'\')">Open</button> ':'')+
-   (x.status==='final'&&isAdmin()?'<button class="dv-b red" onclick="PROMO.unlock(\''+esc(x._id)+'\')">🔓 Unlock</button>':'')+'</td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No sheet started for this session yet.</p>'}
+   (x.status==='final'&&isAdmin()?'<button class="dv-b red" onclick="PROMO.unlock(\''+esc(x._id)+'\')">🔓 Unlock</button>':'')+(x.status!=='final'&&isAdmin()?' <button class="dv-b red" onclick="PROMO.delSheet(\''+esc(x._id)+'\')">🗑 Delete</button>':'')+'</td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No sheet started for this session yet.</p>'}
  function open(id){const x=sheets.find(s=>s._id===id);if(!x)return;$('pmYear').value=String(x.year);$('pmCls').value=x.cls;$('pmSec').value=x.sec||'';load()}
 
  /* ---------- print ---------- */
@@ -3473,7 +3491,7 @@ const PROMO=(function(){
  $('pmYear').addEventListener('change',()=>{refreshSheets();loadAdmin()});
  const nb=document.querySelector('.tf-side button[data-v=prom]');if(nb)nb.addEventListener('click',enter);
  if(auth)auth.onAuthStateChanged(u=>{cur=null;sheet=null;rows=[];$('pmSheetCard').style.display='none';$('pmBadge').innerHTML='';$('pmCur').textContent='';roleP=loadRole(u)});
- return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,isAdmin}
+ return{auLoad,auPreview,auSave,auPrint,auApply,_au,_m,load,draw,_o,_r,selAll,autoRoll,saveDraft,finalize,unlock,delSheet,delDrafts,printList,open,mkInvite,copy,loadAdmin,delInvite,toggleT,isAdmin}
 })();
 </script>
 
