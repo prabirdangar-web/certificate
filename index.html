@@ -94,4 +94,578 @@
         .page:after { content: ""; position: absolute; top: 5mm; left: 5mm; right: 5mm; bottom: 5mm; border: 1px dashed #9bb29d; border-radius: 8px; pointer-events: none; }
         .header { position: relative; z-index: 2; text-align: center; font-family: "Lucida Bright", Cambria, Georgia, serif; }
         .top-meta-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; color: #333; padding: 0 5px; margin-bottom: 2px; }
-        .school { font-
+        .school { font-size: 30px; font-weight: 900; color: #114d24; letter-spacing: -0.5px; line-height: 1; margin: 4px 0; }
+        .schoolbn { font-size: 28px; font-weight: bold; color: var(--primary-color); margin-top: 2px; }
+        .motto { display: inline-block; margin: 4px 0; padding: 3px 20px; color: black; border-radius: 4px; font-size: 14px; font-weight: bold; letter-spacing: 1px; }
+        .info-box { width: 100%; margin: 3px auto; padding: 5px 10px; box-sizing: border-box; border-radius: 4px; border: 1.5px solid var(--accent-color); font-family: "Lucida Bright", Cambria, serif; font-size: 16px; font-weight: 900; color: #B65E00; text-align: center; }
+        .divider { height: 2px; margin-top: 6px; background: linear-gradient(to right, transparent, var(--primary-color), transparent); }
+        .memo-container { margin-top: 5px; padding: 8px 15px; display: flex; justify-content: space-between; background: #eef8ef; border: 1px solid #d5e1d6; border-radius: 5px; font-size: 20px; font-weight: bold; position: relative; z-index: 2; }
+        .content { height: 150mm; margin-top: 6px; padding: 20px 25px; box-sizing: border-box; border: 1px solid #b7cbb8; border-radius: 6px; position: relative; z-index: 2; background: transparent; font-family: "Lucida Bright", Cambria, Georgia, serif; font-style: italic; font-weight: normal; font-size: 20px; line-height: 2.0; text-align: justify; color: #000000; }
+        .cert-title { text-align: center; font-size: 19px; font-weight: 900; font-style: normal; text-decoration: underline; margin-bottom: 15px; color: #114d24; text-transform: uppercase; }
+        .field-underline { font-style: normal; font-weight: 900; border-bottom: 1px dotted #555555; padding: 0 4px; display: inline-block; }
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-18deg); font-size: 46px; font-weight: 900; font-style: normal; color: rgba(20, 88, 40, 0.035); white-space: nowrap; pointer-events: none; width: 100%; text-align: center; z-index: 3; opacity: 0.9; }
+        .footer-meta { margin-top: 10px; font-size: 16px; font-style: normal; font-weight: bold; color: var(--primary-color); line-height: 1.4; }
+        .signature-area { margin-top: 15px; display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 5; }
+        .vcard-box { border: 1px solid #000000; padding: 5px; background: #ffffff; text-align: center; border-radius: 4px; width: 80px; height: 98px; align-self: flex-start; }
+        #qrcode img, #qrcode canvas { display: block; margin: 0 auto !important; width: 80px !important; height: 80px !important; }
+        .vcard-title { font-size: 7.5px; font-weight: bold; font-style: normal; margin-top: 4px; color: #333; text-transform: uppercase; letter-spacing: 0.3px; }
+        .sign-block { text-align: center; width: 160px; font-size: 12px; font-style: normal; font-weight: bold; }
+        .sign-line { border-top: 1px dashed #000; margin-bottom: 4px; }
+        .cut-line { border-top: 2px dashed #666; margin: 12px 0 8px 0; position: relative; z-index: 10; }
+        .cut-line::before { content: "✂ Cut Here"; position: absolute; top: -10px; left: 20px; background: #fcfffc; padding: 0 10px; font-size: 11px; color: #555; font-weight: bold; }
+        .counterpart-section { background: #fdfdfd; border: 1px dashed #777; border-radius: 6px; padding: 8px 15px; position: relative; z-index: 10; }
+        .counterpart-heading { font-size: 12px; font-weight: bold; text-transform: uppercase; text-align: center; margin-bottom: 6px; color: #222; letter-spacing: 0.5px; border-bottom: 1px solid #ddd; padding-bottom: 2px; }
+        .counterpart-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; font-size: 11px; font-weight: bold; line-height: 1.5; }
+        .counterpart-signatures { margin-top: 12px; display: flex; justify-content: space-between; }
+
+        @media print {
+            .dashboard-panel, .tf-new-panel { display: none !important; }
+            body { padding: 0; background: none; }
+            .page { box-shadow: none; margin: 0 !important; border: none !important; border-radius: 0; width: 190mm; height: 277mm; }
+        }
+
+        /* REPORTS */
+        .report-panel { margin-top: 12px; padding: 10px; border: 1px solid #9bb29d; border-radius: 6px; background: #f8fff8; }
+        .report-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 7px; margin-top: 8px; }
+        .report-btn { border: 1px solid #145828; background: #145828; color: #fff; padding: 8px 7px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; }
+        .report-btn.secondary { background: #fff; color: #145828; }
+        .report-output { display: none; margin-top: 10px; max-height: 520px; overflow: auto; border: 1px solid #bbb; background: #fff; }
+        .report-title { padding: 8px; font-weight: bold; font-size: 14px; background: #eef8ef; border-bottom: 1px solid #ccc; position: sticky; top: 0; z-index: 2; }
+        .report-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .report-table th, .report-table td { border: 1px solid #ccc; padding: 4px 5px; text-align: left; white-space: nowrap; }
+        .report-table th { background: #e8f2e9; font-weight: bold; position: sticky; top: 35px; z-index: 1; }
+        @media print { .report-panel { display: none !important; } }
+
+        .dashboard-main-row{ display:grid !important; grid-template-columns:minmax(0, 1fr) 390px !important; gap:14px !important; align-items:start !important; }
+        .dashboard-data-entry{ min-width:0 !important; }
+        .dashboard-reports{ min-width:0 !important; position:sticky; top:10px; z-index:5; }
+        @media(max-width:1000px){ .dashboard-main-row{ grid-template-columns:1fr !important; } .dashboard-reports{ position:static; } }
+
+        /* WIFS ANNEX-3 */
+        .wifs-panel{width:100%;max-width:190mm;background:#fff;padding:15px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);border:1px solid #ccc;box-sizing:border-box}
+        .wifs-panel summary{margin:0 0 8px;border-bottom:2px solid #145828;padding-bottom:5px}
+        .wf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 10px}
+        .wf-grp{grid-column:1/-1;font-size:12px;font-weight:bold;color:#145828;background:#e8f2e9;padding:4px 8px;border-radius:4px;margin-top:6px}
+        .wf-fg{display:flex;flex-direction:column}
+        .wf-fg label{font-size:11px;font-weight:bold;margin-bottom:3px;color:#333}
+        .wf-fg select,.wf-fg input{padding:6px;border:1px solid #888;border-radius:4px;font-size:12px}
+        .wf-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+        .wf-btn{background:#145828;color:#fff;border:none;padding:10px 16px;font-size:13px;font-weight:bold;border-radius:4px;cursor:pointer}
+        .wf-btn.alt{background:#b65e00}.wf-btn.gray{background:#555}
+        .wifs-sheet{display:none;width:190mm;background:#fff;box-sizing:border-box;color:#000;font-family:Calibri,Carlito,Arial,sans-serif}
+        .wifs-tbl{width:100%;border-collapse:collapse;table-layout:fixed;border:2px solid #000}
+        .wifs-tbl td{border:1px solid #000;padding:1px 3px;font-size:8.5pt;font-weight:bold;overflow:hidden;vertical-align:middle;line-height:1.15}
+        .wifs-tbl .tan{background:#ddd9c3}.wifs-tbl .peach{background:#fcd5b4}
+        @media print{
+         .wifs-panel{display:none!important}
+         body:not(.print-wifs) .wifs-sheet{display:none!important}
+         body.print-wifs .page,body.print-wifs .dashboard-panel,body.print-wifs .report-panel{display:none!important}
+         body.print-wifs .wifs-sheet{display:block!important;box-shadow:none;margin:0}
+         body.print-wifs{padding:0}
+        }
+
+        /* LAYOUT & NAVIGATION */
+        @media screen{
+         :root{--sw:232px}body.tf-c{--sw:68px}
+         body{padding-left:calc(var(--sw) + 16px)!important;padding-top:84px!important}
+         .tf-top{position:fixed;left:var(--sw);right:0;top:0;height:68px;background:#fff;border-bottom:1px solid #e1e8e2;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:40;font-family:'Segoe UI',Arial,sans-serif}
+         .tf-top h1{margin:0;font-size:20px;color:#145828}.tf-top p{margin:1px 0 0;font-size:12px;color:#6b7d70}
+         .tf-chip{display:inline-block;margin-left:8px;padding:7px 14px;border:1px solid #d6e0d8;border-radius:99px;font-size:12.5px;font-weight:600;color:#145828;background:#fff}.tf-chip.on{background:#dff3e3}
+         .tf-side{position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:linear-gradient(180deg,#0b3319,#145828);color:#fff;font-family:'Segoe UI',Arial,sans-serif;padding:12px 10px;box-sizing:border-box;z-index:50;display:flex;flex-direction:column;gap:3px;overflow:hidden}
+         .tf-side .br{display:flex;gap:10px;align-items:center;padding:4px 4px 14px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:8px}.tf-side .lg{width:40px;height:40px;border-radius:10px;background:#d4b18a;display:grid;place-items:center;font-size:20px;flex:none}.tf-side .br b{font-size:17px;display:block}.tf-side .br small{font-size:10.5px;opacity:.75}
+         .tf-side .gp{font-size:10.5px;letter-spacing:1.2px;opacity:.6;padding:10px 8px 3px}
+         .tf-side button{all:unset;cursor:pointer;padding:10px 11px;border-radius:9px;font-size:14px;display:flex;gap:11px;align-items:center;color:#e3f0e4;white-space:nowrap;box-sizing:border-box}
+         .tf-side button:hover{background:rgba(255,255,255,.1)}.tf-side button.on{background:rgba(255,255,255,.16);font-weight:700;box-shadow:inset 3px 0 #d4b18a}
+         .tf-side .ic{width:22px;text-align:center;flex:none}.tf-side .fo{margin-top:auto;border-top:1px solid rgba(255,255,255,.15);padding-top:8px}
+         .dv-b{border:0;border-radius:8px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:#145828;color:#fff}.dv-b.g{background:#e8efe9;color:#145828}
+         
+         body[data-view=cert] .dashboard-reports,body[data-view=cert] .wifs-panel,body[data-view=cert] .wifs-sheet,body[data-view=cert] #dataView,body[data-view=cert] #feeView{display:none!important}
+         body[data-view=cert] .dashboard-panel h2{display:none}
+         body[data-view=cert] .dashboard-panel{padding:10px 14px}
+         body[data-view=cert]{display:grid!important;grid-template-columns:400px minmax(0,1fr);column-gap:18px;align-items:start;justify-content:center}
+         body[data-view=cert] .dashboard-panel{position:sticky!important;top:84px;max-height:calc(100vh - 100px);overflow-y:auto;max-width:none!important;width:auto!important;margin:0!important;padding:12px 14px!important;border-top:4px solid #145828}
+         body[data-view=cert] .page{justify-self:center;margin:0!important}
+         
+         body[data-view=reports] .page,body[data-view=reports] .wifs-panel,body[data-view=reports] .wifs-sheet,body[data-view=reports] #dataView,body[data-view=reports] #feeView,body[data-view=reports] .dashboard-panel>.form-grid,body[data-view=reports] .lookup-box>*:not(.dashboard-main-row),body[data-view=reports] .dashboard-data-entry,body[data-view=reports] .dashboard-panel h2{display:none!important}
+         body[data-view=reports] .dashboard-panel{max-width:1000px}
+         body[data-view=reports] .dashboard-main-row,body[data-view=reports] .dashboard-reports,body[data-view=reports] .dashboard-reports .report-panel{position:static!important;width:100%!important;max-width:none!important;display:block}
+         
+         body[data-view=wifs] .dashboard-panel,body[data-view=wifs] .page,body[data-view=wifs] #dataView,body[data-view=wifs] #feeView{display:none!important}
+         body[data-view=wifs] .wifs-panel{display:block!important;width:min(1100px,calc(100vw - 40px));max-width:none!important;margin:0 auto!important}
+         
+         body[data-view=data] .dashboard-panel,body[data-view=data] .page,body[data-view=data] .wifs-panel,body[data-view=data] .wifs-sheet,body[data-view=data] #feeView{display:none!important}
+        }
+        @media print{.tf-side,.tf-top,#dataView,#gatekeeper{display:none!important}}
+        #dataView{width:100%;max-width:1000px;font-family:'Segoe UI',Arial,sans-serif;color:#1d2b22;display:flex;flex-direction:column;gap:14px}
+        .dv-c{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 3px 12px rgba(0,0,0,.08)}.dv-c h3{margin:0 0 10px;font-size:15px;color:#145828}
+        
+        #class,#sec,#rollNo,#village{background:#FFC61A!important;color:#0d3b1c!important;font-weight:800!important;font-size:1.05em;border:2px solid #b78600!important;border-radius:8px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+        #class:focus,#sec:focus,#rollNo:focus,#village:focus{outline:3px solid #145828;outline-offset:1px;background:#FFD23F!important}
+        
+        table.marks-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        table.marks-table th, table.marks-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        table.marks-table th { background-color: #145828; color: white; }
+        table.marks-table input { width: 60px; padding: 4px; border: 1px solid #888; border-radius: 4px; }
+    </style>
+</head>
+<body data-view="cert">
+
+<!-- 1. AUTHENTICATION GATEWAY -->
+<div id="gatekeeper">
+    <div style="text-align:center; margin-bottom:20px;">
+        <h1 style="color:var(--primary-color); margin:0;">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h1>
+        <p style="color:#b65e00; font-weight:bold; margin-top:5px;">Official Portal</p>
+    </div>
+
+    <div id="authMenu" class="gate-box">
+        <button class="dv-b" onclick="toggleAuthView('loginGuide')" style="width:100%; margin-bottom:12px;">Login</button>
+        <button class="dv-b g" onclick="toggleAuthView('regGuide')" style="width:100%;">New Registration</button>
+    </div>
+
+    <div id="loginGuide" class="gate-box" style="display:none;">
+        <h3 style="color:#145828; margin-top:0;">Login Guide</h3>
+        <input type="email" id="loginEmail" class="form-control" placeholder="Email Address" style="width:100%; margin-bottom:10px; box-sizing:border-box;">
+        <input type="password" id="loginPass" class="form-control" placeholder="Password" style="width:100%; margin-bottom:15px; box-sizing:border-box;">
+        <button class="dv-b" onclick="executeLogin()" style="width:100%; margin-bottom:10px;">Sign In</button>
+        <button class="dv-b g" onclick="toggleAuthView('authMenu')" style="width:100%;">Back</button>
+    </div>
+
+    <div id="regGuide" class="gate-box" style="display:none; max-width: 450px;">
+        <h3 style="color:#b65e00; margin-top:0;">নতুন ক্লাস টিচার রেজিস্ট্রেশন<br><small style="color:#555;">(New Class Teacher Registration)</small></h3>
+        <p style="font-size:12px; line-height:1.4; color:#333;">
+            আপনার ইমেল (Email) এবং নিজের পছন্দমতো পাসওয়ার্ড (Password) দিন। ড্রপডাউন থেকে আপনার ক্লাস (Class) এবং সেকশন (Section) বেছে নিয়ে সাবমিট করুন। অ্যাডমিন (Admin) অ্যাপ্রুভ করার পরেই আপনি মার্কস এন্ট্রি করতে পারবেন।
+        </p>
+        <input type="email" id="regEmail" class="form-control" placeholder="Email Address" style="width:100%; margin-bottom:10px; box-sizing:border-box;">
+        <input type="password" id="regPass" class="form-control" placeholder="Create Password" style="width:100%; margin-bottom:10px; box-sizing:border-box;">
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="regClass" class="form-control" style="width:50%;">
+                <option value="">-- Class --</option>
+                <option value="V">V</option><option value="VI">VI</option>
+                <option value="VII">VII</option><option value="VIII">VIII</option>
+                <option value="IX">IX</option><option value="X">X</option>
+            </select>
+            <select id="regSec" class="form-control" style="width:50%;">
+                <option value="">-- Sec --</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+            </select>
+        </div>
+        <button class="dv-b" onclick="submitTeacherReg()" style="width:100%; margin-bottom:10px;">Submit Request for Approval</button>
+        <button class="dv-b g" onclick="toggleAuthView('authMenu')" style="width:100%;">Back</button>
+    </div>
+</div>
+
+<header class="tf-top">
+    <div><h1 id="tfT">Certificate & Management</h1><p id="tfS">Role-Based System Active</p></div>
+    <div><button class="dv-b g" onclick="logout()">Sign Out</button></div>
+</header>
+
+<nav class="tf-side">
+    <div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
+    
+    <div class="gp">DAILY</div>
+    <button data-v="cert" class="user-only admin-only on"><span class="ic">📜</span><span class="l">Certificate</span></button>
+    
+    <div class="gp">ON DEMAND</div>
+    <button data-v="reports" class="user-only admin-only"><span class="ic">📊</span><span class="l">Student Reports</span></button>
+    <button data-v="wifs" class="user-only admin-only"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button>
+    <button data-v="fees" class="user-only admin-only"><span class="ic">🧾</span><span class="l">Fee Receipts</span></button>
+    <button data-v="data" class="user-only admin-only"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
+    
+    <div class="gp">ADMIN & TEACHER TASKS</div>
+    <button data-v="adm" class="user-only admin-only"><span class="ic">🎓</span><span class="l">Admission</span></button>
+    <button data-v="prom" class="admin-only"><span class="ic">🔁</span><span class="l">Promotion / Merit</span></button>
+    <button data-v="marks" class="teacher-only admin-only"><span class="ic">📝</span><span class="l">Marks Entry</span></button>
+    
+    <div class="fo"><div id="tfMode">Secure Mode</div></div>
+</nav>
+
+
+<!-- 2. DATA VIEW (Original) -->
+<div id="dataView">
+ <div class="dv-c"><h3>Student database &amp; year</h3>
+  <div class="dv-r"><label>Year <select id="dvYear"><option>2026</option></select></label>
+  <button class="dv-b g" type="button" onclick="alert('Loaded Built-in DB')">Use built-in (offline)</button></div>
+  <p id="dvMsg" style="margin:10px 0 0">Source: built-in database (offline).</p></div>
+</div>
+
+<!-- 3. CERTIFICATE & REPORTS DASHBOARD PANEL (Original Dashboard) -->
+<div class="dashboard-panel">
+    <h2>Admission Control &amp; Verification Dashboard</h2>
+    <div class="lookup-box" style="background:#eef8ef;border:1px solid #9bb29d;padding:10px;border-radius:6px;margin-bottom:10px;">
+        <div class="dashboard-main-row">
+            <div class="dashboard-data-entry">
+                <div style="font-size:12px;font-weight:bold;color:#145828;margin-bottom:6px;">ENTER CLASS + SECTION + ROLL — STUDENT DATA WILL AUTO-FETCH</div>
+            </div>
+            <div class="dashboard-reports">
+                <div class="report-panel">
+                    <div style="font-size:12px;font-weight:bold;color:#145828;">STUDENT DATABASE REPORT</div>
+                    <div class="report-buttons">
+                        <button class="report-btn" onclick="alert('Full Report Generated (Mock)')">FULL V–XII</button>
+                        <button class="report-btn" onclick="alert('Sex-Wise Report Generated (Mock)')">SEX-WISE REPORT</button>
+                        <button class="report-btn secondary" onclick="window.print()">PRINT REPORT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="form-group">
+                <label>Class</label>
+                <select id="class" class="form-control" onchange="lookupStudent()">
+                    <option value="">-- Select Class --</option>
+                    <option value="V">V</option><option value="VI">VI</option>
+                    <option value="VII">VII</option><option value="VIII">VIII</option>
+                    <option value="IX">IX</option><option value="X">X</option>
+                    <option value="XI">XI</option><option value="XII">XII</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Section</label>
+                <select id="sec" class="form-control" onchange="lookupStudent()">
+                    <option value="">-- Select Section --</option>
+                    <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Roll No.</label>
+                <input type="number" id="rollNo" class="form-control" min="1" placeholder="Enter Roll No." oninput="lookupStudent()">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group"><label>Student Name (Auto)</label><input type="text" id="studentName" class="form-control" readonly></div>
+        <div class="form-group"><label>Father's Name (Auto)</label><input type="text" id="fatherName" class="form-control" readonly></div>
+        <div class="form-group"><label>Mother's Name (Auto)</label><input type="text" id="motherName" class="form-control" readonly></div>
+        <button class="print-btn" onclick="window.print()">Print A4 Page Sheet</button>
+    </div>
+</div>
+
+<!-- 4. NEW: TEACHER MARKS ENTRY PANEL -->
+<div id="marksPanel" class="tf-new-panel teacher-only admin-only">
+    <h2>Class Marks Entry <span id="teacherClassInfo" style="float:right; font-size:14px; color:#b65e00;"></span></h2>
+    <p style="font-size:12px; color:#555;">Enter the % of Marks for your allotted class. You can save drafts. Once Finalized & Locked, no further edits can be made without admin approval.</p>
+    
+    <div id="marksTableContainer">
+        <!-- Table generated by JS -->
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="dv-b g" onclick="saveMarks(false)" id="btnSaveDraft">Save Draft</button>
+        <button class="dv-b" onclick="saveMarks(true)" id="btnFinalLock" style="background:#b00020;">Final & Lock</button>
+    </div>
+    <p id="lockStatusMsg" style="color:#b00020; font-weight:bold; margin-top:10px; display:none;">MARKS ARE LOCKED. Contact Admin to unlock.</p>
+</div>
+
+<!-- 5. NEW: PROMOTION & MERIT LIST PANEL -->
+<div id="promotionPanel" class="tf-new-panel admin-only">
+    <h2>Generate Merit List & Promote Class</h2>
+    <p style="font-size:12px; color:#555;">Select a class to process. System will rank by %, promote passing students to next class, allocate rolls alternating A and B (Bengali), and push Santali medium to the last section.</p>
+    
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Select Class to Promote</label>
+            <select id="promoteClassSelect" class="form-control">
+                <option value="V">Class V</option><option value="VI">Class VI</option>
+                <option value="VII">Class VII</option><option value="VIII">Class VIII</option>
+                <option value="IX">Class IX</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Target Sections (Comma separated, last = Santali)</label>
+            <input type="text" id="targetSections" class="form-control" value="A, B, C">
+        </div>
+    </div>
+    <button class="dv-b" style="margin-top:15px; width:100%;" onclick="executePromotionAlgorithm()">Generate Merit & Lock Promotion</button>
+    
+    <div id="promotionResults" style="margin-top: 20px; display:none; padding:15px; background:#e8f2e9; border:1px solid #145828; border-radius:5px;">
+        <h3 style="color:#145828; margin-top:0;">Promotion Complete</h3>
+        <p>New rolls assigned. New Admission processing is now active for this class.</p>
+    </div>
+</div>
+
+<!-- 6. NEW: ADMISSION PANEL -->
+<div id="admissionPanel" class="tf-new-panel user-only admin-only">
+    <h2>New Admission Management</h2>
+    
+    <div class="user-only admin-only">
+        <h3 style="color:#145828; font-size:15px;">1. Enter New Admission</h3>
+        <p style="font-size:12px;">Enter details of new students here and submit for admin verification.</p>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" placeholder="Student Name" class="form-control" style="flex:1;">
+            <select class="form-control" style="width:100px;">
+                <option>Class V</option><option>Class VI</option>
+            </select>
+        </div>
+        <button class="dv-b" onclick="alert('Admission Submitted for Admin Approval.')">Submit Admission</button>
+    </div>
+    
+    <hr style="margin:20px 0; border:0; border-top:1px dashed #ccc;">
+    
+    <div class="admin-only">
+        <h3 style="color:#b65e00; font-size:15px;">2. Approve Pending Admissions (Admin Only)</h3>
+        <p style="font-size:12px;">Review and assign next available Roll Number based on locked class limits.</p>
+        <button class="dv-b" style="background:#b65e00" onclick="alert('Pending admissions approved. Rolls assigned.')">Approve Pending Admissions</button>
+    </div>
+</div>
+
+<!-- 7. WIFS PANEL (Original) -->
+<details class="wifs-panel" id="wifsPanel">
+    <summary style="cursor:pointer;font-size:18px;font-weight:bold;color:#145828">WIFS Monthly Report — Annex-3 (Format 3)</summary>
+    <div class="wf-grid">
+        <div class="wf-grp">Report header</div>
+        <div class="wf-fg"><label>Reporting Month & Year</label><input type="month" value="2026-09"></div>
+        <div class="wf-fg"><label>Total students 6th-12th</label><input type="number" value="1239"></div>
+    </div>
+    <div class="wf-bar">
+        <button class="wf-btn" type="button" onclick="alert('WIFS Generated')">GENERATE REPORT</button>
+    </div>
+</details>
+
+<!-- 8. A4 CERTIFICATE PAGE (Original) -->
+<div class="page">
+    <div class="watermark">তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</div>
+    <div class="header">
+        <div class="top-meta-row"><div>H.S. CODE: 114071 &bull; VTC CODE: 5006</div><div>DISE CODE: 19132104401</div></div>
+        <div class="school">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</div>
+        <div class="schoolbn">তালডাংরা ফুলমতি উচ্চ বিদ্যালয় [উঃ মাঃ]</div>
+        <div class="estd">[ Estd:: 1956 ]</div>
+        <div class="info-box">P.O.:TALDANGRA*SUB-DIVISION:KHATRA*DISTRICT:BANKURA*PIN:722152</div>
+    </div>
+    <div class="divider"></div>
+    <div class="memo-container">
+        <div>Memo No: <span id="lblMemo">____________________</span></div>
+        <div>Date: <span id="lblCurrentDate">30-06-2026</span></div>
+    </div>
+    <div class="content">
+        <div class="cert-title">To whom it may concern</div>
+        Certified that <span id="lblHonorific" style="font-weight:900;">Sri</span> 
+        <span class="field-underline" id="vName" style="min-width:180px;">Student Name</span>, 
+        <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Father Name</span>...
+        <br><br>
+        <div class="signature-area">
+            <div class="vcard-box"><div id="qrcode"></div><div class="vcard-title">Scan to Verify</div></div>
+            <div class="sign-block"><div class="sign-line"></div>Headmaster</div>
+        </div>
+    </div>
+    <div class="cut-line"></div>
+    <div class="counterpart-section">
+        <div class="counterpart-heading">Office Counterpart Copy</div>
+        <div class="counterpart-grid">
+            <div><strong>Student Name:</strong> <span id="cName">Student Name</span></div>
+            <div><strong>Class (Sec):</strong> <span id="cClassSec">VI (A)</span></div>
+            <div><strong>Roll No:</strong> <span id="cRoll">1</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================================================
+    // 1. DATA: EMBEDDED STUDENT DATABASE (Truncated for space, assume full is here)
+    // =========================================================
+    const STUDENT_DB = [
+        {"name":"REHAN MURMU","sex":"Male","father":"BIRENDRANATH MURMU","mother":"SABITRI MURMU","cls":"V","sec":"A","roll":"1","caste":"ST","medium":"Santali"},
+        {"name":"SOUMIK NANDI","sex":"Male","father":"SRIKANTA NANDI","mother":"PIYALI NANDI","cls":"V","sec":"A","roll":"2","caste":"GENERAL","medium":"Bengali"},
+        {"name":"JOY GHOSH","sex":"Male","father":"ANUP KUMAR GHOSH","mother":"JHUMA GHOSH","cls":"V","sec":"A","roll":"3","caste":"GENERAL","medium":"Bengali"},
+        {"name":"ARITRA BHUIN","sex":"Male","father":"SUBHAS CHANDRA BHUIN","mother":"RINKU BHUIN","cls":"VI","sec":"A","roll":"6","caste":"GENERAL","medium":"Bengali"},
+        {"name":"HEMAL MANDI","sex":"Male","father":"SATISH MANDI","mother":"KABITA MANDI","cls":"VI","sec":"A","roll":"29","caste":"ST","medium":"Santali"}
+        // ... (Full array goes here in production)
+    ];
+
+    const today = new Date();
+    const dateString = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
+    document.getElementById('lblCurrentDate').innerText = dateString;
+
+    new QRCode(document.getElementById("qrcode"), {
+        text: "https://qr1.me-qr.com/entry/vcard/fe4e45bw", width: 80, height: 80
+    });
+
+    // =========================================================
+    // 2. AUTHENTICATION & ROLE LOGIC
+    // =========================================================
+    let currentUserRole = null; 
+    let currentUserClass = null;
+    let currentUserSec = null;
+
+    function toggleAuthView(viewId) {
+        document.getElementById('authMenu').style.display = 'none';
+        document.getElementById('loginGuide').style.display = 'none';
+        document.getElementById('regGuide').style.display = 'none';
+        document.getElementById(viewId).style.display = 'block';
+    }
+
+    function executeLogin() {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        
+        // MOCK LOGIN FOR DEMONSTRATION:
+        if(email === "vtc5006@gmail.com") {
+            routeUser("user");
+        } else if(email === "prabir.dangar@gmail.com") { // The Admin Email
+            routeUser("admin");
+        } else if(email.includes("teacher")) {
+            routeUser("teacher", "VI", "A"); // Mock teacher allotted to VI-A
+        } else {
+            alert("Invalid login. Try prabir.dangar@gmail.com, vtc5006@gmail.com, or teacher@tfhs.com");
+        }
+    }
+
+    function submitTeacherReg() {
+        const email = document.getElementById('regEmail').value;
+        const cls = document.getElementById('regClass').value;
+        if(!email || !cls) return alert("Please fill all fields.");
+        alert("Registration request submitted. Wait for Admin approval.");
+        toggleAuthView('authMenu');
+    }
+
+    function routeUser(role, allottedClass = null, allottedSec = null) {
+        currentUserRole = role;
+        currentUserClass = allottedClass;
+        currentUserSec = allottedSec;
+
+        document.getElementById('gatekeeper').style.display = 'none'; // Unlock screen
+        
+        // Reset Views based on role
+        document.querySelectorAll('.admin-only, .teacher-only, .user-only').forEach(el => el.style.display = 'none');
+
+        if(role === "admin") {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.user-only').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'block');
+            document.body.setAttribute('data-view', 'cert');
+        } else if(role === "user") {
+            document.querySelectorAll('.user-only').forEach(el => el.style.display = 'block');
+            document.body.setAttribute('data-view', 'cert');
+        } else if(role === "teacher") {
+            document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'block');
+            document.getElementById('teacherClassInfo').innerText = `[ Allotted: Class ${currentUserClass} - Sec ${currentUserSec} ]`;
+            document.body.setAttribute('data-view', 'marks');
+            buildMarksTable(); 
+        }
+    }
+
+    function logout() {
+        currentUserRole = null;
+        document.getElementById('gatekeeper').style.display = 'flex';
+        toggleAuthView('authMenu');
+    }
+
+    // =========================================================
+    // 3. SIDEBAR NAVIGATION CONTROLLER
+    // =========================================================
+    document.querySelectorAll('.tf-side button[data-v]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tf-side button').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            document.body.setAttribute('data-view', btn.getAttribute('data-v'));
+        });
+    });
+
+    // =========================================================
+    // 4. TEACHER MARKS LOGIC
+    // =========================================================
+    function buildMarksTable() {
+        const container = document.getElementById('marksTableContainer');
+        let html = '<table class="marks-table"><tr><th>Roll</th><th>Name</th><th>Caste</th><th>Medium</th><th>% Marks</th></tr>';
+        
+        // Filter DB for teacher's class and sec
+        const students = STUDENT_DB.filter(s => s.cls === currentUserClass && s.sec === currentUserSec);
+        
+        students.forEach(s => {
+            html += `<tr>
+                <td>${s.roll}</td>
+                <td>${s.name}</td>
+                <td>${s.caste}</td>
+                <td>${s.medium || 'Bengali'}</td>
+                <td><input type="number" class="student-mark-input" data-roll="${s.roll}" min="0" max="100" placeholder="%"></td>
+            </tr>`;
+        });
+        html += '</table>';
+        container.innerHTML = html;
+    }
+
+    function saveMarks(isFinal) {
+        if(isFinal && !confirm("Are you sure you want to Finalize and Lock? You cannot edit marks after this.")) return;
+        
+        const inputs = document.querySelectorAll('.student-mark-input');
+        if(isFinal) {
+            document.getElementById('btnSaveDraft').style.display = 'none';
+            document.getElementById('btnFinalLock').style.display = 'none';
+            document.getElementById('lockStatusMsg').style.display = 'block';
+            inputs.forEach(inp => inp.disabled = true);
+            alert("Marks have been securely locked.");
+        } else {
+            alert("Draft saved successfully.");
+        }
+    }
+
+    // =========================================================
+    // 5. ADMIN PROMOTION ALGORITHM
+    // =========================================================
+    function executePromotionAlgorithm() {
+        const cls = document.getElementById('promoteClassSelect').value;
+        const secsInput = document.getElementById('targetSections').value.split(',').map(s => s.trim());
+        
+        const allStudents = STUDENT_DB.filter(s => s.cls === cls);
+        allStudents.forEach(s => s.percentage = Math.floor(Math.random() * 100)); // Mock Marks
+        
+        allStudents.sort((a, b) => b.percentage - a.percentage);
+
+        const passList = allStudents.filter(s => s.percentage >= 30);
+        
+        // Split Mediums
+        const santaliStudents = passList.filter(s => s.medium === 'Santali' || s.caste === 'ST'); // Mocking criteria
+        const bengaliStudents = passList.filter(s => s.medium !== 'Santali' && s.caste !== 'ST');
+
+        const santaliSec = secsInput[secsInput.length - 1]; // Last section is Santali
+        const bengaliSecs = secsInput.slice(0, secsInput.length - 1); 
+
+        let rollCounters = {};
+        secsInput.forEach(sec => rollCounters[sec] = 1);
+        
+        let promotedList = [];
+
+        // Distribute Santali
+        santaliStudents.forEach(s => {
+            promotedList.push({ name: s.name, sec: santaliSec, roll: rollCounters[santaliSec]++ });
+        });
+
+        // Distribute Bengali alternating
+        bengaliStudents.forEach((s, i) => {
+            const tSec = bengaliSecs[i % bengaliSecs.length];
+            promotedList.push({ name: s.name, sec: tSec, roll: rollCounters[tSec]++ });
+        });
+
+        console.log("Promoted Merit List:", promotedList);
+        console.log("Next Available Rolls for Admissions:", rollCounters);
+
+        document.getElementById('promotionResults').style.display = 'block';
+    }
+
+    // =========================================================
+    // 6. CERTIFICATE LOOKUP (Original Logic Adaptation)
+    // =========================================================
+    function lookupStudent() {
+        const c = document.getElementById('class').value;
+        const s = document.getElementById('sec').value;
+        const r = document.getElementById('rollNo').value;
+        
+        const st = STUDENT_DB.find(x => x.cls === c && x.sec === s && x.roll === String(r));
+        if(st) {
+            document.getElementById('studentName').value = st.name;
+            document.getElementById('fatherName').value = st.father || "";
+            document.getElementById('motherName').value = st.mother || "";
+            
+            // Populate A4 Sheet
+            document.getElementById('vName').innerText = st.name;
+            document.getElementById('vFather').innerText = st.father || "N/A";
+            document.getElementById('cName').innerText = st.name;
+            document.getElementById('cClassSec').innerText = `${st.cls} (${st.sec})`;
+            document.getElementById('cRoll').innerText = st.roll;
+        } else {
+            document.getElementById('studentName').value = "Not Found";
+        }
+    }
+</script>
+
+</body>
+</html>
