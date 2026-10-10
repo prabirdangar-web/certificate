@@ -67,7 +67,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
 
  <div class="card"><h2><b>2</b> Student details <small style="font-weight:500;color:var(--mut)">(fields marked * are compulsory)</small></h2>
   <div class="grid">
-   <label class="full">Student's full name (as in birth certificate)<input id="name" class="key req" maxlength="80"></label>
+   <label class="full">Student's full name (as in Board certificate)<input id="name" class="key req" maxlength="80"></label>
    <label class="full">Name in Bengali <small>(optional)</small><input id="nameBn" maxlength="80"></label>
    <label>Sex<select id="sex" class="req"></select></label>
    <label>Date of birth<input id="dob" type="date" class="req"></label>
@@ -192,7 +192,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
    </div>
   </div>
   <p class="note">Bring these originals when called for verification:</p>
-  <ul class="docs"><li>Birth certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report, Madhyamik admit card &amp; mark-sheet</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
+  <ul class="docs"><li>Board certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report, Madhyamik admit card &amp; mark-sheet</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
   <label class="chk" style="margin-top:12px"><input type="checkbox" id="decl"> I declare that the information given above is true and complete. I understand that this is only an application: admission is confirmed only after verification by the school staff and approval by the Headmaster / Admin.</label>
   <input class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
   <button class="submit" id="btn" type="submit">Submit application</button>
@@ -590,6 +590,28 @@ $('f').addEventListener('submit',async ev=>{
   if(e.code==='permission-denied'){$('sikshaId').classList.add('bad');$('err').textContent='An application with Banglar Siksha Portal ID '+d.sikshaId+' has already been submitted for session '+SES+'. A duplicate application is not allowed.\nIf you think this is a mistake, please contact the school.'}
   else $('err').textContent='Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.'}
 });
+</script>
+<style>
+.fh{font-size:11px;font-weight:600;min-height:13px;color:#778}.fh.ok{color:#2b8a3e}.fh.no{color:#c92a2a}
+@media(max-width:600px){input,select,textarea{font-size:16px!important;padding:9px 10px}}
+</style>
+<script>
+/* digits-only + live counters (mobile 10, Portal ID 14, Aadhaar 12, PIN 6) and phone-safe village autofill */
+(function(){
+ var R={sikshaId:14,aadhaar:12,mobile:10,fatherMob:10,motherMob:10,whatsapp:10,pin:6};
+ Object.keys(R).forEach(function(id){
+  var el=document.getElementById(id);if(!el)return;
+  var h=document.createElement('span');h.className='fh';el.parentNode.appendChild(h);
+  function chk(){var c=el.value.replace(/\D/g,'').slice(0,R[id]);if(c!==el.value)el.value=c;
+   var n=c.length;h.textContent=n?(n===R[id]?'\u2714 valid':n+' / '+R[id]+' digits'):'';h.className='fh'+(n?(n===R[id]?' ok':' no'):'')}
+  el.addEventListener('input',chk);el.addEventListener('paste',function(){setTimeout(chk,0)});
+ });
+ var v=document.getElementById('village');
+ if(v){['blur','keyup','compositionend'].forEach(function(ev){v.addEventListener(ev,function(){v.dispatchEvent(new Event('input'))})});
+  v.setAttribute('autocapitalize','words');v.setAttribute('autocorrect','off');v.setAttribute('spellcheck','false')}
+ ['name','father','mother'].forEach(function(id){var e=document.getElementById(id);if(e){e.setAttribute('autocapitalize','characters');e.setAttribute('spellcheck','false');
+  e.addEventListener('blur',function(){e.value=e.value.replace(/\s+/g,' ').trim().toUpperCase()})}});
+})();
 </script>
 </body>
 </html>
