@@ -2684,9 +2684,9 @@ const ADM=(function(){
 
  /* ---------- ADMIN-ONLY profile editor (placed students + applications) ---------- */
  let EDIT=null;
- const SEL={sex:['Male','Female','Other'],caste:['GENERAL','OBC-A','OBC-B','SC','ST'],cls:CLS,sec:['','A','B','C'],stream:['Science','Arts','Vocational'],medium:['Bengali','Santali','English','Other'],disab:['No','Yes'],bpl:['No','Yes']};
+ const SEL={medium:['','Bengali','Santali'],sex:['Male','Female','Other'],caste:['GENERAL','OBC-A','OBC-B','SC','ST'],cls:CLS,sec:['','A','B','C'],stream:['Science','Arts','Vocational'],medium:['Bengali','Santali','English','Other'],disab:['No','Yes'],bpl:['No','Yes']};
  const DATEK={dob:1,tcDate:1,regDate:1};
- const CORE_G=['Register & placement','Student','Parents / guardian','Address','Previous school','Bank (scholarship)','Class','Parents / contact','Other fields'];
+ const CORE_G=['Register & placement','Student','Parents / guardian','Address','Previous school','Bank (scholarship)','Class','Class (current year)','Parents / contact','Other fields'];
  function fld(k,label,v){const id='ed_'+k;v=v==null?'':String(v);
   if(SEL[k]){const o=SEL[k].slice();if(v!==''&&o.indexOf(v)<0)o.push(v);return '<label>'+label+'<select id="'+id+'">'+o.map(x=>'<option value="'+esc(x)+'"'+(x===v?' selected':'')+'>'+(x===''?'—':esc(x))+'</option>').join('')+'</select></label>'}
   const iso=DATEK[k]&&(v===''||/^\d{4}-\d\d-\d\d$/.test(v));
@@ -2696,10 +2696,10 @@ const ADM=(function(){
   if(!isAdmin()){msg('Only admin can edit a student profile.',true,mid);alert('Only an ADMIN login can edit and save student profiles.');return}
   const rec=kind==='c'?pfRows[id]:(kind==='s'?placed.find(x=>x._id===id):A(id));if(!rec)return;
   let groups=[];
-  if(kind==='c'){const K=['name','sex','dob','caste','sikshaId','cls','sec','roll','father','mother','mobile'];
-   groups=[['Student',[['name','Name'],['sex','Sex'],['dob','Date of birth'],['caste','Category'],['sikshaId','Banglar Siksha Portal ID']]],['Class',[['cls','Class'],['sec','Section'],['roll','Roll no.']]],['Parents / contact',[['father','Father'],['mother','Mother'],['mobile','Mobile']]]];
+  if(kind==='c'){const K=['name','sex','dob','caste','medium','sikshaId','cls','sec','roll','father','mother','mobile'];
+   groups=[['Student',[['name','Name'],['sex','Sex'],['dob','Date of birth'],['caste','Category'],['medium','Medium'],['sikshaId','Banglar Siksha Portal ID']]],['Class (current year)',[['cls','Class'],['sec','Section'],['roll','Roll no.']]],['Parents / contact',[['father','Father'],['mother','Mother'],['mobile','Mobile']]]];
    const ex=Object.keys(rec).filter(k=>K.indexOf(k)<0&&k.charAt(0)!=='_');if(ex.length)groups.push(['Other fields',ex.map(k=>[k,k])])}
-  else{if(kind==='s')groups.push(['Register & placement',(rec.type==='new'?[['regNo','Register Sl. No.'],['regDate','Admission date']]:[]).concat([['cls','Class'],['sec','Section'],['roll','Roll no.']])]);
+  else{if(kind==='a')groups.push(['Register & placement',[['cls','Class'],['medium','Medium']]]);if(kind==='s')groups.push(['Register & placement',(rec.type==='new'?[['regNo','Register Sl. No.'],['regDate','Admission date']]:[]).concat([['cls','Class'],['sec','Section'],['roll','Roll no.'],['medium','Medium']])]);
    groups=groups.concat(GROUPS)}const used={},fields=[];let body='';
   groups.forEach(g=>{const fs=g[1].filter(f=>!used[f[0]]);if(!fs.length)return;
    if(CORE_G.indexOf(g[0])<0&&!fs.some(f=>rec[f[0]]!==undefined&&rec[f[0]]!==''))return;
@@ -2708,7 +2708,7 @@ const ADM=(function(){
   EDIT={kind,rec,fields,photo:''};const showPh=kind!=='c';
   let m=$('edModal');if(!m){m=document.createElement('div');m.id='edModal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto';document.body.appendChild(m)}
   m.style.display='flex';
-  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:900px;width:100%;padding:16px 20px;font-family:Segoe UI,Arial,sans-serif;color:#1d2b22"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:0;background:#fff;padding-bottom:8px;border-bottom:1px solid #ddd"><h2 style="margin:0;flex:1;font-size:17px">✎ Edit profile — '+esc(rec.name)+(rec.regNo?' · Reg. '+esc(regText(rec)):'')+'</h2><button class="dv-b" type="button" onclick="ADM.saveEdit()">💾 Save</button><button class="dv-b g" type="button" onclick="ADM.closeEdit()">Cancel</button></div><p id="edMsg" class="am-msg"></p>'+
+  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:900px;width:100%;padding:16px 20px;font-family:Segoe UI,Arial,sans-serif;color:#1d2b22"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:0;background:#fff;padding-bottom:8px;border-bottom:1px solid #ddd"><h2 style="margin:0;flex:1;font-size:17px">✎ Edit profile — '+esc(rec.name)+(rec.regNo?' · Reg. '+esc(regText(rec)):'')+' · '+esc(rec.year||TFDB.getYear())+' · '+esc(rec.cls||'')+(rec.sec?'-'+esc(rec.sec):'')+(rec.roll?' · Roll '+esc(rec.roll):'')+'</h2><button class="dv-b" type="button" onclick="ADM.saveEdit()">💾 Save</button><button class="dv-b g" type="button" onclick="ADM.closeEdit()">Cancel</button></div><p id="edMsg" class="am-msg"></p>'+
    ''+(showPh?'<div style="display:flex;gap:12px;align-items:center;margin:8px 0"><img id="edImg" src="'+(rec.photo||'')+'" style="width:70px;height:88px;object-fit:cover;border:1px solid #999;background:#f3f3f3"><label style="font-size:11px;font-weight:700">Replace photo <input type="file" id="edPh" accept="image/*"></label></div>':'')+body+'</div>';
   if($('edPh'))$('edPh').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,300/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);EDIT.photo=c.toDataURL('image/jpeg',.8);$('edImg').src=EDIT.photo};im.src=r.result};r.readAsDataURL(f)}}
  function closeEdit(){const m=$('edModal');if(m)m.style.display='none';EDIT=null}
