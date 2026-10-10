@@ -476,7 +476,7 @@ body[data-view=home] #homePanel,body[data-view=setup] #setupPanel{display:block}
     let ME={role:null,email:'',uid:'',cls:null,sec:null},D={},ref=null,unsub=null,fbOk=false,REG=false,PC='V';
 const ADMIN='prabir.dangar@gmail.com', USERM='vtc5006@gmail.com';
 // >>> PASTE your tfhs-portal web-app keys here (Firebase Console > Project settings > Your apps)
-const FIREBASE_CONFIG={apiKey:"PASTE_API_KEY",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",appId:"PASTE_APP_ID"};
+const FIREBASE_CONFIG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
 try{if(FIREBASE_CONFIG.apiKey.startsWith('PASTE'))throw 0;firebase.initializeApp(FIREBASE_CONFIG);fbOk=true;ref=firebase.firestore().collection('tfhs').doc('portal');}catch(e){}
 const CL=['V','VI','VII','VIII','IX','X','XI','XII'],C6=CL.slice(0,6),nxt=c=>CL[CL.indexOf(c)+1];
 const $=id=>document.getElementById(id),R={};
