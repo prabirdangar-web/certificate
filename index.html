@@ -1,24 +1,97 @@
-function executeLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const pass = document.getElementById('loginPass').value;
-        
-        // MOCK LOGIN FOR DEMONSTRATION:
-        if(email === "vtc5006@gmail.com") {
-            routeUser("user");
-        } else if(email === "prabir.dangar@gmail.com") { // Updated Admin Email
-            routeUser("admin");
-        } else if(email.includes("teacher")) {
-            routeUser("teacher", "VI", "A"); // Mock allotted class
-        } else {
-            alert("Invalid login. Try prabir.dangar@gmail.com, vtc5006@gmail.com, or teacher@tfhs.com");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script>if(/[?&]join=/.test(location.search))document.documentElement.className+=" join-mode"</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFHS Official Certificate System</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --dashboard-bg: #ecefe6;
+            --primary-color: #145828;
+            --accent-color: #d4b18a;
         }
 
-        /* REAL FIREBASE LOGIN (Uncomment and delete the mock above when Firebase is active):
-        auth.signInWithEmailAndPassword(email, pass).then(cred => {
-            db.collection("users").doc(cred.user.uid).get().then(doc => {
-                if(doc.data().status === "pending") return alert("Waiting for Admin Approval");
-                routeUser(doc.data().role, doc.data().allottedClass, doc.data().allottedSec);
-            });
-        }).catch(err => alert(err.message));
-        */
-    }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: var(--dashboard-bg);
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* GATEKEEPER UI (Blocks screen until login) */
+        #gatekeeper {
+            position: fixed; inset: 0; background: var(--dashboard-bg); 
+            z-index: 999999; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .gate-box {
+            background: #fff; padding: 25px; border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 380px;
+        }
+
+        /* ROLE-BASED VISIBILITY CLASSES */
+        .admin-only, .teacher-only, .user-only { display: none; }
+
+        /* NEW PANELS CSS */
+        .tf-new-panel {
+            width: 100%; max-width: 190mm; background: #ffffff; padding: 15px; 
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            border: 1px solid #ccc; box-sizing: border-box; display: none; margin-top: 15px;
+        }
+        .tf-new-panel h2 {
+            margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); 
+            padding-bottom: 5px; font-size: 18px;
+        }
+        
+        body[data-view=marks] #marksPanel { display: block; }
+        body[data-view=prom] #promotionPanel { display: block; }
+        body[data-view=adm] #admissionPanel { display: block; }
+        
+        /* Hide original elements when on new views */
+        body[data-view=marks] .dashboard-panel, body[data-view=marks] .page, body[data-view=marks] .wifs-panel, body[data-view=marks] #dataView, body[data-view=marks] .wifs-sheet,
+        body[data-view=prom] .dashboard-panel, body[data-view=prom] .page, body[data-view=prom] .wifs-panel, body[data-view=prom] #dataView, body[data-view=prom] .wifs-sheet,
+        body[data-view=adm] .dashboard-panel, body[data-view=adm] .page, body[data-view=adm] .wifs-panel, body[data-view=adm] #dataView, body[data-view=adm] .wifs-sheet {
+            display: none !important;
+        }
+
+        /* ORIGINAL CONTROL DASHBOARD PANEL */
+        .dashboard-panel {
+            width: 100%; max-width: 190mm; background: #ffffff; padding: 15px;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #ccc; box-sizing: border-box;
+        }
+
+        .dashboard-panel h2 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 5px; font-size: 18px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #333; }
+        .form-control { padding: 6px; border: 1px solid #888; border-radius: 4px; font-size: 12px; }
+        .auto-memo { background-color: #fffde6; font-weight: bold; color: #b65e00; }
+
+        .print-btn { grid-column: 1 / -1; background-color: var(--primary-color); color: white; border: none; padding: 10px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 5px; }
+
+        /* A4 SCHOOL CERTIFICATE DISPLAY */
+        .page {
+            width: 190mm; height: 272mm; background: #fcfffc; padding: 6mm 8mm; box-sizing: border-box; position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); page-break-after: always; page-break-inside: avoid;
+        }
+        .page:before { content: ""; position: absolute; top: 3mm; left: 3mm; right: 3mm; bottom: 3mm; border: 2.5px solid var(--primary-color); border-radius: 10px; pointer-events: none; }
+        .page:after { content: ""; position: absolute; top: 5mm; left: 5mm; right: 5mm; bottom: 5mm; border: 1px dashed #9bb29d; border-radius: 8px; pointer-events: none; }
+        .header { position: relative; z-index: 2; text-align: center; font-family: "Lucida Bright", Cambria, Georgia, serif; }
+        .top-meta-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; color: #333; padding: 0 5px; margin-bottom: 2px; }
+        .school { font-
