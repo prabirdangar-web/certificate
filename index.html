@@ -822,7 +822,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <!-- NEW PANELS -->
-<div id="homePanel" class="tf-new-panel"><div id="homeBody"></div></div>
+<div id="homePanel" class="tf-new-panel"><div id="homeBody"></div><div id="homeNewAdm"></div></div>
 <div id="setupPanel" class="tf-new-panel"><div id="setupBody"></div></div>
 
 <div id="marksPanel" class="tf-new-panel">
@@ -2289,6 +2289,15 @@ const ROLL=(function(){
 .am-t td{padding:3px 5px;border-bottom:1px solid #e6eee8;text-align:center}.am-t td.l{text-align:left}
 .am-t input[type=text],.am-t input[type=number],.am-t select{width:62px;padding:4px;border:2px solid #b78600;background:#FFF3C4;border-radius:6px;font-weight:800;color:#0d3b1c;text-align:center}
 .am-box{max-height:420px;overflow:auto;border:1px solid #e0e8e2;border-radius:8px;margin-top:8px}
+.na-uonly{display:none!important}
+#naCard.na-home .na-uonly{display:flex!important}
+#naCard.na-home #naRollL{display:none}
+#naCard.na-home{border-top:5px solid #145828;padding:18px 20px}
+#naCard.na-home h3{font-size:20px;margin:0 0 14px}
+#naCard.na-home .am-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px 20px}
+#naCard.na-home .am-grid label{font-size:15px;gap:6px}
+#naCard.na-home .am-grid input:not([type=checkbox]),#naCard.na-home .am-grid select{font-size:18px;padding:14px 14px;min-height:54px;border-radius:12px}
+#naCard.na-home .dv-b{font-size:19px;padding:16px 30px;border-radius:12px}
 .am-yel{background:#FFC61A!important;color:#0d3b1c!important;font-weight:800!important;border:2px solid #b78600!important}
 .am-ok{background:#e6f4ea;border-left:4px solid #145828;padding:8px 12px;border-radius:6px;margin-top:8px;font-size:13px}
 .am-chk{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#b00020;background:#fff0f0;border:1px dashed #b00020;border-radius:8px;padding:6px 9px;cursor:pointer}
@@ -2381,13 +2390,13 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
   <div id="amProm" class="am-box" style="display:none"></div>
   <p id="amPMsg" class="am-msg"></p><p id="amTrialInfo" class="am-msg bad"></p>
  </div>
- <div class="dv-c"><h3>2 · New admission — one by one (roll no. &amp; register Sl. No. are automatic · admin only)</h3>
+ <div id="naSlot" style="display:none"></div><div class="dv-c" id="naCard"><h3 id="naTitle">2 · New admission — one by one (roll no. &amp; register Sl. No. are automatic · admin only)</h3>
   <div class="am-grid">
    <label>Student name <input id="naName" class="am-yel" autocomplete="off"></label>
    <label>Sex <select id="naSex"><option>Male</option><option>Female</option></select></label>
    <label>Admit to class <select id="naCls" class="am-yel" onchange="ADM.preview()"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
    <label>Section <select id="naSec" class="am-yel" onchange="ADM.preview()"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
-   <label>Roll no. (auto) <input id="naRoll" class="am-yel" readonly></label>
+   <label id="naRollL">Roll no. (auto) <input id="naRoll" class="am-yel" readonly></label>
    <label>Father's name <input id="naFat"></label>
    <label>Mother's name <input id="naMot"></label>
    <label>Date of birth <input id="naDob" type="date"></label>
@@ -2397,8 +2406,9 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
    <label>Village <input id="naVil" value="Taldangra"></label>
    <label>Admission fee <select id="naFee"><option value="reg">Regular fee</option><option value="free">FREE admission (fee waived)</option></select></label>
    <label>Free-admission reason (optional) <input id="naFeeWhy" placeholder="e.g. RTE / orphan / scholarship"></label>
+   <label class="na-uonly am-chk" style="flex-direction:row;align-items:center;gap:10px"><input type="checkbox" id="naVer" style="width:24px;height:24px;min-height:0"> Original documents checked (staff verification)</label>
   </div>
-  <div class="am-row"><button class="dv-b" type="button" onclick="ADM.addNew()">➕ Admit &amp; assign roll no.</button></div>
+  <div class="am-row"><button class="dv-b" id="naBtn" type="button" onclick="ADM.addNew()">➕ Admit &amp; assign roll no.</button></div>
   <div id="naLast"></div>
  </div>
  <div class="dv-c"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
@@ -2670,8 +2680,23 @@ const ADM=(function(){
    const full=Object.assign({},d,reg,{roll:String(r),ts:firebase.firestore.FieldValue.serverTimestamp()});
    tx.set(ref,full);tx.set(cref,{year:y,cls:c,sec:s,last:r});if(rref)tx.set(rref,{year:y,series,last:reg.regNo});
    return{id:ref.id,roll:r,reg}})}
+
+ /* User / staff login: enter the student; admin gives final approval, class, section, roll no. & register Sl. No. */
+ async function submitApp(){
+  const nm=(m,bad)=>{$('naLast').innerHTML='<div class="'+(bad?'am-msg bad':'am-ok')+'" style="font-size:16px;padding:10px 0">'+m+'</div>'};
+  if(!(db&&auth&&auth.currentUser)){nm('Sign in first.',true);return}
+  const name=up($('naName').value);if(!name){nm('Enter student name.',true);return}
+  const mob=$('naMob').value.trim();if(mob&&!/^\d{10}$/.test(mob)){nm('Mobile must be 10 digits.',true);return}
+  const ver=!!($('naVer')&&$('naVer').checked);
+  const ref='ST'+yr()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  const d={year:yr(),status:'pending',ref,name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,reqSec:$('naSec').value,dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),feeFree:$('naFee').value==='free',feeNote:$('naFeeWhy').value.trim(),source:'staff-entry',enteredBy:meMail(),ts:firebase.firestore.FieldValue.serverTimestamp()};
+  try{const r=await db.collection('admApps').add(d);
+   if(ver)await db.collection('admApps').doc(r.id).update({staffOk:{by:meMail(),at:Date.now()},staffNote:'Documents checked (entered by staff)',status:'verified'});
+   ['naName','naFat','naMot','naDob','naMob','naSik','naFeeWhy'].forEach(i=>$(i).value='');if($('naVer'))$('naVer').checked=false;
+   nm('✔ <b>'+esc(name)+'</b> saved (Ref '+esc(ref)+') — '+(ver?'documents verified, ':'waiting for staff verification, ')+'sent to <b>Admin</b> for final approval. Class, section, roll no. and register Sl. No. are given by admin.')}
+  catch(e){nm('Failed: '+esc(e.code||e.message),true)}}
  async function addNew(){
-  if(!need())return;await roleP;if(!isAdmin()){msg('Only admin can admit a new student (class, section, roll no. and register Sl. No. are finalized by admin).',true);return}await refresh(true);
+  if(!need())return;await roleP;if(!isAdmin())return submitApp();await refresh(true);
   const name=up($('naName').value);if(!name){msg('Enter student name.',true);return}
   const mob=$('naMob').value.trim();if(mob&&!/^\d{10}$/.test(mob)){msg('Mobile must be 10 digits.',true);return}
   const d={year:yr(),type:'new',name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,sec:$('naSec').value,dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),feeFree:$('naFee').value==='free',feeNote:$('naFeeWhy').value.trim(),by:auth.currentUser.email};
@@ -2688,7 +2713,7 @@ const ADM=(function(){
  let role=null,roleP=Promise.resolve(); /* role comes from users/{uid}.role in Firestore (admin / staff / teacher) */
  const isAdmin=()=>['admin','administrator','headmaster'].indexOf(String(role||'').trim().toLowerCase())>=0||ADMINS.indexOf(meMail())>=0;
  const A=id=>apps.find(x=>x._id===id);
- const SKIP=/^_|^(status|ts|staffOk|adminOk|staffNote|adminNote|rejectReason|admitted|decl)$/;
+ const SKIP=/^_|^(status|ts|staffOk|adminOk|staffNote|adminNote|rejectReason|admitted|decl|reqSec|source|enteredBy)$/;
  const GROUPS=[['Admission',[['cls','Class'],['stream','Stream'],['medium','Medium'],['subj','Subjects'],['lang1','Language 1'],['lang2','Language 2'],['el1','Elective 1'],['el2','Elective 2'],['el3','Elective 3'],['opt','Optional elective'],['trade','Vocational trade']]],
   ['Madhyamik (Class XI)',[['mpRoll','Roll & number'],['mpYear','Year'],['mpMarks','Total (700)'],['mpPct','Percentage'],['mpMA','Mathematics'],['mpPS','Physical Science'],['mpLS','Life Science'],['mpHI','History'],['mpGE','Geography']]],
   ['Student',[['name','Name'],['nameBn','Name (Bengali)'],['sex','Sex'],['dob','Date of birth'],['pob','Place of birth'],['nationality','Nationality'],['religion','Religion'],['tongue','Mother tongue'],['caste','Category'],['casteCert','Caste cert. no.'],['blood','Blood group'],['sikshaId','Banglar Siksha Portal ID'],['aadhaar','Aadhaar'],['kanya','Kanyashree'],['disab','Differently abled'],['disabType','Disability'],['bpl','BPL'],['bplNo','BPL / ration no.']]],
@@ -2756,7 +2781,7 @@ const ADM=(function(){
 
  /* ---------- live listeners (placed students + applications) ---------- */
  let unsubS=null,unsubA=null,liveY=null;
- const mapApps=docs=>{const old={};apps.forEach(a=>old[a._id]=a);return docs.map(d=>{const a=Object.assign({_id:d.id},d.data());const o=old[a._id];a._cls=o&&o._cls||a.cls;a._sec=o&&o._sec!==undefined?o._sec:'A';return a}).sort((x,y)=>(x.ts&&x.ts.seconds||0)-(y.ts&&y.ts.seconds||0))};
+ const mapApps=docs=>{const old={};apps.forEach(a=>old[a._id]=a);return docs.map(d=>{const a=Object.assign({_id:d.id},d.data());const o=old[a._id];a._cls=o&&o._cls||a.cls;a._sec=o&&o._sec!==undefined?o._sec:(a.reqSec!==undefined?a.reqSec:'A');return a}).sort((x,y)=>(x.ts&&x.ts.seconds||0)-(y.ts&&y.ts.seconds||0))};
  function stopLive(){if(unsubS)unsubS();if(unsubA)unsubA();unsubS=unsubA=null;liveY=null;placed=[];apps=[];dash()}
  function live(){
   if(!(db&&auth&&auth.currentUser))return;const y=yr();if(unsubS&&liveY===y)return;
@@ -3656,7 +3681,7 @@ async function pt_submitTeacherReg(){
  REG=false;
 }
 function pt_logout(){fbOk&&AUTH.signOut()}
-function showGate(){unsub&&unsub();unsub=null;D={};ME={role:null,email:'',uid:'',cls:null,sec:null};document.body.dataset.role='';$('gatekeeper').style.display='flex';if($('authMenu').style.display=='none'&&$('loginGuide').style.display=='none'&&$('regGuide').style.display=='none')pt_gv('authMenu')}
+function showGate(){placeNewAdm(null);unsub&&unsub();unsub=null;D={};ME={role:null,email:'',uid:'',cls:null,sec:null};document.body.dataset.role='';$('gatekeeper').style.display='flex';if($('authMenu').style.display=='none'&&$('loginGuide').style.display=='none'&&$('regGuide').style.display=='none')pt_gv('authMenu')}
 function deny(t){AUTH.signOut().then(()=>{pt_gv('loginGuide');msg(t)})}
 if(fbOk)AUTH.onAuthStateChanged(async u=>{
  if(REG)return;
@@ -3679,13 +3704,18 @@ function resolve(){
  document.body.dataset.ct=ME.ct?'1':'0';
  if(ME.role!=r)enter(r);else render();
 }
-function enter(r){ME.role=r;document.body.dataset.role=r;$('gatekeeper').style.display='none';
+function placeNewAdm(r){
+ const c=$('naCard'),h=$('homeNewAdm'),sl=$('naSlot');if(!c||!h||!sl)return;
+ if(r==='user'){h.appendChild(c);c.classList.add('na-home');$('naTitle').textContent='➕ New admission — enter student details';$('naBtn').textContent='✔ Submit for admin approval'}
+ else if(c.parentNode===h){sl.parentNode.insertBefore(c,sl.nextSibling);c.classList.remove('na-home');$('naTitle').textContent='2 · New admission — one by one (roll no. & register Sl. No. are automatic · admin only)';$('naBtn').textContent='➕ Admit & assign roll no.'}
+}
+function enter(r){placeNewAdm(r);ME.role=r;document.body.dataset.role=r;$('gatekeeper').style.display='none';
  $('roleChip').textContent={admin:'👑 Admin',user:'🧑‍💼 User',teacher:'👩‍🏫 Class Teacher'}[r]+' · '+ME.email;pt_go('home')}
 function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"]');if(b)b.click();scrollTo(0,0)}
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a'};
+const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'a',data:'au',prom:'a',marks:'at',setup:'a',merit:'a'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -3696,7 +3726,7 @@ R.home=()=>{
  if(me=='admin'){tiles=tl('👩‍🏫',T.filter(x=>x[1].status=='approved').length,'Class teachers approved')+tl('⏳',T.filter(x=>x[1].status=='pending').length,'Teacher requests pending')+tl('🔒',fin+' / '+allSecs().length,'Sections finalised (marks)')+tl('📒',Object.values(D.plock||{}).filter(Boolean).length+' / 7','Class registers locked');
   qa=[['setup','✅ Approvals & Setup'],['merit','🔁 Merit List'],['adm','🎓 Admission'],['cert','📜 Certificate']]}
  else if(me=='user'){tiles=tl('🎓',STUDENT_DB.length,'Students in database')+tl('📅','Session '+(D.session||2027),'Working session');
-  qa=[['cert','📜 Issue Certificate'],['reports','📊 Reports'],['adm','🎓 New Admission']]}
+  qa=[['cert','📜 Issue Certificate'],['reports','📊 Reports']]}
  else{const k=ME.cls+'-'+ME.sec,m=M[k];tiles=tl('🏫',ME.cls+' – '+ME.sec,'Your allotted class')+tl(m&&m.st=='final'?'🔒':'✏️',m?(m.st=='final'?'Locked':'Draft'):'Not started','Final exam % status')+tl('🎓',STUDENT_DB.filter(s=>s.cls==ME.cls&&s.sec==ME.sec).length,'Students in class');qa=[['marks','✏️ Enter % of Marks']]}
  $('homeBody').innerHTML=`<div class="banner"><h3>Welcome 👋</h3><p>${esc(ME.email)} · Session ${D.session||2027}</p></div><div class="tiles">${tiles}</div><div class="qa">${qa.map(([v,t])=>`<button class="dv-b" onclick="pt_go('${v}')">${t}</button>`).join('')}</div>`;
 };
