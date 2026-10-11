@@ -344,7 +344,7 @@ fill('tongue',['Bengali','Santali','Hindi','Urdu','Nepali','Odia','English','Oth
 const OCC=['NA','Farmer / Agriculture','Agricultural labourer','Daily wage labourer','Migrant worker','Business / Shop','Private service','Government service','Teacher','Driver','Artisan / Craftsman / Tailor','Retired / Pensioner','Homemaker / Housewife','Unemployed','Deceased','Other'];
 fill('fatherOcc',OCC);fill('motherOcc',OCC);
 fill('guardianRel',['Father','Mother','Guardian','Brother','Sister','Grandfather','Grandmother','Uncle','Aunt','Other']);
-fill('medium',XI?['Bengali','Santali']:['Bengali','English','Other']);
+fill('medium',XI?['Bengali','Santali']:['Bengali','Santali','English','Other']);
 if(!XI)fill('cls',['V','VI','VII','VIII','IX','X']);
 $('vl').innerHTML=VILLAGES.map(x=>'<option value="'+x.v+'">').join('');
 function cond(){
