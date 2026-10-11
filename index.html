@@ -662,29 +662,47 @@
 </head>
 <body data-role="">
 <div id="gatekeeper">
- <div class="gt-hero"><div class="gt-logo">🎓</div>
-  <div class="gt-tag">OFFICIAL SCHOOL MANAGEMENT PORTAL</div>
+ <div class="gt-hero">
+  <div class="gt-tag"><span class="gt-dot"></span>ADMISSION OPEN</div>
   <h1 class="gt-name"><span style="color:#ffd23f">TFHS</span> <span style="color:#7fe0ff">SMART</span> <span style="color:#ff9ec7">SCHOOL</span> <span style="color:#8affb0">PORTAL</span></h1>
-    <div class="gt-sc"><span style="color:#ffb86b">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</span> · <span style="color:#a5d8ff">P.O. Taldangra, Dist. Bankura, West Bengal</span></div>
-  <div class="gt-sub"><span style="color:#ffd23f">Admission</span> · <span style="color:#7fe0ff">Promotion</span> · <span style="color:#ff9ec7">Marks</span> · <span style="color:#8affb0">Certificates</span> · <span style="color:#ffb86b">Reports</span></div></div>
+  <div class="gt-sc"><span style="color:#ffb86b">TALDANGRA FULMATI HIGH SCHOOL [H.S.]</span> · <span style="color:#a5d8ff">P.O. Taldangra, Dist. Bankura, West Bengal</span></div>
+  <p class="gt-story">One secure place for the whole school — apply online, track admissions, enter marks and print certificates and receipts in seconds.</p>
+ </div>
  <div id="authMenu" class="gate-box cover">
-  <h2 class="cv-h" style="color:#c2255c">Portal Functions</h2>
-  <div class="cv-g"><div class="cv-c" style="border-top-color:#d9480f"><div class="cv-i">📝</div><div class="cv-t1" style="color:#d9480f">Admission &amp; Online Application</div><p class="cv-e">Online form → staff verification → admin approval; automatic roll number and admission-register serial.</p></div><div class="cv-c" style="border-top-color:#2b8a3e"><div class="cv-i">🔁</div><div class="cv-t1" style="color:#2b8a3e">Promotion &amp; Roll Allocation</div><p class="cv-e">Merit-based promotion to the next class, section &amp; roll allotment, lock / unlock, trial run and admin revert.</p></div><div class="cv-c" style="border-top-color:#7048e8"><div class="cv-i">✏️</div><div class="cv-t1" style="color:#7048e8">Marks Entry</div><p class="cv-e">Final-exam percentage by the class teacher — save draft, then Final &amp; Lock.</p></div><div class="cv-c" style="border-top-color:#0b7285"><div class="cv-i">📜</div><div class="cv-t1" style="color:#0b7285">Certificates</div><p class="cv-e">Instant A4 certificates from the student database.</p></div><div class="cv-c" style="border-top-color:#e8590c"><div class="cv-i">📊</div><div class="cv-t1" style="color:#e8590c">Student Reports</div><p class="cv-e">Class-, sex- and caste-wise boys / girls statements — print, save and share.</p></div><div class="cv-c" style="border-top-color:#5f3dc4"><div class="cv-i">🧾</div><div class="cv-t1" style="color:#5f3dc4">Fee Receipts</div><p class="cv-e">Two-copy receipts for new session; free-admission students supported.</p></div><div class="cv-c" style="border-top-color:#c92a2a"><div class="cv-i">🩺</div><div class="cv-t1" style="color:#c92a2a">WIFS Data Entry</div><p class="cv-e">Monthly Annex-3 report with A4 print and WhatsApp sharing.</p></div><div class="cv-c" style="border-top-color:#1971c2"><div class="cv-i">🗄️</div><div class="cv-t1" style="color:#1971c2">Data &amp; Year</div><p class="cv-e">Year-wise student database on secure cloud, with offline built-in copy.</p></div></div>
-  <h2 class="cv-h" style="color:#1c7ed6">User Roles</h2>
-  <div class="cv-g3"><div class="cv-r" style="border-color:#c92a2a"><div class="cv-i">🛡️</div><div class="cv-t1" style="color:#c92a2a">Admin / Headmaster</div><p class="cv-e">Full control — approves registrations and admissions, promotes, reverts, unlocks, edits profiles, prints all reports.</p></div><div class="cv-r" style="border-color:#2b8a3e"><div class="cv-i">👩‍🏫</div><div class="cv-t1" style="color:#2b8a3e">Class Teacher</div><p class="cv-e">Registers with own class &amp; section; after Admin approval enters final-exam marks of that class only.</p></div><div class="cv-r" style="border-color:#1c7ed6"><div class="cv-i">🧑‍💼</div><div class="cv-t1" style="color:#1c7ed6">User / Office Staff</div><p class="cv-e">Certificates, reports, WIFS, fee receipts and verification of online admission applications.</p></div></div>
-  <h2 class="cv-h" style="color:#2b8a3e">Get Started</h2>
-  <div class="cv-act">
-   <div class="cv-a" style="border-color:#145828"><button class="dv-b pbig" onclick="pt_gv('loginGuide')">🔐 Login</button><p class="cv-e"><b style="color:#145828">Purpose:</b> For registered Admin, Class Teacher and User. The portal recognises your role automatically after sign-in.</p></div>
-   <div class="cv-a" style="border-color:#e8590c"><button class="dv-b pbig" style="background:#e8590c" onclick="pt_gv('regGuide')">📝 New Registration</button><p class="cv-e"><b style="color:#e8590c">Purpose:</b> For a new Class Teacher to request access to own class &amp; section. Login is possible only after Admin approval.</p></div>
+  <div class="pg-h"><b>Apply online for admission</b><span>Scan the QR code with your phone or open the link — no sign-in needed</span></div>
+  <div class="pg-g">
+   <div class="pg-c pg-vx"><div class="pg-t">Classes V – X</div><div class="pg-qr" id="pgQrVX"></div><div class="pg-l" id="pgLinkVX"></div>
+    <div class="pg-b"><a class="pg-go" id="pgOpenVX" target="_blank" rel="noopener">Apply now</a><button type="button" onclick="ADM.pubCopy(false)">Copy link</button><button type="button" onclick="ADM.qrSend(false)">WhatsApp</button><button type="button" onclick="ADM.qrPoster(false)">Poster</button></div></div>
+   <div class="pg-c pg-xi"><div class="pg-t">Class XI</div><div class="pg-qr" id="pgQrXI"></div><div class="pg-l" id="pgLinkXI"></div>
+    <div class="pg-b"><a class="pg-go" id="pgOpenXI" target="_blank" rel="noopener">Apply now</a><button type="button" onclick="ADM.pubCopy(true)">Copy link</button><button type="button" onclick="ADM.qrSend(true)">WhatsApp</button><button type="button" onclick="ADM.qrPoster(true)">Poster</button></div></div>
+  </div>
+  <div class="pg-keep">Keep ready: Banglar Siksha Portal ID · Aadhaar · mobile number · photo · Transfer Certificate</div>
+  <div id="pgMsg" class="pg-msg"></div>
+  <div class="pg-act">
+   <div class="lg-dd" id="lgDd"><button type="button" class="lg-main" onclick="pt_ddToggle(event)">Login <span class="lg-car">▾</span></button>
+    <div class="lg-menu" id="lgMenu"><div class="lg-mh">Log in as</div>
+     <button type="button" onclick="pt_loginAs('admin')"><b>Admin / Headmaster</b><small>Approves, promotes, full control</small></button>
+     <button type="button" onclick="pt_loginAs('user')"><b>User / Office Staff</b><small>Certificates, reports, receipts, verification</small></button>
+     <button type="button" onclick="pt_loginAs('teacher')"><b>Class Teacher</b><small>Final-exam marks of own class</small></button></div></div>
+   <button type="button" class="lg-reg" onclick="pt_gv('regGuide')">New Registration <small>(Class Teacher)</small></button>
   </div>
  </div>
  <div id="loginGuide" class="gate-box wide" style="display:none">
-  <h3 style="color:#145828;margin-top:0">Login</h3>
-  <div class="guide"><b>Guide:</b> Class Teacher · User · Admin — all use the same login.<br>1) Enter your registered email and password &nbsp;2) Press <b>Sign In</b> — the portal recognises your role automatically.<br>New Class Teacher? Use <b>New Registration</b> first; you can log in only after Admin approval.</div>
-  <input type="email" id="loginEmail" placeholder="Email Address">
-  <input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key=='Enter')pt_executeLogin()">
+  <h3 style="color:#145828;margin:0 0 4px">Login as <span id="lgAsName">—</span></h3>
+  <p class="lg-desc" id="lgDesc"></p>
+  <input type="email" id="loginEmail" placeholder="Email address" autocomplete="username">
+  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key=='Enter')pt_executeLogin()">
   <button class="dv-b pbig" onclick="pt_executeLogin()">Sign In</button>
   <button class="dv-b pbig g" style="margin:0" onclick="pt_gv('authMenu')">← Back</button>
+  <div class="fn-h">What this portal does</div>
+  <div class="fn-g">
+   <div style="border-color:#d9480f"><b style="color:#d9480f">Admission</b>Online form → staff verification → admin approval.</div>
+   <div style="border-color:#2b8a3e"><b style="color:#2b8a3e">Promotion</b>Merit-based promotion with automatic roll numbers.</div>
+   <div style="border-color:#7048e8"><b style="color:#7048e8">Marks Entry</b>Class teachers save, finalise and lock marks.</div>
+   <div style="border-color:#0b7285"><b style="color:#0b7285">Certificates</b>Instant A4 certificates from the student database.</div>
+   <div style="border-color:#e8590c"><b style="color:#e8590c">Reports</b>Class, sex and caste-wise statements.</div>
+   <div style="border-color:#5f3dc4"><b style="color:#5f3dc4">Fee Receipts</b>Two-copy receipts for new and promoted students.</div>
+  </div>
  </div>
  <div id="regGuide" class="gate-box wide" style="display:none">
   <h3 style="color:#b65e00;margin-top:0">New Class Teacher Registration</h3>
@@ -2420,10 +2438,16 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
    <div class="am-row"><button class="dv-b" id="naBtn" type="button" onclick="ADM.addNew()">➕ Admit &amp; assign roll no.</button></div>
    <div id="naLast"></div>
   </div>
-  <div class="dv-c"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
+  <div class="dv-c u-ok" id="amApprCard" style="border-top:4px solid #145828"><h3>✅ Approved admissions — print fee receipt</h3>
+   <p class="am-msg" id="amApprMsg">Students approved by the Admin appear here, newest first. Press <b>🖨 Print receipt</b> beside a student to print the 2-copy fee receipt.</p>
+   <div class="am-row" style="margin-top:0"><label style="font-size:11px;font-weight:700">Search <input id="apprQ" type="search" placeholder="name / ref / mobile" oninput="ADM.drawApproved()" style="padding:6px 9px;border-radius:8px;border:1px solid #c9d6cc;min-width:190px"></label>
+    <label style="font-size:11px;font-weight:700">Show <select id="apprF" onchange="ADM.drawApproved()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="all">All approved</option><option value="todo">Receipt not printed yet</option></select></label>
+    <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Refresh</button></div>
+   <div id="amApproved" class="am-box"></div></div>
+  <div class="dv-c u-ok"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
   <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><a class="dv-b g" id="amOpen" target="_blank" style="text-decoration:none">Open form ↗</a></div>
   <div class="am-row" style="margin-top:6px"><span class="am-link" id="amLinkXI"></span><button class="dv-b" type="button" onclick="ADM.copyLink(true)">Copy Class XI link</button><a class="dv-b g" id="amOpenXI" target="_blank" style="text-decoration:none">Open XI form ↗</a></div>
-  <p class="am-msg" id="amAMsg">Share this separate link with parents. Staff can <b>verify</b> an application; the <b>admin approves and finalizes</b> it (class, section, auto roll no. and admission-register Sl. No.). Admin can correct any profile with ✎ before or after admission.</p>
+  <p class="am-msg" id="amAMsg">Admission QR codes and links are now on the main page (open to everyone, no sign-in). Staff can <b>verify</b> an application; the <b>admin approves and finalizes</b> it (class, section, auto roll no. and admission-register Sl. No.). Admin can correct any profile with ✎ before or after admission.</p>
   <div class="am-row"><label style="font-size:11px;font-weight:700">Show <select id="apFilt" onchange="ADM.drawApps()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="open">Open (pending / verified / approved)</option><option value="pending">Waiting for staff verification</option><option value="verified">Waiting for admin approval</option><option value="approved">Approved — ready to admit</option><option value="admitted">Admitted</option><option value="rejected">Rejected</option><option value="all">All</option></select></label>
    <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button><span id="amRole" class="am-msg" style="margin:0"></span></div>
   <div id="amApps" class="am-box" style="display:none"></div>
@@ -2464,7 +2488,7 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
     // =================================================================================================</pre>
    <p><small>Roles: <b>admin</b> approves and can delete; <b>staff / teacher</b> verify, admit and place students. “Publish to Data &amp; Year” writes <code>certDb</code>, which your rules allow for admin only.</small></p></details>
  </div>
- <div class="dv-c"><h3>📱 Admission QR codes — WhatsApp &amp; notice board</h3>
+ <div class="dv-c" style="display:none"><h3>📱 Admission QR codes — WhatsApp &amp; notice board</h3>
   <p class="am-msg" style="margin:0 0 8px">One QR for each form: <b>V–X</b> and <b>XI</b>. The QR carries the link for the session selected above. Upload the forms to your site before sharing. (QR needs internet to draw.)</p>
   <div class="qr-row">
    <div class="qr-b" style="border-color:#1e9b4a;background:#effaf2"><b style="color:#0b5a2b">Classes V – X</b><div id="qrVX" class="qr-c"></div>
@@ -2718,6 +2742,32 @@ const ADM=(function(){
    ['naName','naFat','naMot','naDob','naMob','naSik','naFeeWhy'].forEach(i=>$(i).value='');window.TFV&&TFV.reset();preview();msg('Admitted '+name+' — roll '+r.roll+', register '+regText(r.reg)+'.')}
   catch(e){msg('Failed: '+(e.code||e.message),true)}}
  function receipt(id){const p=placed.find(x=>x._id===id);if(!p)return;FEE.one(p,ses(p.year||yr()))}
+ /* ----- approved list for office staff: print receipt beside each student ----- */
+ const rcKey=()=>'tfhsRcPrinted_'+yr();
+ const rcGet=()=>{try{return JSON.parse(localStorage.getItem(rcKey())||'{}')}catch(e){return {}}};
+ const rcSet=id=>{try{const o=rcGet();o[id]=Date.now();localStorage.setItem(rcKey(),JSON.stringify(o))}catch(e){}};
+ function printApprovedReceipt(id){
+  const a=A(id);if(!a)return;
+  const p=placed.find(x=>x.appId===a._id);
+  if(p)FEE.one(p,ses(p.year||yr()));
+  else FEE.one({name:up(a.name),cls:a._cls||a.cls,sec:a._sec||'',roll:'',type:'new',feeFree:false,feeNote:'',trial:false},ses(yr()));
+  rcSet(id);setTimeout(drawApproved,400)}
+ function drawApproved(){
+  const box=$('amApproved');if(!box)return;
+  const q=String(($('apprQ')||{}).value||'').trim().toLowerCase(),f=($('apprF')||{}).value||'all',done=rcGet();
+  let list=apps.filter(a=>a.status==='approved'||a.status==='admitted');
+  list.sort((x,y)=>((y.adminOk&&y.adminOk.at)||0)-((x.adminOk&&x.adminOk.at)||0));
+  if(f==='todo')list=list.filter(a=>!done[a._id]);
+  if(q)list=list.filter(a=>[a.name,a.ref,a.mobile,a.father].join(' ').toLowerCase().indexOf(q)>=0);
+  const m=$('amApprMsg');
+  if(!apps.length){box.innerHTML='<p style="padding:10px;font-size:13px">Loading approved admissions… press <b>⟳ Refresh</b> if nothing appears.</p>';return}
+  box.innerHTML=list.length?'<table class="am-t"><tr><th>#</th><th>Ref</th><th>Name</th><th>Class</th><th>Mobile</th><th>Approved</th><th>Status</th><th>Receipt</th></tr>'+list.map((a,i)=>{
+   const p=placed.find(x=>x.appId===a._id),adm=a.status==='admitted'||p;
+   const cls=p?(p.cls+(p.sec?'-'+p.sec:'')):(a._cls||a.cls)+(a._sec?'-'+a._sec:'');
+   const st=adm?'<b style="color:#0b5a2b">Admitted'+(p&&p.roll?' · Roll '+esc(p.roll):'')+'</b>':'<span style="color:#8a5600;font-weight:700">Approved — roll no. pending</span>';
+   const pr=done[a._id];
+   return '<tr><td>'+(i+1)+'</td><td><small>'+esc(a.ref||'')+'</small></td><td class="l"><b>'+esc(a.name)+'</b><br><small>'+esc(a.father||'')+(a.village?' · '+esc(a.village):'')+'</small></td><td><b>'+esc(cls)+'</b></td><td>'+esc(a.mobile||'')+'</td><td><small>'+esc(when(a.adminOk&&a.adminOk.at))+'</small></td><td>'+st+'</td><td><button class="dv-b" type="button" onclick="ADM.printApprovedReceipt(\''+a._id+'\')">🖨 Print receipt</button>'+(pr?'<br><small style="color:#145828">✓ printed '+esc(when(pr))+'</small>':'')+'</td></tr>'}).join('')+'</table>':'<p style="padding:10px;font-size:13px">No approved admissions in this view.</p>';
+  if(m)m.innerHTML='<b>'+list.length+'</b> approved admission(s) shown. Press <b>🖨 Print receipt</b> beside a student to print the 2-copy fee receipt'+(list.some(a=>!(a.status==='admitted'||placed.find(x=>x.appId===a._id)))?' (roll no. is blank until the Admin admits the student — write it by hand).':'.')}
  function toReceipts(){document.querySelector('.tf-side button[data-v=fees]').click();const m=$('fcMode');m.value='adm';FEE.mode();$('fcSes').value=ses(yr());$('fcMsg').textContent='Source: admission list ('+ses(yr())+'). Pick class/section and press Generate.'}
 
  /* ---------- 3. online applications: staff verify -> admin approve -> admit ---------- */
@@ -2742,7 +2792,7 @@ const ADM=(function(){
   if(!need('amAMsg'))return;await roleP;await refresh(true);
   try{const q=await db.collection('admApps').where('year','==',yr()).get();
    apps=mapApps(q.docs);dash();
-   $('amRole').textContent='You are signed in as '+(isAdmin()?'ADMIN':'STAFF')+' ('+meMail()+(role&&role!=='?'?', role: '+role:'')+')';drawApps();msg(apps.length+' application(s) for '+ses(yr())+'.',false,'amAMsg')}
+   $('amRole').textContent='You are signed in as '+(isAdmin()?'ADMIN':'STAFF')+' ('+meMail()+(role&&role!=='?'?', role: '+role:'')+')';drawApps();drawApproved();msg(apps.length+' application(s) for '+ses(yr())+'.',false,'amAMsg')}
   catch(e){msg('Load failed: '+(e.code||e.message),true,'amAMsg')}}
  function drawApps(){const b=$('amApps');b.style.display='block';const f=$('apFilt').value;
   const list=apps.filter(a=>f==='all'||(f==='open'?['pending','verified','approved'].indexOf(a.status)>=0:a.status===f));
@@ -2799,8 +2849,8 @@ const ADM=(function(){
  function live(){
   if(!(db&&auth&&auth.currentUser))return;const y=yr();if(unsubS&&liveY===y)return;
   if(unsubS)unsubS();if(unsubA)unsubA();liveY=y;
-  unsubS=db.collection('admStudents').where('year','==',y).onSnapshot(q=>{placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);summary();drawPlaced();drawRegister();dash();preview();if($('pfSrc').value==='new')profDraw()},e=>{});
-  unsubA=db.collection('admApps').where('year','==',y).onSnapshot(q=>{apps=mapApps(q.docs);if($('amApps').style.display==='block')drawApps();dash()},e=>{})}
+  unsubS=db.collection('admStudents').where('year','==',y).onSnapshot(q=>{placed=q.docs.map(d=>Object.assign({_id:d.id},d.data())).sort(sorter);drawApproved();summary();drawPlaced();drawRegister();dash();preview();if($('pfSrc').value==='new')profDraw()},e=>{});
+  unsubA=db.collection('admApps').where('year','==',y).onSnapshot(q=>{apps=mapApps(q.docs);if($('amApps').style.display==='block')drawApps();drawApproved();dash()},e=>{})}
 
  /* ---------- dashboard: live new-admission synopsis ---------- */
  function dash(){
@@ -2952,6 +3002,10 @@ const ADM=(function(){
    const c=d.querySelector('canvas');if(!c){d.remove();return null}
    const o=document.createElement('canvas');o.width=o.height=size;const g=o.getContext('2d');g.imageSmoothingEnabled=false;g.fillStyle='#fff';g.fillRect(0,0,size,size);g.drawImage(c,0,0,c.width,c.height,0,0,size,size);d.remove();return o}
   catch(e){d.remove();return null}}
+ function pubDraw(){[['pgQrVX',false,'pgLinkVX','pgOpenVX'],['pgQrXI',true,'pgLinkXI','pgOpenXI']].forEach(a=>{const el=$(a[0]);if(!el)return;el.innerHTML='';const c=qrCanvas(link(a[1]),440);
+   if(c)el.appendChild(c);else el.innerHTML='<small>QR needs internet — use the link below.</small>';$(a[2]).textContent=link(a[1]);$(a[3]).href=link(a[1])})}
+ function pubCopy(xi){const tx=link(xi),m=$('pgMsg');const ok=()=>{m.textContent='Link copied ✔';setTimeout(()=>{m.textContent=''},2500)};
+  (navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(ok).catch(()=>{const r=document.createRange();r.selectNodeContents($(xi?'pgLinkXI':'pgLinkVX'));const s=getSelection();s.removeAllRanges();s.addRange(r);m.textContent='Select-copy the link shown.'})}
  function qrDraw(){
   [['qrVX',false],['qrXI',true]].forEach(a=>{const el=$(a[0]);if(!el)return;el.innerHTML='';const c=qrCanvas(link(a[1]),440);
    if(c)el.appendChild(c);else el.innerHTML='<small style="color:#b00020">QR library not loaded — check internet and reload.</small>'})}
@@ -3070,14 +3124,14 @@ const ADM=(function(){
 
  /* ---------- init ---------- */
  const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
- $('amSes').value=ses(yr());$('amLink').textContent=link();$('amLinkXI').textContent=link(true);$('csDate').value=today();
- const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{profDraw();refresh(true)});
+ $('amSes').value=ses(yr());$('amLink').textContent=link();$('amLinkXI').textContent=link(true);$('csDate').value=today();pubDraw();
+ const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{profDraw();refresh(true);if(document.body.dataset.role==='user')setTimeout(()=>{try{loadApps()}catch(e){}},300)});
  if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
  $('amOpen').href=link();
  window.addEventListener('load',qrDraw);
  if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{live();dash();if(document.body.dataset.view==='adm')refresh(true)})}else stopLive()});
  dash();
- return{qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
@@ -3672,7 +3726,11 @@ const allSecs=()=>C6.flatMap(c=>secsOf(c).map(s=>c+'-'+s));
 const recNo=(c,s,r)=>`${D.session||2027}/${c}-${s}/${String(r).padStart(3,'0')}`;
 const TT={home:'Dashboard',cert:'Certificate',reports:'Student Reports',wifs:'WIFS Data Entry',fees:'Fee Receipts',data:'Data & Year',adm:'Admission',marks:'Marks Entry — Final Exam',setup:'Approvals & Setup',prom:'Merit List & Promotion'};
 function msg(t,ok){const m=$('gMsg');m.textContent=t;m.className='gmsg '+(ok?'ok':'err');m.style.display='block'}
-function pt_gv(id){['authMenu','loginGuide','regGuide'].forEach(x=>$(x).style.display=x==id?'block':'none');$('gMsg').style.display='none'}
+function pt_gv(id){['authMenu','loginGuide','regGuide'].forEach(x=>$(x).style.display=x==id?'block':'none');$('gMsg').style.display='none';const m=$('lgMenu');if(m)m.classList.remove('show')}
+const PT_ROLE={admin:['Admin / Headmaster','Approves registrations and admissions, promotes students, unlocks marks and prints all reports.'],user:['User / Office Staff','Certificates, reports, WIFS, fee receipts and verification of online admission applications.'],teacher:['Class Teacher','Enter final-exam marks for your own class and section after Admin approval.']};
+function pt_ddToggle(e){if(e)e.stopPropagation();$('lgMenu').classList.toggle('show')}
+function pt_loginAs(r){window.PT_AS=r;$('lgAsName').textContent=PT_ROLE[r][0];$('lgDesc').textContent=PT_ROLE[r][1];pt_gv('loginGuide');setTimeout(()=>{try{$('loginEmail').focus()}catch(e){}},50)}
+document.addEventListener('click',e=>{const m=$('lgMenu');if(m&&!e.target.closest('#lgDd'))m.classList.remove('show')});
 const needFb=()=>{if(!fbOk){msg('Firebase keys missing — paste apiKey & appId in FIREBASE_CONFIG (see comment in code).');return true}};
 async function pt_executeLogin(){
  if(needFb())return;
@@ -3714,6 +3772,8 @@ function resolve(){
   if(t.status=='pending')return deny('Awaiting Admin approval');
   if(t.status!='approved')return deny('Request rejected. Contact Admin.');
   r='teacher';ME.cls=t.cls;ME.sec=t.sec}
+ if(window.PT_AS&&window.PT_AS!==r){const w=window.PT_AS;window.PT_AS=null;return deny('This account is registered as '+PT_ROLE[r][0]+', not '+PT_ROLE[w][0]+'. Open Login and choose the correct option under "Log in as".')}
+ window.PT_AS=null;
  document.body.dataset.ct=ME.ct?'1':'0';
  if(ME.role!=r)enter(r);else render();
 }
@@ -3728,7 +3788,7 @@ function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'a',data:'au',prom:'a',marks:'at',setup:'a',merit:'a'};
+const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -4080,5 +4140,64 @@ body{padding-top:70px!important}
  setTimeout(init,800);setTimeout(init,2500);
 })();
 </script>
+
+<style id="tfStaffLayer">
+/* Office staff (role "user") see only: applications (verify) + approved list with Print receipt */
+body[data-role=user] #admView>*:not(.u-ok){display:none!important}
+body[data-role=user] #admView details,body[data-role=user] #amLink,body[data-role=user] #amLinkXI{display:none!important}
+body[data-role=user] #admView .u-ok .am-row:has(#amLink),body[data-role=user] #admView .u-ok .am-row:has(#amLinkXI){display:none!important}
+#amApproved{max-height:none}
+#amApproved .dv-b{white-space:nowrap}
+@media(max-width:860px){#amApproved{overflow-x:auto}#amApproved .am-t{min-width:640px}}
+</style>
+<script>
+(function(){function lab(){var r=document.body.dataset.role,b=document.querySelector('.tf-side button[data-v=adm] .l');if(b)b.textContent=r==='user'?'Applications':'Admission';
+ var t=document.getElementById('tfT');if(r==='user'&&document.body.dataset.view==='adm'&&t)t.textContent='Applications & Fee Receipts'}
+ new MutationObserver(lab).observe(document.body,{attributes:true,attributeFilter:['data-role','data-view']});lab()})();
+</script>
+<style id="tfGateLayer">
+/* ===== main page: flash design, public admission QR, Login-as dropdown ===== */
+#admView .am-row:has(#amLink),#admView .am-row:has(#amLinkXI){display:none!important}
+#gatekeeper{background:linear-gradient(125deg,#06210f,#0f4d24 35%,#1b6b3a 60%,#0b3a5a);background-size:260% 260%;animation:gtFlow 14s ease infinite}
+@keyframes gtFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.gt-hero{margin-bottom:12px!important}
+.gt-tag{display:inline-flex!important;align-items:center;gap:8px;background:linear-gradient(90deg,#ff3d71,#ff9a2e)!important;color:#fff!important;font-weight:900!important;letter-spacing:2px!important;box-shadow:0 0 18px rgba(255,120,60,.55);animation:gtPulse 1.8s ease-in-out infinite}
+.gt-dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:gtBlink 1s infinite}
+@keyframes gtPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}@keyframes gtBlink{50%{opacity:.25}}
+.gt-hero h1.gt-name{background:linear-gradient(90deg,#fff,#ffd23f,#7fe0ff,#ff9ec7,#fff);background-size:250% 100%;animation:gtShine 6s linear infinite}
+@keyframes gtShine{to{background-position:-250% 0}}
+.gt-story{max-width:640px;margin:8px auto 0!important;font-size:clamp(12.5px,2.2vw,14.5px)!important;line-height:1.5;color:#e6f6ea;opacity:1!important}
+.gate-box.cover{max-width:900px!important;background:rgba(255,255,255,.97)!important}
+.pg-h{text-align:center;margin-bottom:12px}.pg-h b{display:block;font-size:clamp(17px,3.4vw,22px);color:#0b3319;letter-spacing:.3px}.pg-h span{font-size:12.5px;color:#4a5d50}
+.pg-g{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pg-c{border-radius:16px;padding:12px;color:#fff;text-align:center;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.pg-c:before{content:"";position:absolute;top:-60%;left:-40%;width:60%;height:220%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:rotate(12deg);animation:pgSweep 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes pgSweep{0%{left:-70%}60%,100%{left:130%}}
+.pg-vx{background:linear-gradient(160deg,#22b455,#0b5a2b)}.pg-xi{background:linear-gradient(160deg,#5566e6,#1b2370)}
+.pg-t{font-size:17px;font-weight:900;letter-spacing:.5px;margin-bottom:8px}
+.pg-qr{background:#fff;border-radius:12px;padding:8px;display:inline-block;line-height:0}.pg-qr canvas{width:150px;height:150px;display:block}.pg-qr small{font-size:11px;color:#b00020;line-height:1.3;display:block;width:150px;padding:30px 0}
+.pg-l{font-size:10.5px;word-break:break-all;margin:7px 4px 8px;opacity:.9;font-family:Consolas,monospace}
+.pg-b{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;position:relative}
+.pg-b a,.pg-b button{all:unset;cursor:pointer;box-sizing:border-box;padding:7px 12px;border-radius:99px;font-size:12px;font-weight:800;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.45);color:#fff;text-align:center}
+.pg-b .pg-go{background:#ffd23f;color:#3a2b00;border-color:#ffd23f}.pg-b button:hover,.pg-b a:hover{filter:brightness(1.12)}
+.pg-keep{text-align:center;font-size:12px;color:#445;margin:10px 0 2px;font-weight:600}.pg-msg{text-align:center;min-height:16px;font-size:12px;font-weight:700;color:#145828}
+.pg-act{display:flex;gap:12px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-top:8px}
+.lg-dd{position:relative}
+.lg-main{all:unset;cursor:pointer;box-sizing:border-box;min-width:190px;text-align:center;padding:13px 22px;border-radius:12px;background:linear-gradient(135deg,#145828,#1f8a43);color:#fff;font-size:16px;font-weight:900;letter-spacing:.5px;box-shadow:0 4px 14px rgba(20,88,40,.4)}
+.lg-main:hover{filter:brightness(1.1)}.lg-car{margin-left:6px;font-size:13px}
+.lg-menu{display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:270px;background:#fff;border:1px solid #cfdcd2;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:6px;z-index:5;text-align:left}
+.lg-menu.show{display:block}
+.lg-mh{font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#6a7a6e;padding:6px 10px 4px}
+.lg-menu button{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:9px 10px;border-radius:9px}
+.lg-menu button:hover{background:#eaf5ec}.lg-menu button b{display:block;font-size:14px;color:#0b3319}.lg-menu button small{display:block;font-size:11.5px;color:#5a6b5f;margin-top:1px}
+.lg-reg{all:unset;cursor:pointer;box-sizing:border-box;padding:13px 20px;border-radius:12px;border:2px solid #e8590c;color:#e8590c;font-weight:800;font-size:14px;background:#fff}.lg-reg small{font-weight:600;font-size:11px;opacity:.85}
+.lg-reg:hover{background:#fff4ec}
+.lg-desc{font-size:12.5px;color:#445;margin:0 0 12px;line-height:1.5}
+.fn-h{margin:16px 0 8px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#5a6b5f;border-top:1px solid #e1e8e3;padding-top:12px}
+.fn-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fn-g div{border-left:4px solid;border-radius:8px;background:#f6faf7;padding:7px 10px;font-size:11.5px;line-height:1.4;color:#34473b}.fn-g b{display:block;font-size:12.5px;margin-bottom:1px}
+@media(max-width:640px){.pg-g{grid-template-columns:1fr}.pg-qr canvas{width:140px;height:140px}.fn-g{grid-template-columns:1fr}.lg-main{min-width:100%}.lg-dd{width:100%}.lg-reg{width:100%;text-align:center}.lg-menu{width:100%;left:0;transform:none}}
+@media(prefers-reduced-motion:reduce){#gatekeeper,.gt-tag,.gt-dot,.gt-hero h1.gt-name,.pg-c:before{animation:none!important}}
+</style>
 </body>
 </html>
