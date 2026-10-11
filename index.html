@@ -3903,7 +3903,7 @@ function pt_printMerit(){pt_printHTML('Merit List Class '+PC,$('meritOut').inner
 function pt_saveSess(){W({session:+$('sess').value})}
 function pt_setPass(v){D.pass=+v;R.merit()}
 
-Object.assign(window,{pt_R:R,pt_gv,pt_executeLogin,pt_submitTeacherReg,pt_logout,pt_go,pt_tAct,pt_tDel,pt_unlockM,pt_secLock,pt_saveMarks,pt_mk,pt_setPC,pt_runProm,pt_runXI,pt_lockReg,pt_unlockReg,pt_printReg2,pt_printHTML,pt_printMerit,pt_saveSess,pt_setPass});
+Object.assign(window,{pt_R:R,pt_gv,pt_ddToggle,pt_loginAs,pt_executeLogin,pt_submitTeacherReg,pt_logout,pt_go,pt_tAct,pt_tDel,pt_unlockM,pt_secLock,pt_saveMarks,pt_mk,pt_setPC,pt_runProm,pt_runXI,pt_lockReg,pt_unlockReg,pt_printReg2,pt_printHTML,pt_printMerit,pt_saveSess,pt_setPass});
 })();
 </script>
 <style>
@@ -4164,8 +4164,8 @@ body[data-role=user] #admView .u-ok .am-row:has(#amLink),body[data-role=user] #a
 .gt-tag{display:inline-flex!important;align-items:center;gap:8px;background:linear-gradient(90deg,#ff3d71,#ff9a2e)!important;color:#fff!important;font-weight:900!important;letter-spacing:2px!important;box-shadow:0 0 18px rgba(255,120,60,.55);animation:gtPulse 1.8s ease-in-out infinite}
 .gt-dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:gtBlink 1s infinite}
 @keyframes gtPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}@keyframes gtBlink{50%{opacity:.25}}
-.gt-hero h1.gt-name{background:linear-gradient(90deg,#fff,#ffd23f,#7fe0ff,#ff9ec7,#fff);background-size:250% 100%;animation:gtShine 6s linear infinite}
-@keyframes gtShine{to{background-position:-250% 0}}
+.gt-hero h1.gt-name{animation:gtGlow 3.2s ease-in-out infinite}
+@keyframes gtGlow{0%,100%{text-shadow:0 2px 8px rgba(0,0,0,.35)}50%{text-shadow:0 0 18px rgba(255,255,255,.55),0 2px 8px rgba(0,0,0,.35)}}
 .gt-story{max-width:640px;margin:8px auto 0!important;font-size:clamp(12.5px,2.2vw,14.5px)!important;line-height:1.5;color:#e6f6ea;opacity:1!important}
 .gate-box.cover{max-width:900px!important;background:rgba(255,255,255,.97)!important}
 .pg-h{text-align:center;margin-bottom:12px}.pg-h b{display:block;font-size:clamp(17px,3.4vw,22px);color:#0b3319;letter-spacing:.3px}.pg-h span{font-size:12.5px;color:#4a5d50}
@@ -4185,7 +4185,7 @@ body[data-role=user] #admView .u-ok .am-row:has(#amLink),body[data-role=user] #a
 .lg-dd{position:relative}
 .lg-main{all:unset;cursor:pointer;box-sizing:border-box;min-width:190px;text-align:center;padding:13px 22px;border-radius:12px;background:linear-gradient(135deg,#145828,#1f8a43);color:#fff;font-size:16px;font-weight:900;letter-spacing:.5px;box-shadow:0 4px 14px rgba(20,88,40,.4)}
 .lg-main:hover{filter:brightness(1.1)}.lg-car{margin-left:6px;font-size:13px}
-.lg-menu{display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:270px;background:#fff;border:1px solid #cfdcd2;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:6px;z-index:5;text-align:left}
+.lg-menu{box-sizing:border-box;display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:270px;background:#fff;border:1px solid #cfdcd2;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:6px;z-index:5;text-align:left}
 .lg-menu.show{display:block}
 .lg-mh{font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#6a7a6e;padding:6px 10px 4px}
 .lg-menu button{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:9px 10px;border-radius:9px}
