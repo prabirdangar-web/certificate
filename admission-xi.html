@@ -67,7 +67,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
 
  <div class="card"><h2><b>2</b> Student details <small style="font-weight:500;color:var(--mut)">(fields marked * are compulsory)</small></h2>
   <div class="grid">
-   <label class="full">Student's full name (as in Board certificate)<input id="name" class="key req" maxlength="80"></label>
+   <label class="full">Student's full name (as in birth certificate)<input id="name" class="key req" maxlength="80"></label>
    <label class="full">Name in Bengali <small>(optional)</small><input id="nameBn" maxlength="80"></label>
    <label>Sex<select id="sex" class="req"></select></label>
    <label>Date of birth<input id="dob" type="date" class="req"></label>
@@ -192,7 +192,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
    </div>
   </div>
   <p class="note">Bring these originals when called for verification:</p>
-  <ul class="docs"><li>Board certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report, Madhyamik admit card &amp; mark-sheet</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
+  <ul class="docs"><li>Birth certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report, Madhyamik admit card &amp; mark-sheet</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
   <label class="chk" style="margin-top:12px"><input type="checkbox" id="decl"> I declare that the information given above is true and complete. I understand that this is only an application: admission is confirmed only after verification by the school staff and approval by the Headmaster / Admin.</label>
   <input class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
   <button class="submit" id="btn" type="submit">Submit application</button>
@@ -371,7 +371,7 @@ fill('tongue',['Bengali','Santali','Hindi','Urdu','Nepali','Odia','English','Oth
 const OCC=['NA','Farmer / Agriculture','Agricultural labourer','Daily wage labourer','Migrant worker','Business / Shop','Private service','Government service','Teacher','Driver','Artisan / Craftsman / Tailor','Retired / Pensioner','Homemaker / Housewife','Unemployed','Deceased','Other'];
 fill('fatherOcc',OCC);fill('motherOcc',OCC);
 fill('guardianRel',['Father','Mother','Guardian','Brother','Sister','Grandfather','Grandmother','Uncle','Aunt','Other']);
-fill('medium',XI?['Bengali','Santali']:['Bengali','English','Other']);
+fill('medium',XI?['Bengali','Santali']:['Bengali','Santali','English','Other']);
 if(!XI)fill('cls',['V','VI','VII','VIII','IX','X']);
 $('vl').innerHTML=VILLAGES.map(x=>'<option value="'+x.v+'">').join('');
 function cond(){
