@@ -2807,6 +2807,7 @@ const ADM=(function(){
    else if(a.status==='rejected')act+='<small>'+esc(a.rejectReason||'')+'</small>';
    if(a.status!=='admitted')act+=' <button class="dv-b g" onclick="ADM.edit(\'a\',\''+a._id+'\')">✎ Edit</button>';
    if(['pending','verified','approved'].indexOf(a.status)>=0)act+=' <button class="dv-b g" style="color:#b00020" onclick="ADM.reject(\''+a._id+'\')">✕</button>';
+   if(isAdmin())act+=' <button class="dv-b g" style="color:#b00020" title="Permanently delete (test data)" onclick="ADM.delApp(\''+a._id+'\')">🗑 Delete</button>';
    return '<tr><td><small>'+esc(a.ref||'')+'</small></td><td>'+(a.photo?'<img src="'+a.photo+'" style="width:34px;height:42px;object-fit:cover;border-radius:4px">':'')+'</td><td class="l"><b>'+esc(a.name)+'</b><br><small>'+esc(a.father)+' · '+esc(a.village)+'</small></td><td><b>'+esc(a.cls)+'</b>'+(a.stream?'<br><small>'+esc(a.stream)+'</small>':'')+(a.medium?'<br><small>'+esc(a.medium)+'</small>':'')+'</td><td>'+esc(a.mobile)+'</td><td>'+chip(a.staffOk,'—')+'</td><td>'+chip(a.adminOk,'—')+'</td><td>'+act+'</td></tr>'}).join('')+'</table>':'<p style="padding:10px;font-size:13px">No applications in this view.</p>'}
  function _a(id,k,v){const a=A(id);if(a)a[k]=v}
  async function upd(id,patch){await db.collection('admApps').doc(id).update(patch);Object.assign(A(id),patch)}
@@ -2822,6 +2823,25 @@ const ADM=(function(){
  async function reject(id){
   if(!need('amAMsg'))return;const a=A(id);const r=prompt('Reject application of '+a.name+'?\nReason:','');if(r===null)return;
   try{await upd(id,{status:'rejected',rejectReason:r+' ('+meMail().split('@')[0]+')'});drawApps()}catch(e){msg('Failed: '+(e.code||e.message),true,'amAMsg')}}
+ async function delApp(id){
+  if(!need('amAMsg'))return;await roleP;if(!isAdmin()){msg('Only admin can permanently delete an application.',true,'amAMsg');alert('Only an ADMIN login can delete applications.');return}
+  const a=A(id);if(!a)return;await refresh(true);
+  const links=placed.filter(p=>p.appId===id||(a.admitted&&p._id===docId(a.year||yr(),a.admitted.cls,a.admitted.sec,a.admitted.roll)));
+  const txt='PERMANENTLY DELETE application of '+a.name+' ('+(a.ref||id)+')?'+(links.length?'\n\nAlso removes the admitted student record: Class '+links.map(p=>p.cls+' '+secOf(p)+' roll '+p.roll+(p.regNo?' / Reg Sl. '+p.regNo:'')).join(', ')+'\nRoll no. and admission-register Sl. No. counters will be set back so the numbers can be reused.':'')+'\n\nThis cannot be undone. Type DELETE to confirm:';
+  const t=prompt(txt,'');if(t===null)return;if(t.trim().toUpperCase()!=='DELETE'){msg('Not deleted — confirmation word did not match.',true,'amAMsg');return}
+  try{
+   const y=a.year||yr();
+   if(links.length)await delIds(links.map(p=>p._id));
+   await db.collection('admApps').doc(id).delete();
+   const gone={};links.forEach(p=>gone[p._id]=1);const left=placed.filter(p=>!gone[p._id]);
+   const rs={},ss={};links.forEach(p=>{rs[p.cls+'|'+secOf(p)]=1;if(p.type==='new')ss[p.regSeries||serOf(p.cls)]=1});
+   for(const k of Object.keys(rs)){const x=k.split('|'),mx=left.filter(p=>p.cls===x[0]&&secOf(p)===x[1]).reduce((m,p)=>Math.max(m,parseInt(p.roll,10)||0),0);
+    await db.collection('admCounters').doc(cntId(y,x[0],x[1])).set({year:y,cls:x[0],sec:x[1],last:mx})}
+   for(const sr of Object.keys(ss)){const mx=left.filter(p=>p.type==='new'&&(p.regSeries||serOf(p.cls))===sr).reduce((m,p)=>Math.max(m,+p.regNo||0),0);
+    await db.collection('admCounters').doc('REG_'+y+'_'+sr).set({year:y,series:sr,last:mx})}
+   apps=apps.filter(x=>x._id!==id);placed=left;summary();drawPlaced();drawRegister();drawApps();drawApproved();dash();
+   msg('Deleted ✔ '+a.name+(links.length?' (application + admitted record; roll / register counters reset)':''),false,'amAMsg')}
+  catch(e){msg('Delete failed: '+(e.code||e.message),true,'amAMsg')}}
  async function admit(id){
   if(!need('amAMsg'))return;await roleP;if(!isAdmin()){msg('Only admin can finalize an admission (class, section, roll no. and register Sl. No.).',true,'amAMsg');return}const a=A(id);
   if(!(a.staffOk&&a.adminOk&&a.status==='approved')){msg('Needs BOTH staff verification and admin approval first.',true,'amAMsg');return}
@@ -3132,7 +3152,7 @@ const ADM=(function(){
  window.addEventListener('load',qrDraw);
  if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{live();dash();if(document.body.dataset.view==='adm')refresh(true)})}else stopLive()});
  dash();
- return{pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
