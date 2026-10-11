@@ -1,14 +1,15 @@
 {
-  "id": "./index.html",
   "name": "TFHS Smart School Portal",
-  "short_name": "TFHS Portal",
-  "description": "Taldangra Fulmati High School - Smart School Portal",
+  "short_name": "TFHS",
+  "description": "Taldangra Fulmati High School \u2014 admission, promotion, marks, certificates and reports",
   "start_url": "./index.html",
   "scope": "./",
+  "id": "./index.html",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#ecefe6",
+  "background_color": "#ffffff",
   "theme_color": "#145828",
+  "lang": "en",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -21,12 +22,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "icons/icon-maskable-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
     },
     {
       "src": "icons/icon-maskable-512.png",
