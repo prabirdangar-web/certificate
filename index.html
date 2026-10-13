@@ -887,6 +887,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 <button class="report-btn" onclick="generateStudentReport('classSex')">CLASS + SEX</button>
                 <button class="report-btn" onclick="generateStudentReport('classCaste')">CLASS + CASTE</button>
                 <button class="report-btn" onclick="generateClassSexCasteCountReport()">CLASS + SEX + CASTE-WISE COUNT</button>
+                <button class="report-btn" id="btnMedRpt" style="grid-column:1/-1;background:#0b4f8a;color:#fff" onclick="generateMediumReport()">MEDIUM-WISE REPORT (when more than one medium exists)</button>
                 <button class="report-btn secondary" onclick="printStudentReport()">PRINT REPORT</button>
                 <button class="report-btn secondary" onclick="exportStudentReportCSV()">EXPORT CSV</button>
             </div>
@@ -942,6 +943,12 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             <div class="form-group">
                 <label>Caste / Social Category (Auto)</label>
                 <input type="text" id="caste" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>Medium of Reading (Auto)</label>
+                <select id="medium" class="form-control" onchange="syncData()" disabled>
+                    <option>Bengali</option><option>Santali</option><option>English</option><option>Other</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Session (Year)</label>
@@ -1181,7 +1188,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             <span id="lblParentage">son of</span> <span class="field-underline" id="vFather" style="min-width:170px;">Subhas Chandra Bhuin</span>; an inhabitant of Village : <span id="vVillage" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.O. : <span id="vPo" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; P.S. : <span id="vPs" style="font-style:normal; font-weight:900;" class="field-underline">Taldangra</span>; District : <span id="vDist" style="font-style:normal; font-weight:1100;" class="field-underline">Bankura</span>, PIN-<span id="vPin" style="font-style:normal; font-weight:900;" class="field-underline">722152</span> is a bonafide student of this school. 
             
             <span id="lblPronounCaps">He</span> is reading now in Class: <span class="field-underline" id="vClass" style="min-width:35px;">VI</span> 
-            [Sec-<span class="field-underline" id="vSec" style="min-width:35px;">A</span>; Roll No-<span class="field-underline" id="vRoll" style="min-width:35px;">6</span>]. <span id="vPrevRes"></span> 
+            [Sec-<span class="field-underline" id="vSec" style="min-width:35px;">A</span>; Roll No-<span class="field-underline" id="vRoll" style="min-width:35px;">6</span>]; Medium of reading : <span class="field-underline" id="vMedium" style="min-width:55px;">Bengali</span>. <span id="vPrevRes"></span> 
             
             <span id="lblPossessiveCaps">His</span> date of birth recorded in the Admission Register is 
             <span class="field-underline" id="vDob" style="min-width:90px;">07-12-2014</span> 
@@ -1215,6 +1222,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 <div><strong>Student Name:</strong> <span id="cName" style="border-bottom: 1px dotted #333;">Aritra Bhuin</span></div>
                 <div><strong>Class (Sec):</strong> <span id="cClassSec" style="border-bottom: 1px dotted #333;">VI (A)</span></div>
                 <div><strong>Roll No:</strong> <span id="cRoll" style="border-bottom: 1px dotted #333;">6</span></div>
+                <div><strong>Medium of Reading:</strong> <span id="cMedium" style="border-bottom: 1px dotted #333;">Bengali</span></div>
                 <div><strong>BS Student ID:</strong> <span id="cSikshaId" style="border-bottom: 1px dotted #333;">004773320000012</span></div>
                 <div><strong>Mobile No:</strong> <span id="cMobile" style="border-bottom: 1px dotted #333;">________________</span></div>
                 <div><strong>Memo Reference:</strong> <span id="cMemo" style="border-bottom: 1px dotted #333;">TFHS-26/VI-A-6</span></div>
@@ -1453,7 +1461,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
         }
 
         function setManualMode(isManual) {
-            const ids = ['studentName','fatherName','motherName','sex','caste','dob','sikshaId','mobileNo','class','sec','rollNo'];
+            const ids = ['studentName','fatherName','motherName','sex','medium','caste','dob','sikshaId','mobileNo','class','sec','rollNo'];
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
@@ -1464,7 +1472,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                     el.disabled = false;
                 } else {
                     el.readOnly = !isManual;
-                    el.disabled = !isManual && id === 'sex';
+                    el.disabled = !isManual && (id === 'sex' || id === 'medium');
                     if (isManual) el.removeAttribute('readonly');
                     else if (['studentName','fatherName','motherName','caste','dob','sikshaId','mobileNo'].includes(id)) el.setAttribute('readonly','readonly');
                 }
@@ -1541,6 +1549,13 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             if (cw) { cw.style.display = ''; cs.innerText = rows.map(r => `${r.c}/${r.y}: ${(+r.p).toFixed(2)}%`).join(', '); }
         }
 
+        function setMediumField(v) {
+            const el = document.getElementById('medium'); if (!el) return;
+            v = String(v == null ? '' : v).trim() || 'Bengali';
+            if (![...el.options].some(o => o.value === v)) { const o = document.createElement('option'); o.value = o.textContent = v; el.appendChild(o); }
+            el.value = v;
+        }
+
         function lookupStudent() {
             if (document.getElementById('manualMode')?.checked) {
                 syncData();
@@ -1565,6 +1580,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
                 document.getElementById('fatherName').value = '';
                 document.getElementById('motherName').value = '';
                 document.getElementById('caste').value = '';
+                setMediumField('');
                 document.getElementById('dob').value = '';
                 document.getElementById('sikshaId').value = '';
                 document.getElementById('mobileNo').value = '';
@@ -1578,6 +1594,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             document.getElementById('motherName').value = student.mother;
             document.getElementById('sex').value = student.sex;
             document.getElementById('caste').value = student.caste || 'NOT AVAILABLE';
+            setMediumField(student.medium);
             document.getElementById('dob').value = student.dob;
             document.getElementById('sikshaId').value = normalizeStudentId(student.sikshaId);
             document.getElementById('mobileNo').value = normalizeMobile(student.mobile);
@@ -1651,6 +1668,8 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
             document.getElementById('vClass').innerText = cls || '___';
             document.getElementById('vSec').innerText = sec || '___';
             document.getElementById('vRoll').innerText = roll || '___';
+            { const _me = document.getElementById('medium'); const _md = (_me && _me.value) || 'Bengali';
+              document.getElementById('vMedium').innerText = _md; document.getElementById('cMedium').innerText = _md; }
             document.getElementById('vSikshaId').innerText = sikshaId || '______________________';
 
             document.getElementById('cName').innerText = name || '________________________';
@@ -1677,6 +1696,71 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
     
         let lastReportRows = [];
         let lastReportTitle = "";
+
+        /* ===== MEDIUM HELPERS (shared by reports, certificate and promotion) =====
+           A student with no recorded medium is treated as the default medium (Bengali). */
+        const MED0 = 'Bengali';
+        function medN(m) { m = String(m == null ? '' : m).trim(); return m || MED0; }
+        function medSort(a, b) { return (a === MED0 ? -1 : b === MED0 ? 1 : 0) || a.localeCompare(b); }
+        function medsOf(rows, f) { const s = new Set(); (rows || STUDENT_DB).forEach(x => s.add(medN(f ? f(x) : x.medium))); return [...s].sort(medSort); }
+        function multiMedium(rows, f) { return medsOf(rows, f).length > 1; }
+
+        function generateMediumReport() {
+            const out = document.getElementById('reportOutput'); if (!out) return;
+            out.style.display = 'block';
+            const sess = (document.getElementById('session') || {}).value || '';
+            const meds = medsOf();
+            const blank = STUDENT_DB.filter(s => !String(s.medium || '').trim()).length;
+            if (meds.length < 2) {
+                lastReportRows = []; lastReportTitle = 'MEDIUM-WISE STUDENT REPORT';
+                out.innerHTML = '<div class="report-title">MEDIUM-WISE STUDENT REPORT — SESSION ' + escapeReportHtml(sess) + '</div>' +
+                    '<div class="report-summary">Only one medium (' + escapeReportHtml(meds[0] || MED0) + ') exists in the student data (' + STUDENT_DB.length +
+                    ' students), so no medium-wise report is needed. It is generated automatically once a second medium is recorded (Data &amp; Year → Edit Profile → Medium).</div>';
+                return;
+            }
+            const ORD = ['V','VI','VII','VIII','IX','X','XI','XII'];
+            const cl = s => String(s.cls || '').trim().toUpperCase() || 'NOT AVAILABLE';
+            const sx = s => { const x = String(s.sex || '').trim().toLowerCase(); return /^(f|female|girl)/.test(x) ? 'g' : /^(m|male|boy)/.test(x) ? 'b' : 'o'; };
+            const cs = s => String(s.caste || '').trim().toUpperCase() || 'NOT AVAILABLE';
+            const ck = c => { const i = ORD.indexOf(c); return i < 0 ? 99 : i; };
+            const mk = () => ({ b: 0, g: 0, o: 0, t: 0 });
+            const add = (r, s) => { r[sx(s)]++; r.t++; };
+            const byC = {}, bySec = {}, byCaste = {}, tot = {};
+            meds.forEach(m => tot[m] = mk());
+            STUDENT_DB.forEach(s => {
+                const c = cl(s), m = medN(s.medium), sec = String(s.sec || '').trim().toUpperCase() || '—', k = cs(s);
+                ((byC[c] = byC[c] || {})[m] = (byC[c][m] || mk())); add(byC[c][m], s);
+                const sk = c + '|' + sec; ((bySec[sk] = bySec[sk] || {})[m] = (bySec[sk][m] || mk())); add(bySec[sk][m], s);
+                ((byCaste[k] = byCaste[k] || {})[m] = (byCaste[k][m] || mk())); add(byCaste[k][m], s);
+                add(tot[m], s);
+            });
+            const anyO = STUDENT_DB.some(s => sx(s) === 'o');
+            const V = (r, f) => (r && r[f]) || 0;
+            const sub = anyO ? ['Boys','Girls','Other','Total'] : ['Boys','Girls','Total'], fl = anyO ? ['b','g','o','t'] : ['b','g','t'];
+            const e = escapeReportHtml;
+            const head = lead => '<tr><th rowspan="2">' + lead + '</th>' + meds.map(m => '<th colspan="' + sub.length + '" style="text-align:center">' + e(m.toUpperCase()) + '</th>').join('') + '<th rowspan="2">ALL<br>MEDIUMS</th></tr><tr>' + meds.map(() => sub.map(x => '<th>' + x + '</th>').join('')).join('') + '</tr>';
+            const rowOf = (lead, d) => { let all = 0; const cells = meds.map(m => { const r = d[m]; all += V(r, 't'); return fl.map(f => '<td' + (f === 't' ? ' style="font-weight:bold"' : '') + '>' + V(r, f) + '</td>').join(''); }).join(''); return '<tr><td><b>' + lead + '</b></td>' + cells + '<td><b>' + all + '</b></td></tr>'; };
+            const totRow = (lead, d) => '<tr style="background:#eee;font-weight:bold"><td>' + lead + '</td>' + meds.map(m => fl.map(f => '<td>' + V(d[m], f) + '</td>').join('')).join('') + '<td>' + meds.reduce((n, m) => n + V(d[m], 't'), 0) + '</td></tr>';
+            const classes = Object.keys(byC).sort((a, b) => ck(a) - ck(b) || a.localeCompare(b));
+            let h = '<div class="report-title">MEDIUM-WISE STUDENT REPORT — SESSION ' + e(sess) + '</div>' +
+                '<div class="report-summary">Mediums found: ' + e(meds.join(' + ')) + ' &nbsp;|&nbsp; Total students: ' + STUDENT_DB.length + ' &nbsp;|&nbsp; ' +
+                meds.map(m => e(m) + ': ' + tot[m].t).join(' &nbsp;|&nbsp; ') +
+                (blank ? ' &nbsp;|&nbsp; ' + blank + ' student(s) with no medium recorded are counted as ' + MED0 : '') + '</div>';
+            h += '<div class="report-title" style="margin-top:10px">1. CLASS-WISE × MEDIUM</div><table class="report-table"><thead>' + head('CLASS') + '</thead><tbody>' +
+                classes.map(c => rowOf(e(c), byC[c])).join('') + totRow('TOTAL', tot) + '</tbody></table>';
+            const secs = Object.keys(bySec).sort((a, b) => { const [c1, s1] = a.split('|'), [c2, s2] = b.split('|'); return ck(c1) - ck(c2) || s1.localeCompare(s2); });
+            h += '<div class="report-title" style="margin-top:12px">2. CLASS + SECTION-WISE × MEDIUM</div><table class="report-table"><thead>' + head('CLASS-SEC') + '</thead><tbody>' +
+                secs.map(k => { const [c, s] = k.split('|'); return rowOf(e(c + '-' + s), bySec[k]); }).join('') + totRow('TOTAL', tot) + '</tbody></table>';
+            const castes = Object.keys(byCaste).sort();
+            h += '<div class="report-title" style="margin-top:12px">3. CASTE-WISE × MEDIUM</div><table class="report-table"><thead>' + head('CASTE') + '</thead><tbody>' +
+                castes.map(k => rowOf(e(k), byCaste[k])).join('') + totRow('TOTAL', tot) + '</tbody></table>';
+            out.innerHTML = h;
+            // CSV export: one flat row per class + section + medium
+            const rows = [];
+            secs.forEach(k => { const [c, s] = k.split('|'); meds.forEach(m => { const r = bySec[k][m]; if (r) { const o = { class: c, section: s, medium: m, boys: r.b, girls: r.g }; if (anyO) o.other = r.o; o.total = r.t; rows.push(o); } }); });
+            lastReportRows = rows; lastReportTitle = 'MEDIUM-WISE STUDENT REPORT ' + sess;
+        }
+
 
         function reportValue(v) {
             return String(v ?? "").trim() || "NOT AVAILABLE";
@@ -2660,7 +2744,7 @@ const ADM=(function(){
    if(seen[k]||existing[k]){msg('Duplicate roll '+rn+' in '+nc+(r.sec?'-'+r.sec:'')+' ('+r.src.name+'). Fix and save again.',true,'amPMsg');return}seen[k]=1}
   if(!confirm((trial?'🧪 TRIAL RUN (test data, can be wiped)\n\n':'')+'Save '+sel.length+' students into class '+nc+' for '+ses(yr())+'?'))return;
   try{const y=yr();let b=db.batch(),n=0;const mx={};
-   for(const r of sel){const x=r.src,rn=parseInt(r.roll,10),d={year:y,type:'promoted',from:r.key,name:up(x.name),sex:x.sex,father:up(x.father),mother:up(x.mother),cls:nc,sec:r.sec,roll:String(rn),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',by:auth.currentUser.email,ts:firebase.firestore.FieldValue.serverTimestamp()};
+   for(const r of sel){const x=r.src,rn=parseInt(r.roll,10),d={year:y,type:'promoted',from:r.key,name:up(x.name),sex:x.sex,father:up(x.father),mother:up(x.mother),cls:nc,sec:r.sec,roll:String(rn),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',medium:x.medium||'',by:auth.currentUser.email,ts:firebase.firestore.FieldValue.serverTimestamp()};
     if(trial)d.trial=true;b.set(db.collection('admStudents').doc((trial?'T_':'')+docId(y,nc,r.sec,rn)),d);if(!trial){const ck=nc+'|'+r.sec;mx[ck]=Math.max(mx[ck]||0,rn)}
     if(++n%400===0){await b.commit();b=db.batch()}}
    await b.commit();
@@ -3451,7 +3535,7 @@ const PROMO=(function(){
   note+='<p class="am-msg" id="pmCount" style="margin:8px 0 0"></p>';$('pmNote').innerHTML=note;
   const list=[];rows.forEach((r,i)=>{if(f==='*'||(f==='__'?!r.os:r.os===f))list.push(i)});
   $('pmTbl').innerHTML='<table class="am-t pm-t" id="pmT"><tr><th>✓</th><th>#</th><th>Name</th><th>Sex</th><th>Father</th><th>Old class-sec</th><th>Old roll</th><th>Merit marks</th><th>→ New roll</th></tr>'+list.map((i,n)=>{const r=rows[i];
-   return '<tr data-i="'+i+'"'+(r.on?'':' class="pm-off"')+'><td><input type="checkbox" '+(r.on?'checked ':'')+(edit?'':'disabled ')+'onchange="PROMO._o('+i+',this.checked)"></td><td>'+(n+1)+'</td><td class="l">'+esc(r.name)+'</td><td>'+esc(r.sex)+'</td><td class="l">'+esc(r.father)+'</td><td>'+esc(r.oc)+(r.os?'-'+esc(r.os):'')+'</td><td>'+esc(r.or)+'</td><td><input type="number" step="any" value="'+esc(r.mk)+'" '+(edit?'':'disabled ')+'onchange="PROMO._m('+i+',this.value)"></td><td><input class="pm-roll" type="number" min="1" value="'+esc(r.roll)+'" '+(edit&&r.on?'':'disabled ')+'onchange="PROMO._r('+i+',this.value)"></td></tr>'}).join('')+'</table>';
+   return '<tr data-i="'+i+'"'+(r.on?'':' class="pm-off"')+'><td><input type="checkbox" '+(r.on?'checked ':'')+(edit?'':'disabled ')+'onchange="PROMO._o('+i+',this.checked)"></td><td>'+(n+1)+'</td><td class="l">'+esc(r.name)+(r.medium&&r.medium!=='Bengali'?' <small>('+esc(r.medium)+')</small>':'')+'</td><td>'+esc(r.sex)+'</td><td class="l">'+esc(r.father)+'</td><td>'+esc(r.oc)+(r.os?'-'+esc(r.os):'')+'</td><td>'+esc(r.or)+'</td><td><input type="number" step="any" value="'+esc(r.mk)+'" '+(edit?'':'disabled ')+'onchange="PROMO._m('+i+',this.value)"></td><td><input class="pm-roll" type="number" min="1" value="'+esc(r.roll)+'" '+(edit&&r.on?'':'disabled ')+'onchange="PROMO._r('+i+',this.value)"></td></tr>'}).join('')+'</table>';
   markDup()}
  function _o(i,v){rows[i].on=v;dirty=true;const tr=document.querySelector('#pmTbl tr[data-i="'+i+'"]');if(tr){tr.classList.toggle('pm-off',!v);const inp=tr.querySelector('input.pm-roll');if(inp)inp.disabled=!v}markDup()}
  function _m(i,v){rows[i].mk=String(v).trim();dirty=true}
@@ -3469,7 +3553,7 @@ const PROMO=(function(){
   dirty=true;draw();msg('Roll numbers filled for '+todo.length+' student(s). You can still edit any box, then Save draft.')}
 
  /* ---------- save / finalize / unlock ---------- */
- const clean=r=>({key:r.key,name:r.name,sex:r.sex,father:r.father,mother:r.mother,dob:r.dob,sikshaId:r.sikshaId,mobile:r.mobile,caste:r.caste,village:r.village,oc:r.oc,os:r.os,or:r.or,roll:String(r.roll||'').trim(),mk:r.mk==null?'':String(r.mk)});
+ const clean=r=>({key:r.key,name:r.name,sex:r.sex,father:r.father,mother:r.mother,dob:r.dob,sikshaId:r.sikshaId,mobile:r.mobile,caste:r.caste,village:r.village,medium:r.medium||'',oc:r.oc,os:r.os,or:r.or,roll:String(r.roll||'').trim(),mk:r.mk==null?'':String(r.mk)});
  async function persist(){
   const {y,c,s,key}=cur,on=rows.filter(r=>r.on).map(clean),ref=db.collection('admAlloc').doc(key);
   await db.runTransaction(async tx=>{const sn=await tx.get(ref),old=sn.exists?sn.data():null;
@@ -3506,7 +3590,7 @@ const PROMO=(function(){
     const keep={};ids.forEach(id=>keep[id]=1);prev.forEach(d=>{if(!keep[d.id])tx.delete(d.ref)});
     let mx=0;
     on.forEach((x,i)=>{const rn=parseInt(x.roll,10);mx=Math.max(mx,rn);
-     tx.set(db.collection('admStudents').doc(ids[i]),{year:y,type:'promoted',from:x.key,name:x.name,sex:x.sex,father:x.father,mother:x.mother,cls:c,sec:s,roll:String(rn),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',allocKey:key,by:mail(),ts:ts()})});
+     tx.set(db.collection('admStudents').doc(ids[i]),{year:y,type:'promoted',from:x.key,name:x.name,sex:x.sex,father:x.father,mother:x.mother,cls:c,sec:s,roll:String(rn),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',medium:x.medium||'',allocKey:key,by:mail(),ts:ts()})});
     tx.set(cref,{year:y,cls:c,sec:s,last:Math.max(cs.exists?cs.data().last||0:0,mx)});
     tx.set(sref,{status:'final',finalBy:mail(),finalTs:ts(),count:on.length},{merge:true})});
    await load(true);msg('Finalized & locked ✔ — '+on.length+' student(s) placed in class '+label(c,s)+'.')}
@@ -3599,6 +3683,8 @@ const PROMO=(function(){
   const any=L.some(x=>num(x.mk)!==null);
   L.sort((a,b)=>{if(any){const ma=num(a.mk),mb=num(b.mk);if(ma!==mb){if(ma===null)return 1;if(mb===null)return-1;return mb-ma}}
    return(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0)||String(a.os).localeCompare(String(b.os))||a.name.localeCompare(b.name)});
+  if(secs.length>1&&medsOf(L,x=>x.medium).length>1){const sa=secs[secs.length-1],bn=secs.slice(0,-1),cnt={};let k=0;secs.forEach(s=>cnt[s]=0);
+   return L.map((x,i)=>{const sec=medN(x.medium)!=MED0?sa:bn[k++%bn.length];return{x,rank:i+1,sec,roll:String(++cnt[sec])}})}
   return L.map((x,i)=>{const r=i+1;return secs.length===2?{x,rank:r,sec:secs[r%2?0:1],roll:String(Math.ceil(r/2))}:{x,rank:r,sec:secs[0],roll:String(r)}})}
  async function auLoad(){
   if(!need('auMsg'))return;await roleP;if(!isAdmin()){msg('Admin only.',true,'auMsg');return}
@@ -3614,14 +3700,14 @@ const PROMO=(function(){
    const cands=[];let skip=0;
    STUDENT_DB.forEach(x=>{if(String(x.cls).trim().toUpperCase()!==old)return;const os=String(x.sec||'').trim().toUpperCase(),k=old+'|'+os+'|'+x.roll;
     if(taken[k]){skip++;return}
-    cands.push({key:k,name:up(x.name),sex:x.sex||'',father:up(x.father),mother:up(x.mother),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',oc:old,os,or:String(x.roll),mk:mk[k]==null?'':String(mk[k])})});
+    cands.push({key:k,name:up(x.name),sex:x.sex||'',father:up(x.father),mother:up(x.mother),dob:x.dob||'',sikshaId:x.sikshaId||'',mobile:x.mobile||'',caste:x.caste||'',village:x.village||'',medium:medN(x.medium),oc:old,os,or:String(x.roll),mk:mk[k]==null?'':String(mk[k])})});
    cands.sort((a,b)=>String(a.os).localeCompare(String(b.os))||(parseInt(a.or,10)||0)-(parseInt(b.or,10)||0));
    const oldSecs=Array.from(new Set(cands.map(x=>x.os))).sort();
-   au={y,c,old,cands,fx,oldSecs,plan:null};
+   au={y,c,old,cands,fx,oldSecs,plan:null};const mm=medsOf(cands,x=>x.medium);
    const sel=$('auSecs');
    if(c==='XII'){sel.disabled=true;$('auRule').innerHTML='<b>Class XI → XII:</b> same section and the <b>same roll number</b> are carried over. No merit list needed.'}
    else{sel.disabled=false;if(oldSecs.length>=2){sel.value='A,B'}else if(sel.value==='A,B'&&oldSecs.length<2){sel.value=oldSecs[0]===''?'':'A'}
-    $('auRule').innerHTML='<b>Class '+esc(old)+' → '+esc(c)+':</b> previous class has <b>'+oldSecs.length+' section(s)</b> ('+esc(oldSecs.map(s=>s||'none').join(', '))+'). All students go into <b>one merit list</b>. One new section → roll = merit rank. Two new sections → <b>odd ranks to A, even ranks to B</b> (rolls 1, 2, 3… in each). Equal marks → lower previous roll first. If no marks are entered, previous roll order is used.'}
+    $('auRule').innerHTML='<b>Class '+esc(old)+' → '+esc(c)+':</b> previous class has <b>'+oldSecs.length+' section(s)</b> ('+esc(oldSecs.map(s=>s||'none').join(', '))+'). All students go into <b>one merit list</b>. One new section → roll = merit rank. Two new sections → <b>odd ranks to A, even ranks to B</b> (rolls 1, 2, 3… in each). Equal marks → lower previous roll first. If no marks are entered, previous roll order is used.'+(mm.length>1?' <b>Medium rule:</b> '+esc(mm.join(' + '))+' found — when two or more new sections are chosen, <b>'+esc(mm.filter(x=>x!=='Bengali').join(', '))+'</b> students go to the <b>last section</b> and Bengali students fill the earlier section(s), each by merit.':'')}
    auTable();$('auPrev').innerHTML='';
    msg(cands.length+' student(s) of class '+old+' loaded'+(skip?' · '+skip+' already placed elsewhere (hidden)':'')+(cands.length?'. Enter / paste marks, then ② Preview.':'. Load Data & Year → from Firebase first.'),!cands.length,'auMsg')}
   catch(e){msg('Load failed: '+(e.code||e.message),true,'auMsg')}}
@@ -3651,7 +3737,7 @@ const PROMO=(function(){
   const r=auCompute();au.plan=r.plan;
   const any=au.cands.some(x=>num(x.mk)!==null),cnt={};r.plan.forEach(p=>cnt[p.sec]=(cnt[p.sec]||0)+1);
   $('auPrev').innerHTML='<p style="margin:6px 8px;font-size:13px"><b>'+(au.c==='XII'?'Same section, same roll':(any?'Merit list (by marks)':'No marks entered — previous roll order'))+'</b> · '+Object.keys(cnt).sort().map(s=>label(au.c,s)+': <b>'+cnt[s]+'</b>').join(' · ')+'</p>'+
-   '<table class="am-t"><tr><th>'+(au.c==='XII'?'#':'Merit')+'</th><th>Name</th><th>Old</th><th>Marks</th><th>→ New class-sec</th><th>New roll</th></tr>'+r.plan.map((p,i)=>'<tr><td>'+(p.rank||i+1)+'</td><td class="l">'+esc(p.x.name)+'</td><td>'+esc(p.x.oc+(p.x.os?'-'+p.x.os:'')+' / '+p.x.or)+'</td><td>'+esc(p.x.mk)+'</td><td><b>'+esc(label(au.c,p.sec))+'</b></td><td><b>'+esc(p.roll)+'</b></td></tr>').join('')+'</table>';
+   '<table class="am-t"><tr><th>'+(au.c==='XII'?'#':'Merit')+'</th><th>Name</th><th>Old</th><th>Marks</th><th>→ New class-sec</th><th>New roll</th></tr>'+r.plan.map((p,i)=>'<tr><td>'+(p.rank||i+1)+'</td><td class="l">'+esc(p.x.name)+(p.x.medium&&p.x.medium!=='Bengali'?' <small>('+esc(p.x.medium)+')</small>':'')+'</td><td>'+esc(p.x.oc+(p.x.os?'-'+p.x.os:'')+' / '+p.x.or)+'</td><td>'+esc(p.x.mk)+'</td><td><b>'+esc(label(au.c,p.sec))+'</b></td><td><b>'+esc(p.roll)+'</b></td></tr>').join('')+'</table>';
   msg(r.err.length?r.err.slice(0,6).join('\n')+(r.err.length>6?'\n… and '+(r.err.length-6)+' more':''):'Preview ready. Press ③ to create the draft sheets (class teachers can then review and finalize).',r.err.length>0,'auMsg')}
  async function auSave(){
   if(!need('auMsg'))return;await roleP;if(!isAdmin()){msg('Admin only.',true,'auMsg');return}
@@ -3831,20 +3917,25 @@ R.setup=()=>{
  let h=`<h2>👩‍🏫 Class Teacher Requests</h2>`+(T.length?TB+'<tr><th>Name / Email</th><th>Class</th><th>Sec</th><th>Status</th><th>Action</th></tr>'+T.map(([u,t])=>`<tr><td><b>${esc(t.name)}</b><br><small>${esc(t.email)}</small></td><td><select id="tc_${u}">${opt(C6.slice(0,6),t.cls)}</select></td><td><select id="ts_${u}">${opt(['A','B','C','D'],t.sec)}</select></td><td>${B(t.status,t.status=='approved'?'ok':t.status=='pending'?'wa':'er')}</td><td><button class="dv-b" onclick="pt_tAct('${u}','approved')">Approve</button> <button class="dv-b g" onclick="pt_tAct('${u}','rejected')">Reject</button> <button class="dv-b er" onclick="pt_tDel('${u}')">✕</button></td></tr>`).join('')+'</table></div>':'<p class="mut">No requests yet.</p>');
  h+=`<h2>🔒 Marks Status — Final Exam</h2>${TB}<tr><th>Class-Sec</th><th>Students</th><th>Teacher</th><th>Status</th><th></th></tr>`+allSecs().map(k=>{const [c,s]=k.split('-'),m=M[k],tc=T.find(([,t])=>t.cls==c&&t.sec==s&&t.status=='approved');
   return `<tr><td><b>${k}</b></td><td>${STUDENT_DB.filter(x=>x.cls==c&&x.sec==s).length}</td><td>${tc?esc(tc[1].email):'—'}</td><td>${m&&m.st=='final'?B('FINAL · LOCKED','ok'):m?B('Draft','wa'):B('Not started','er')}${m&&m.ms&&lastSec(c)==s?'<br><small>Bengali: '+(m.ms.Bengali||'—')+' · Santali: '+(m.ms.Santali||'—')+'</small>':''}</td><td>${m&&m.st=='final'?`<button class="dv-b g" onclick="pt_unlockM('${k}')">🔓 Unlock</button>`:''}</td></tr>`}).join('')+'</table></div>';
- h+=`<h2>🏫 New Session — Sections (Class V–X)</h2><div class="row">Session <input id="sess" type="number" value="${D.session||2027}" style="width:90px;padding:6px"> <button class="dv-b g" onclick="pt_saveSess()">Save</button></div><p class="mut">With 2+ sections the <b>last section is Santali medium</b> (3 → C, 2 → B). Create and lock before promotion.</p>${TB}<tr><th>Class</th><th>No. of sections</th><th>Sections</th><th></th></tr>`+C6.map(c=>{const S=(D.secs||{})[c]||{},n=S.n||2,L=S.list||'ABCD'.slice(0,n).split('');
+ h+=`<h2>🏫 New Session — Sections (Class V–X)</h2><div class="row">Session <input id="sess" type="number" value="${D.session||2027}" style="width:90px;padding:6px"> <button class="dv-b g" onclick="pt_saveSess()">Save</button></div><p class="mut">If <b>more than one medium</b> exists in the student data, the <b>last section holds the non-Bengali medium</b> (e.g. Santali: 3 sections → C, 2 → B); with a single medium all students are spread over all sections. Create and lock before promotion.</p>${TB}<tr><th>Class</th><th>No. of sections</th><th>Sections</th><th></th></tr>`+C6.map(c=>{const S=(D.secs||{})[c]||{},n=S.n||2,L=S.list||'ABCD'.slice(0,n).split('');
   return `<tr><td><b>${c}</b></td><td><select id="sn_${c}" ${S.lock?'disabled':''}>${opt([1,2,3,4],n)}</select></td><td>${L.map((x,i)=>x+(S.lock&&L.length>1&&i==L.length-1?' (Santali)':'')).join(', ')}</td><td>${S.lock?B('LOCKED','ok')+' <button class="dv-b g" onclick="pt_secLock(\''+c+'\',0)">🔓</button>':`<button class="dv-b" onclick="pt_secLock('${c}',1)">🔒 Create & Lock</button>`}</td></tr>`}).join('')+'</table></div>';
  $('setupBody').innerHTML=h;
 };
 function pt_tAct(u,s){W({teachers:{[u]:{status:s,cls:$('tc_'+u).value,sec:$('ts_'+u).value}}})}
 function pt_tDel(u){confirm('Remove this teacher record?')&&W({teachers:{[u]:DEL()}})}
-function pt_unlockM(k){confirm('Unlock '+k+' for editing (both mediums)?')&&W({marks:{[k]:{st:'draft',ms:{Bengali:'draft',Santali:'draft'}}}})}
+function pt_unlockM(k){confirm('Unlock '+k+' for editing (both mediums)?')&&W({marks:{[k]:{st:'draft',ms:Object.fromEntries(MEDL().map(x=>[x,'draft']))}}})}
 function pt_secLock(c,l){if(l){const n=+$('sn_'+c).value;W({secs:{[c]:{n,list:'ABCD'.slice(0,n).split(''),lock:true}}})}else if(confirm('Unlock sections of Class '+c+'?'))W({secs:{[c]:{lock:false}}})}
 
 /* ---------- MARKS (CLASS TEACHER) ---------- */
 function pt_mk(){return ME.role=='admin'?($('mkC')?$('mkC').value:'VI')+'-'+($('mkS')?$('mkS').value:'A'):ME.cls+'-'+ME.sec}
 /* ===== MEDIUM-WISE MARKS: last section (B if 2 sections, C if 3) = Bengali + Santali, entered / ranked / locked separately ===== */
 const lastSec=c=>{const x=secsOf(c).filter(Boolean);return x.length>1?x[x.length-1]:null};
-const medOf=(c,sec,m)=>(lastSec(c)&&sec==lastSec(c)&&m=='Santali')?'Santali':'Bengali';
+/* MEDIUM RULE (data-driven): a student's medium is what is recorded in the student data (blank = Bengali).
+   With more than one medium, the NON-Bengali medium(s) go to the LAST section; Bengali alternate over the other sections. With one medium only, everyone alternates over all sections. */
+const medOf=(c,sec,m)=>medN(m);
+const MEDL=()=>{const a=new Set(['Bengali','Santali']);STUDENT_DB.forEach(s=>a.add(medN(s.medium)));return [...a].sort(medSort)};
+const secMulti=(c,s)=>medsOf(STUDENT_DB.filter(x=>x.cls==c&&x.sec==s)).length>1;
+const isSplit=(c,s)=>{const l=lastSec(c);return (!!l&&s==l)||secMulti(c,s)};
 const PT_TMP={};
 function pt_snap(k){const o=PT_TMP[k]=PT_TMP[k]||{};document.querySelectorAll('.mk-row').forEach(r=>{const cb=r.querySelector('.mk-ab'),ab=!!(cb&&cb.checked),v=r.querySelector('.mk-p').value;o[r.dataset.roll]={p:(ab||v==='')?null:+v,m:r.querySelector('.mk-m').value,ab:ab?1:0}})}
 function pt_medChg(){pt_snap(pt_mk());R.marks()}
@@ -3852,16 +3943,16 @@ function pt_rank(){document.querySelectorAll('.mk-tbl').forEach(t=>{const rs=[..
 R.marks=()=>{
  const adm=ME.role=='admin',pc=adm?($('mkC')?$('mkC').value:'VI'):ME.cls,ps=adm?($('mkS')?$('mkS').value:'A'):ME.sec;
  $('marksSel').innerHTML=adm?`<div class="row">Class <select id="mkC" onchange="pt_R.marks()">${opt(C6,pc)}</select> Sec <select id="mkS" onchange="pt_R.marks()">${opt(['A','B','C','D'],ps)}</select></div>`:'';
- const k=pc+'-'+ps,m=(D.marks||{})[k]||{},fin=m.st=='final',ms=m.ms||{},ls=lastSec(pc),split=!!ls&&ps==ls,anyFin=fin||ms.Bengali=='final'||ms.Santali=='final',ab_=ABR(pc);
+ const k=pc+'-'+ps,m=(D.marks||{})[k]||{},fin=m.st=='final',ms=m.ms||{},ls=lastSec(pc),split=isSplit(pc,ps),anyFin=fin||MEDL().some(x=>ms[x]=='final'),ab_=ABR(pc);
  const tmp=PT_TMP[k]||{},rows={...(m.rows||{})};Object.keys(tmp).forEach(q=>{rows[q]={...(rows[q]||{}),...tmp[q]}});
- $('teacherClassInfo').textContent=`Class ${pc} – Sec ${ps}`+(split?' · Bengali + Santali medium (separate entry & rank)':'');
+ $('teacherClassInfo').textContent=`Class ${pc} – Sec ${ps}`+(split?' · '+MEDL().join(' + ')+' medium (separate entry & rank)':'');
  const S=STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).sort((a,b)=>a.roll-b.roll);
  const med=s=>medOf(pc,ps,(rows[s.roll]||{}).m||s.medium);
- const tbl=(L,md)=>{const lk=fin||ms[md]=='final';return '<div class="tw"><table class="marks-table mk-tbl" data-med="'+md+'"><tr><th>Roll</th><th>Name</th><th>Medium</th>'+(ab_?'<th>Absent (AB)</th>':'')+'<th>% of Marks</th><th>Rank'+(split?' ('+md+')':'')+'</th>'+(ab_?'<th>Result</th>':'')+'</tr>'+L.map(s=>{const r=rows[s.roll]||{},ab=ab_&&r.ab;return `<tr class="mk-row" data-roll="${s.roll}" data-med="${md}"${ab?' style="background:#fdeaea"':''}><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${(!split||anyFin)?'disabled':''} onchange="pt_medChg()">${opt(['Bengali','Santali'],md)}</select></td>${ab_?`<td style="text-align:center"><input class="mk-ab" type="checkbox" ${ab?'checked':''} ${lk?'disabled':''} onchange="pt_abTog(this)"></td>`:''}<td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${ab||r.p==null?'':r.p}" ${lk||ab?'disabled':''} oninput="pt_rank()"></td><td class="mk-rk" style="text-align:center;font-weight:700">—</td>${ab_?`<td class="mk-res">${ab?B('AB / FAILED','er'):''}</td>`:''}</tr>`}).join('')+'</table></div>'};
+ const tbl=(L,md)=>{const lk=fin||ms[md]=='final';return '<div class="tw"><table class="marks-table mk-tbl" data-med="'+md+'"><tr><th>Roll</th><th>Name</th><th>Medium</th>'+(ab_?'<th>Absent (AB)</th>':'')+'<th>% of Marks</th><th>Rank'+(split?' ('+md+')':'')+'</th>'+(ab_?'<th>Result</th>':'')+'</tr>'+L.map(s=>{const r=rows[s.roll]||{},ab=ab_&&r.ab,rm=md||med(s);return `<tr class="mk-row" data-roll="${s.roll}" data-med="${rm}"${ab?' style="background:#fdeaea"':''}><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${(!split||anyFin)?'disabled':''} onchange="pt_medChg()">${opt(MEDL(),rm)}</select></td>${ab_?`<td style="text-align:center"><input class="mk-ab" type="checkbox" ${ab?'checked':''} ${lk?'disabled':''} onchange="pt_abTog(this)"></td>`:''}<td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${ab||r.p==null?'':r.p}" ${lk||ab?'disabled':''} oninput="pt_rank()"></td><td class="mk-rk" style="text-align:center;font-weight:700">—</td>${ab_?`<td class="mk-res">${ab?B('AB / FAILED','er'):''}</td>`:''}</tr>`}).join('')+'</table></div>'};
  let h;
- if(split){h=['Bengali','Santali'].map(md=>{const L=S.filter(s=>med(s)==md),lk=fin||ms[md]=='final';
+ if(split){h=MEDL().filter(md=>md=='Bengali'||md=='Santali'||S.some(s=>med(s)==md)).map(md=>{const L=S.filter(s=>med(s)==md),lk=fin||ms[md]=='final';
    return `<h3 style="margin:16px 0 6px">${md} Medium — ${L.length} students ${lk?B('FINAL · LOCKED','ok'):ms[md]=='draft'?B('Draft saved','wa'):B('Not started','er')}</h3>`+(L.length?tbl(L,md)+(lk?'':`<div class="row" style="margin-top:10px"><button class="dv-b g" onclick="pt_saveMarks(false,'${md}')">💾 Save Draft — ${md}</button><button class="dv-b er" onclick="pt_saveMarks(true,'${md}')">🔒 Final &amp; Lock — ${md}</button></div>`):`<p class="mut">No ${md} medium student in this section.${md=='Santali'?' Use the <b>Medium</b> box in the Bengali list to move a student here (only before any lock).':''}</p>`)}).join('')}
- else h=tbl(S,'Bengali');
+ else h=tbl(S,null);
  $('marksTableContainer').innerHTML=S.length?h:'<p class="mut">No students found for this class-section.</p>';
  $('mkBtns').style.display=(!split&&!fin)?'flex':'none';$('lockStatusMsg').style.display=fin?'block':'none';$('mkUnlock').style.display=anyFin&&adm?'inline-block':'none';
  $('marksStat').innerHTML=fin?B('FINAL · LOCKED','ok'):(m.st||anyFin)?B('Draft saved','wa'):B('Not started','er');
@@ -3869,12 +3960,12 @@ R.marks=()=>{
 };
 function pt_abTog(cb){const r=cb.closest('tr'),p=r.querySelector('.mk-p'),x=r.querySelector('.mk-res');if(cb.checked){p.value='';p.disabled=true;r.style.background='#fdeaea';if(x)x.innerHTML=B('AB / FAILED','er')}else{p.disabled=false;r.style.background='';if(x)x.innerHTML=''}pt_rank()}
 function pt_saveMarks(fin,md){
- const k=pt_mk(),pc=k.split('-')[0],ps=k.split('-')[1],cur=(D.marks||{})[k]||{},ms0=cur.ms||{},ls=lastSec(pc),split=!!ls&&ps==ls;
+ const k=pt_mk(),pc=k.split('-')[0],ps=k.split('-')[1],cur=(D.marks||{})[k]||{},ms0=cur.ms||{},ls=lastSec(pc),split=isSplit(pc,ps);
  if(ME.role=='teacher'&&(cur.st=='final'||(md&&ms0[md]=='final')))return;
  pt_snap(k);
  const rows={};let miss=0,bad=0,n=0;
  document.querySelectorAll('.mk-row').forEach(r=>{
-  const rl=r.dataset.roll,dm=r.dataset.med,moved=medOf(pc,ps,((cur.rows||{})[rl]||{}).m)!=dm;
+  const rl=r.dataset.roll,dm=r.dataset.med,moved=medOf(pc,ps,((cur.rows||{})[rl]||{}).m||(STUDENT_DB.find(s=>s.cls==pc&&s.sec==ps&&String(s.roll)==String(rl))||{}).medium)!=dm;
   if(md&&dm!=md&&!moved)return;n++;
   const cb=r.querySelector('.mk-ab'),ab=!!(cb&&cb.checked),v=ab?'':r.querySelector('.mk-p').value;
   if(!ab&&(!md||dm==md)){if(v==='')miss++;else if(+v<0||+v>100)bad++}
@@ -3885,9 +3976,9 @@ function pt_saveMarks(fin,md){
  const lbl=k+(md?' — '+md+' medium':'');
  if(fin){if(miss)return alert('Enter % for every '+(md?md+' medium ':'')+'student ('+miss+' missing) before Final & Lock.');if(!confirm('Finalise and LOCK '+lbl+'? No edits until Admin unlocks.'))return}
  const o={st:fin?'final':'draft',rows,by:ME.email,ts:Date.now()};
- if(split&&md){const ms={...ms0,[md]:fin?'final':'draft'},all={...(cur.rows||{}),...rows},cnt={Bengali:0,Santali:0};
-  STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).forEach(s=>{cnt[medOf(pc,ps,(all[s.roll]||{}).m||s.medium)]++});
-  o.ms=ms;o.st=['Bengali','Santali'].every(x=>!cnt[x]||ms[x]=='final')?'final':'draft'}
+ if(split&&md){const ms={...ms0,[md]:fin?'final':'draft'},all={...(cur.rows||{}),...rows},cnt={};MEDL().forEach(x=>cnt[x]=0);
+  STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).forEach(s=>{{const q=medOf(pc,ps,(all[s.roll]||{}).m||s.medium);cnt[q]=(cnt[q]||0)+1}});
+  o.ms=ms;o.st=MEDL().every(x=>!cnt[x]||ms[x]=='final')?'final':'draft'}
  W({marks:{[k]:o}}).then(()=>{Object.keys(rows).forEach(q=>{if(PT_TMP[k])delete PT_TMP[k][q]});alert(fin?(md?md+' medium marks locked ✔':'Marks locked ✔'):'Draft saved ✔')});
 }
 
@@ -3897,9 +3988,9 @@ function meritOf(c){
  const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+s.sec]||{}).rows||{})[s.roll]||{};const ab=ABR(c)&&r.ab?1:0;return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:ab?0:+r.p||0,ab,med:medOf(c,s.sec,r.m||s.medium)}});
  L.sort((a,b)=>(a.ab-b.ab)||b.p-a.p||a.n.localeCompare(b.n));return{secs,ok,L};
 }
-function assign(list,S){ // Bengali alternate A,B,A,B… ; Santali -> last section (if 2+ sections)
- const sa=S.length>1?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
- return list.map(x=>{const sec=(x.med=='Santali'&&sa)?sa:bn[i++%bn.length];return{...x,sec,roll:++cnt[sec]}});
+function assign(list,S){ // MORE than one medium: non-Bengali -> last section, Bengali alternate A,B,A,B… over the others. ONE medium only: everyone alternates over ALL sections
+ const multi=medsOf(list,x=>x.med).length>1,sa=(multi&&S.length>1)?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
+ return list.map(x=>{const sec=(sa&&medN(x.med)!=MED0)?sa:bn[i++%bn.length];return{...x,sec,roll:++cnt[sec]}});
 }
 const ND=c=>['V','VI','VII','VIII'].includes(c);
 /* RULE: Class IX-XII — a student ABSENT in the examination is recorded as AB and the result is FAILED (not promoted / repeater) */
@@ -3912,7 +4003,7 @@ R.merit=()=>{
  else{const m=meritOf(PC);
   h+=chk((sk[PC]||{}).lock,'Sections of Class '+PC+' locked (Approvals & Setup)')+chk((sk[t]||{}).lock,'Sections of Class '+t+' locked (Approvals & Setup)')+chk(m.ok,'All sections finalised by Class Teachers ('+m.secs.filter(s=>((D.marks||{})[PC+'-'+s]||{}).st=='final').length+'/'+m.secs.length+')');
   h+=`<div class="row">${ND(PC)?'<input id="passMark" type="hidden" value="0">'+B('No-detention policy: all promoted','ok'):'Pass mark % <input id="passMark" type="number" value="'+pm+'" style="width:70px;padding:6px" onchange="pt_setPass(this.value)">'} <button class="dv-b" ${m.ok?'':'disabled'} onclick="pt_runProm('${PC}')">⚙ Apply Promotion ${pr?'(re-run)':''}</button> <button class="dv-b g" onclick="pt_printMerit()">🖨 Print Merit List</button> ${pr?B('Applied','ok'):''}</div>`;
-  h+='<div id="meritOut">'+['Bengali','Santali'].map(md=>{const L=m.L.filter(x=>x.med==md);return L.length?`<h3>Class ${PC} — ${md} Medium Merit List</h3><div class="tw"><table class="marks-table"><tr><th>Rank</th><th>Name</th><th>Sec–Roll</th><th>%</th><th>Result</th></tr>`+L.map((x,i)=>`<tr><td>${x.ab?'—':i+1}</td><td>${esc(x.n)}</td><td>${x.sec}-${x.roll}</td><td>${x.ab?'AB':x.p}</td><td>${x.ab?B('AB / FAILED → Repeat '+PC,'er'):x.p>=pm?B('Promote → '+t,'ok'):B('Repeat '+PC,'er')}</td></tr>`).join('')+'</table></div>':''}).join('')+'</div>';
+  h+='<div id="meritOut">'+medsOf(m.L,x=>x.med).map((md,_i,MM)=>{const L=m.L.filter(x=>x.med==md);return L.length?`<h3>Class ${PC} — ${MM.length>1?md+' Medium ':''}Merit List</h3><div class="tw"><table class="marks-table"><tr><th>Rank</th><th>Name</th><th>Sec–Roll</th><th>%</th><th>Result</th></tr>`+L.map((x,i)=>`<tr><td>${x.ab?'—':i+1}</td><td>${esc(x.n)}</td><td>${x.sec}-${x.roll}</td><td>${x.ab?'AB':x.p}</td><td>${x.ab?B('AB / FAILED → Repeat '+PC,'er'):x.p>=pm?B('Promote → '+t,'ok'):B('Repeat '+PC,'er')}</td></tr>`).join('')+'</table></div>':''}).join('')+'</div>';
  }
  h+=`<h2>📒 New-Session Registers — lock class-wise</h2><div class="tw"><table class="marks-table"><tr><th>Class</th><th>Students</th><th>Status</th><th></th></tr>`+['V','VI','VII','VIII','IX','X','XII'].map(c=>`<tr><td><b>${c}</b></td><td>${((D.reg||{})[c]||[]).length}</td><td>${(D.plock||{})[c]?B('LOCKED','ok'):B('Open','wa')}</td><td>${(D.plock||{})[c]?`<button class="dv-b g" onclick="pt_unlockReg('${c}')">🔓 Unlock</button> <button class="dv-b g" onclick="pt_printReg2('${c}')">🖨 Roll list</button>`:`<button class="dv-b" onclick="pt_lockReg('${c}')">🔒 Assign Rolls & Lock</button>`}</td></tr>`).join('')+'</table></div><p class="mut">Order: promoted students (merit order) first, then repeaters; Bengali alternate A,B…, Santali to last section.</p>';
  $('promBody').innerHTML=h;
@@ -3924,7 +4015,7 @@ function pt_runProm(c){
  W({pass:p,prom:{[c]:{pass:m.L.filter(x=>x.p>=p).map(f),fail:m.L.filter(x=>x.p<p).map(f),ts:Date.now()}}});
 }
 function pt_runXI(){
- const L=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:s.medium||'Bengali',sec:s.sec,roll:+s.roll}));
+ const L=STUDENT_DB.filter(s=>s.cls=='XI').map(s=>({n:s.name,f:s.father||'',mo:s.mother||'',med:medN(s.medium),sec:s.sec,roll:+s.roll}));
  confirm('Promote '+L.length+' students XI → XII (same sec & roll)?')&&W({prom:{XI:{pass:L,fail:[],ts:Date.now()}}});
 }
 function pt_lockReg(T){
