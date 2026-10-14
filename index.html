@@ -827,7 +827,13 @@ table.marks-table th{background:#145828;color:#fff}
 body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!important}
 @media print{.tf-new-panel,#gatekeeper{display:none!important}}
 
-</style>
+<style>/* header re-arranged: title | scrolling icon strip | status chips */
+.tf-top>div:first-child{flex:none;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tf-top .ad-strip{flex:1 1 0;min-width:0;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden;margin:0 10px;padding:2px 6px!important;scrollbar-width:thin}
+.tf-top .ad-strip>*{flex:none}
+.tf-top>div:last-child{flex:none;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tf-top>div:last-child .tf-chip{margin-left:0!important}
+#roleChip{max-width:210px;overflow:hidden;text-overflow:ellipsis}</style>
 <header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div class="ad-strip" id="admStrip" onclick="ADM.pop()" title="Live new admissions — click for details"></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span><span class="tf-chip" id="roleChip"></span><button class="dv-b g" style="margin-left:8px" onclick="pt_logout()">Sign Out</button></div></header>
 <div class="ad-pop" id="admPop"><div id="admLiveDash" class="ad-live"></div></div>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
@@ -2316,7 +2322,7 @@ const TFDB=(function(){
  async function load(){if(!need())return;year=$('dvYear').value;msg('Loading '+year+'…');
   try{const m=await db.collection('certDb').doc(year).get();if(!m.exists){msg('No online database saved for '+year+' yet.',true);return}
    const n=m.data().chunks,rows=[];for(let i=0;i<n;i++){const c=await db.collection('certDb').doc(year+'_'+i).get();(c.data().rows||[]).forEach(r=>rows.push(r))}
-   apply(rows,'firebase');msg('Loaded '+rows.length+' students for '+year+' from Firebase ✔')}catch(e){msg('Load failed: '+(e.code||e.message),true)}}
+   apply(rows,'firebase');const _mc={};rows.forEach(r=>{const k=medN(r.medium);_mc[k]=(_mc[k]||0)+1});msg('Loaded '+rows.length+' students for '+year+' from Firebase ✔ · Medium: '+Object.keys(_mc).sort(medSort).map(k=>k+' '+_mc[k]).join(', '))}catch(e){msg('Load failed: '+(e.code||e.message),true)}}
  async function upload(){if(!need())return;year=$('dvYear').value;if(!confirm('Upload '+STUDENT_DB.length+' students as database for '+year+'? This replaces the online copy.'))return;
   try{const b=db.batch(),n=Math.ceil(STUDENT_DB.length/CH);for(let i=0;i<n;i++)b.set(db.collection('certDb').doc(year+'_'+i),{year,i,rows:STUDENT_DB.slice(i*CH,(i+1)*CH).map(s=>Object.assign({},s))});
    b.set(db.collection('certDb').doc(year),{year,count:STUDENT_DB.length,chunks:n,updatedBy:auth.currentUser.email,updated:firebase.firestore.FieldValue.serverTimestamp()});await b.commit();chips();msg('Uploaded '+STUDENT_DB.length+' students for '+year+' ✔')}catch(e){msg('Upload failed (admin only): '+(e.code||e.message),true)}}
@@ -2337,7 +2343,7 @@ const TFDB=(function(){
  const y=new Date().getFullYear();$('dvYear').innerHTML=[y-2,y-1,y,y+1].map(v=>'<option'+(v===y?' selected':'')+'>'+v+'</option>').join('');
  document.querySelector('.tf-side').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.v)setView(b.dataset.v);else if(b.id==='tfCol'){document.body.classList.toggle('tf-c');$('tfCol').querySelector('.ic').textContent=document.body.classList.contains('tf-c')?'»':'«'}else if(b.id==='tfSign')$('tfLogin').classList.toggle('show')});
  setView('cert');chips();summary();
- if(ok){const app=firebase.apps.find(a=>a.name==='tfdb')||firebase.initializeApp(CFG,'tfdb');db=app.firestore();auth=app.auth();auth.onAuthStateChanged(u=>{chips();if(u){$('tfLogin').classList.remove('show');$('tfLm').textContent='';msg('Signed in as '+u.email+'. Source: '+src+'.')}})}
+ if(ok){const app=firebase.apps.find(a=>a.name==='tfdb')||firebase.initializeApp(CFG,'tfdb');db=app.firestore();auth=app.auth();auth.onAuthStateChanged(u=>{chips();if(u){$('tfLogin').classList.remove('show');$('tfLm').textContent='';msg('Signed in as '+u.email+'. Source: '+src+'.');if(src!=='firebase')load()}});$('dvYear').addEventListener('change',()=>{if(auth&&auth.currentUser)load()})}
  return{touch,saveOnline,getYear:()=>year,load,upload,builtin,clearLogin,login(){if(!ok){$('tfLm').textContent='Firebase not loaded';return}auth.signInWithEmailAndPassword($('tfE').value.trim(),$('tfP').value).catch(e=>$('tfLm').textContent=e.code||e.message)},logout(){if(auth)auth.signOut().then(()=>$('tfLogin').classList.remove('show'))}};
 })();
 </script>
