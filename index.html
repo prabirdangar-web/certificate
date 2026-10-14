@@ -4465,7 +4465,7 @@ window.LSL={
  col(k,on){on?LS.cols.add(k):LS.cols.delete(k);prev()},
  sug(){suggest();fill()},print,csv,_doc:doc,_rows:rows
 };
-R.lists=function(){if(!built)build();else fill()};
+(window.pt_R||(window.pt_R={})).lists=function(){if(!built)build();else fill()};
 })();
 </script>
 </body>
