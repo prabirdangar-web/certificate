@@ -834,6 +834,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 .tf-top>div:last-child{flex:none;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .tf-top>div:last-child .tf-chip{margin-left:0!important}
 #roleChip{max-width:210px;overflow:hidden;text-overflow:ellipsis}</style>
+<style>body:not([data-role=admin]) #dvLoadBtn{display:none!important}</style>
 <header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div class="ad-strip" id="admStrip" onclick="ADM.pop()" title="Live new admissions — click for details"></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span><span class="tf-chip" id="roleChip"></span><button class="dv-b g" style="margin-left:8px" onclick="pt_logout()">Sign Out</button></div></header>
 <div class="ad-pop" id="admPop"><div id="admLiveDash" class="ad-live"></div></div>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
@@ -862,7 +863,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 
 <div id="dataView">
  <div class="dv-c"><h3>Student database &amp; year</h3><div class="dv-r"><label>Year <select id="dvYear"></select></label>
-  <button class="dv-b" type="button" onclick="TFDB.load()">⬇ Load from Firebase</button><button class="dv-b" type="button" onclick="TFDB.upload()" style="background:#8a5600">⬆ Upload current DB to Firebase (admin)</button><button class="dv-b g" type="button" onclick="TFDB.builtin()">Use built-in (offline)</button><button class="dv-b g" type="button" style="color:#b00020" onclick="TFDB.clearLogin()" title="Sign out and erase the saved trial / test login from this browser">🧹 Remove trial login</button></div>
+  <button class="dv-b" id="dvLoadBtn" type="button" onclick="TFDB.load()">⬇ Load from Firebase</button><button class="dv-b" type="button" onclick="TFDB.upload()" style="background:#8a5600">⬆ Upload current DB to Firebase (admin)</button><button class="dv-b g" type="button" onclick="TFDB.builtin()">Use built-in (offline)</button><button class="dv-b g" type="button" style="color:#b00020" onclick="TFDB.clearLogin()" title="Sign out and erase the saved trial / test login from this browser">🧹 Remove trial login</button></div>
   <p id="dvMsg" style="margin:10px 0 0">Source: built-in database (offline).</p></div>
  <div class="dv-c"><h3>Class-wise strength (current database)</h3><div id="dvCls"></div></div>
 
