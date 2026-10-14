@@ -781,7 +781,7 @@
 body:not([data-role=admin]):not([data-role=teacher]):not([data-role=user]) :is(.tf-side,.tf-top){display:none!important}
 body[data-role=admin] [data-r]:not([data-r*=a]),body[data-role=teacher] [data-r]:not([data-r*=t]),body[data-role=user] [data-r]:not([data-r*=u]){display:none!important}
 body:not([data-view=cert]):not([data-view=reports]):not([data-view=wifs]):not([data-view=data]):not([data-view=fees]):not([data-view=adm]):not([data-view=prom]) :is(.dashboard-panel,.page,.wifs-panel,.wifs-sheet,#dataView){display:none!important}
-body[data-view=home] #homePanel,body[data-view=setup] #setupPanel,body[data-view=marks] #marksPanel,body[data-view=merit] #meritPanel{display:block}
+body[data-view=home] #homePanel,body[data-view=setup] #setupPanel,body[data-view=marks] #marksPanel,body[data-view=merit] #meritPanel,body[data-view=lists] #listsPanel{display:block}
 .tf-new-panel{max-width:1040px!important;font-family:'Segoe UI',Arial,sans-serif;border:0!important;border-radius:16px!important;padding:20px 22px!important}
 .tf-new-panel h2{display:flex;align-items:center;gap:8px;margin:24px 0 10px}.tf-new-panel>h2:first-child,.tf-new-panel>div>h2:first-child{margin-top:0}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:16px 0}
@@ -842,7 +842,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 <div class="gp">DAILY</div><button data-v="cert"><span class="ic">📜</span><span class="l">Certificate</span></button>
 <div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button>
 <button data-v="adm"><span class="ic">🎓</span><span class="l">Admission</span></button><button data-v="prom"><span class="ic">🔁</span><span class="l">Promotion</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
-<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button>
+<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <!-- NEW PANELS -->
@@ -860,6 +860,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 </div>
 
 <div id="meritPanel" class="tf-new-panel"><div id="promBody"></div></div>
+<div id="listsPanel" class="tf-new-panel"><div id="listsBody"></div></div>
 
 <div id="dataView">
  <div class="dv-c"><h3>Student database &amp; year</h3><div class="dv-r"><label>Year <select id="dvYear"></select></label>
@@ -2311,7 +2312,7 @@ const WIFS = (function(){
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const T={cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase'],prom:['Promotion','Draft, finalize & lock roll lists for the new session, class-teacher logins'],home:['Dashboard','Taldangra Fulmati H.S.'],marks:['Marks Entry','Final exam % of marks — save draft, finalise & lock'],setup:['Approvals & Setup','Class-teacher approvals, marks unlock, new-session sections'],merit:['Merit List','Combined class merit list, medium-wise, with new section & roll']};
+ const T={lists:['Student Lists','Medium-wise lists for higher authority and book / uniform / tab distribution'],cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase'],prom:['Promotion','Draft, finalize & lock roll lists for the new session, class-teacher logins'],home:['Dashboard','Taldangra Fulmati H.S.'],marks:['Marks Entry','Final exam % of marks — save draft, finalise & lock'],setup:['Approvals & Setup','Class-teacher approvals, marks unlock, new-session sections'],merit:['Merit List','Combined class merit list, medium-wise, with new section & roll']};
  const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
  function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
  function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
@@ -3838,7 +3839,7 @@ const opt=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join(''
 const secsOf=c=>[...new Set(STUDENT_DB.filter(s=>s.cls==c).map(s=>s.sec))].sort();
 const allSecs=()=>C6.flatMap(c=>secsOf(c).map(s=>c+'-'+s));
 const recNo=(c,s,r)=>`${D.session||2027}/${c}-${s}/${String(r).padStart(3,'0')}`;
-const TT={home:'Dashboard',cert:'Certificate',reports:'Student Reports',wifs:'WIFS Data Entry',fees:'Fee Receipts',data:'Data & Year',adm:'Admission',marks:'Marks Entry — Final Exam',setup:'Approvals & Setup',prom:'Merit List & Promotion'};
+const TT={home:'Dashboard',cert:'Certificate',reports:'Student Reports',wifs:'WIFS Data Entry',fees:'Fee Receipts',data:'Data & Year',adm:'Admission',marks:'Marks Entry — Final Exam',setup:'Approvals & Setup',prom:'Merit List & Promotion',lists:'Student Lists'};
 function msg(t,ok){const m=$('gMsg');m.textContent=t;m.className='gmsg '+(ok?'ok':'err');m.style.display='block'}
 function pt_gv(id){['authMenu','loginGuide','regGuide'].forEach(x=>$(x).style.display=x==id?'block':'none');$('gMsg').style.display='none';const m=$('lgMenu');if(m)m.classList.remove('show')}
 const PT_ROLE={admin:['Admin / Headmaster','Approves registrations and admissions, promotes students, unlocks marks and prints all reports.'],user:['User / Office Staff','Certificates, reports, WIFS, fee receipts and verification of online admission applications.'],teacher:['Class Teacher','Enter final-exam marks for your own class and section after Admin approval.']};
@@ -3902,7 +3903,7 @@ function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a'};
+const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -4346,5 +4347,126 @@ body[data-role=user] #admView .u-ok .am-row:has(#amLink),body[data-role=user] #a
 @media(max-width:640px){.pg-g{grid-template-columns:1fr}.pg-qr canvas{width:140px;height:140px}.fn-g{grid-template-columns:1fr}.lg-main{min-width:100%}.lg-dd{width:100%}.lg-reg{width:100%;text-align:center}.lg-menu{width:100%;left:0;transform:none}}
 @media(prefers-reduced-motion:reduce){#gatekeeper,.gt-tag,.gt-dot,.gt-hero h1.gt-name,.pg-c:before{animation:none!important}}
 </style>
+<script>
+/* ===== ADMIN: STUDENT LISTS (medium-wise / class-wise) — for higher authority & distribution (books, uniform, tab) ===== */
+(function(){
+const CO=['V','VI','VII','VIII','IX','X','XI','XII'];
+const e=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const COLS=[['sl','Sl.'],['cls','Class'],['sec','Sec'],['roll','Roll'],['name','Name of Student'],['sex','Sex'],['caste','Category'],['medium','Medium'],['father',"Father's Name"],['mother',"Mother's Name"],['dob','Date of Birth'],['sikshaId','Banglar Siksha ID'],['mobile','Mobile'],['village','Village'],['rcv','Received (✓)'],['sign','Signature / Thumb impression'],['date','Date'],['rem','Remarks']];
+const BLANK={rcv:1,sign:1,date:1,rem:1};
+const PRE={
+ auth:{t:'Submission to higher authority',h:'LIST OF STUDENTS',cols:['sl','cls','sec','roll','name','sex','caste','medium','father','dob','sikshaId'],sum:1},
+ book:{t:'Distribution of text books',h:'DISTRIBUTION OF TEXT BOOKS',cols:['sl','cls','sec','roll','name','medium','father','sikshaId','sign','date'],sum:0},
+ uniform:{t:'Distribution of uniform',h:'DISTRIBUTION OF UNIFORM',cols:['sl','cls','sec','roll','name','sex','medium','father','sign','date'],sum:0},
+ tab:{t:'Distribution of tab',h:'DISTRIBUTION OF TAB',cols:['sl','cls','sec','roll','name','sex','medium','father','sikshaId','mobile','sign','date'],sum:0},
+ custom:{t:'Student list',h:'LIST OF STUDENTS',cols:['sl','cls','sec','roll','name','sex','caste','medium'],sum:0}
+};
+const LS={purpose:'auth',head:'',sub:'',to:'',memo:'',date:'',cls:new Set(),med:'ALL',sec:'ALL',sex:'ALL',caste:'ALL',group:'medium',cols:new Set(PRE.auth.cols),orient:'portrait',sum:1,sign:1};
+let built=false;
+const yr=()=>((document.getElementById('session')||{}).value||'2026');
+const today=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.getFullYear()};
+const norm=s=>{const x=String(s.sex||'').trim();return /^(f|female|girl)/i.test(x)?'Female':/^(m|male|boy)/i.test(x)?'Male':x||'—'};
+function all(){return STUDENT_DB.map(s=>Object.assign({},s,{_c:String(s.cls||'').trim().toUpperCase(),_s:String(s.sec||'').trim().toUpperCase(),_r:parseInt(s.roll,10)||0,_m:medN(s.medium),_x:norm(s),_k:String(s.caste||'').trim().toUpperCase()||'NOT AVAILABLE'}))}
+function rows(){
+ const m=medsOf();
+ return all().filter(s=>(!LS.cls.size||LS.cls.has(s._c))&&(LS.med==='ALL'||s._m===LS.med)&&(LS.sec==='ALL'||s._s===LS.sec)&&(LS.sex==='ALL'||s._x===LS.sex)&&(LS.caste==='ALL'||s._k===LS.caste))
+  .sort((a,b)=>(CO.indexOf(a._c)-CO.indexOf(b._c))||a._s.localeCompare(b._s)||a._r-b._r||a.name.localeCompare(b.name));
+}
+function filterText(){
+ const p=[];p.push(LS.cls.size?'Class '+CO.filter(c=>LS.cls.has(c)).join(', '):'All classes');
+ if(LS.med!=='ALL')p.push(LS.med+' medium');if(LS.sec!=='ALL')p.push('Section '+LS.sec);if(LS.sex!=='ALL')p.push(LS.sex);if(LS.caste!=='ALL')p.push('Category '+LS.caste);return p.join(' · ')}
+function suggest(){
+ const P=PRE[LS.purpose],y=yr();
+ LS.head=P.h+' — SESSION '+y;
+ LS.sub='Sub: '+P.t+(LS.cls.size?' of Class '+CO.filter(c=>LS.cls.has(c)).join(', '):' of all classes')+(LS.med!=='ALL'?' ('+LS.med+' medium)':' (medium-wise)')+', session '+y+'.';
+}
+function groupsOf(L){
+ if(LS.group==='none')return[{t:'',r:L}];
+ const key=s=>LS.group==='medium'?s._m:LS.group==='class'?s._c:s._c+'|'+s._m,M=new Map();
+ L.forEach(s=>{const k=key(s);if(!M.has(k))M.set(k,[]);M.get(k).push(s)});
+ const ms=medsOf(),ord=k=>{const [c,m]=k.split('|');return LS.group==='medium'?ms.indexOf(k):LS.group==='class'?CO.indexOf(k):CO.indexOf(c)*100+ms.indexOf(m)};
+ return [...M.keys()].sort((a,b)=>ord(a)-ord(b)).map(k=>{const [c,m]=k.split('|');return{t:LS.group==='medium'?'Medium: '+k:LS.group==='class'?'Class '+k:'Class '+c+' — '+m+' Medium',r:M.get(k)}});
+}
+const cv=(s,k,i)=>k==='sl'?i+1:k==='cls'?s._c:k==='sec'?s._s:k==='roll'?s.roll:k==='sex'?s._x:k==='caste'?s._k:k==='medium'?s._m:k==='dob'?(s.dob?s.dob.split('-').reverse().join('-'):''):BLANK[k]?'':(s[k]||'');
+function table(g){
+ const cs=COLS.filter(c=>LS.cols.has(c[0]));
+ let h='<table class="ls-t"><thead><tr>'+cs.map(c=>'<th'+(c[0]==='sign'?' style="width:34%"':'')+'>'+e(c[1])+'</th>').join('')+'</tr></thead><tbody>';
+ g.r.forEach((s,i)=>{h+='<tr>'+cs.map(c=>'<td class="'+(c[0]==='name'||c[0]==='father'||c[0]==='mother'||c[0]==='village'?'l':'')+'">'+e(cv(s,c[0],i))+'</td>').join('')+'</tr>'});
+ const b=g.r.filter(s=>s._x==='Male').length,gl=g.r.filter(s=>s._x==='Female').length;
+ return h+'<tr class="ls-tot"><td colspan="'+cs.length+'">Total: '+g.r.length+' &nbsp;(Boys '+b+', Girls '+gl+(g.r.length-b-gl?', Other '+(g.r.length-b-gl):'')+')</td></tr></tbody></table>';
+}
+function summary(L){
+ const ms=medsOf(L.length?L:undefined,L.length?undefined:undefined);
+ const cl=CO.filter(c=>L.some(s=>s._c===c)),mm=[...new Set(L.map(s=>s._m))].sort(medSort);
+ let h='<div class="ls-h2">Summary — class × medium</div><table class="ls-t"><thead><tr><th>Class</th>'+mm.map(m=>'<th>'+e(m)+'</th>').join('')+'<th>Total</th></tr></thead><tbody>';
+ cl.forEach(c=>{const n=mm.map(m=>L.filter(s=>s._c===c&&s._m===m).length);h+='<tr><td><b>'+c+'</b></td>'+n.map(x=>'<td>'+x+'</td>').join('')+'<td><b>'+n.reduce((a,b)=>a+b,0)+'</b></td></tr>'});
+ const t=mm.map(m=>L.filter(s=>s._m===m).length);
+ return h+'<tr class="ls-tot"><td>Total</td>'+t.map(x=>'<td>'+x+'</td>').join('')+'<td>'+L.length+'</td></tr></tbody></table>';
+}
+const CSS='.ls-doc{font-family:Arial,sans-serif;color:#000;font-size:12px}.ls-doc h2{text-align:center;margin:0;font-size:17px}.ls-doc .c{text-align:center;margin:2px 0;font-size:11px}.ls-doc .hd{text-align:center;font-weight:bold;font-size:14px;margin:10px 0 2px;text-decoration:underline}.ls-doc .sb{margin:6px 0;font-size:12px}.ls-doc .mt{display:flex;justify-content:space-between;margin-top:6px}.ls-doc .gt{font-weight:bold;margin:12px 0 4px;font-size:13px}.ls-h2{font-weight:bold;margin:14px 0 4px}.ls-t{width:100%;border-collapse:collapse;margin-bottom:6px}.ls-t th,.ls-t td{border:1px solid #444;padding:4px 5px;text-align:center;font-size:11px}.ls-t td.l{text-align:left}.ls-t th{background:#e9efe9}.ls-t thead{display:table-header-group}.ls-t tr{page-break-inside:avoid}.ls-t td{height:20px}.ls-tot td{font-weight:bold;text-align:right;background:#f3f3f3}.ls-sg{display:flex;justify-content:space-between;margin-top:46px;font-size:12px}.ls-sg div{text-align:center;min-width:180px;border-top:1px solid #000;padding-top:3px}.ls-pb{page-break-before:always}';
+function doc(){
+ const L=rows(),G=groupsOf(L);
+ let h='<div class="ls-doc"><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><div class="c">Taldangra, Bankura, West Bengal &nbsp;·&nbsp; UDISE: 19132104401</div>';
+ if(LS.memo||LS.date)h+='<div class="mt"><span>'+(LS.memo?'Memo No: '+e(LS.memo):'')+'</span><span>'+(LS.date?'Date: '+e(LS.date):'')+'</span></div>';
+ if(LS.to)h+='<div class="sb"><b>To,</b><br>'+e(LS.to).replace(/\n/g,'<br>')+'</div>';
+ h+='<div class="hd">'+e(LS.head)+'</div>';
+ if(LS.sub)h+='<div class="sb"><b>'+e(LS.sub)+'</b></div>';
+ h+='<div class="sb">Selection: '+e(filterText())+' &nbsp;|&nbsp; Students: <b>'+L.length+'</b></div>';
+ if(!L.length)h+='<p>No student matches the selection.</p>';
+ G.forEach((g,i)=>{if(g.t)h+='<div class="gt'+(i&&LS.group==='medium'?' ls-pb':'')+'">'+e(g.t)+' — '+g.r.length+' student(s)</div>';h+=table(g)});
+ if(LS.sum&&L.length)h+=summary(L);
+ if(LS.sign)h+='<div class="ls-sg"><div>Prepared by (Office)</div><div>Headmaster / Head of Institution<br>(with seal)</div></div>';
+ return h+'</div>';
+}
+function csv(){
+ const cs=COLS.filter(c=>LS.cols.has(c[0])&&c[0]!=='sl'),G=groupsOf(rows()),out=[['Sl.','Group'].concat(cs.map(c=>c[1]))];
+ let n=0;G.forEach(g=>g.r.forEach(s=>{n++;out.push([n,g.t].concat(cs.map(c=>cv(s,c[0],0))))}));
+ const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+ const b=new Blob(['\ufeff'+out.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download=(LS.head||'student_list').replace(/[^a-z0-9]+/gi,'_')+'.csv';document.body.appendChild(a);a.click();a.remove();
+}
+function print(){
+ const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+ w.document.write('<html><head><meta charset="UTF-8"><title>'+e(LS.head)+'</title><style>@page{size:A4 '+LS.orient+';margin:10mm}body{margin:0}'+CSS+'</style></head><body>'+doc()+'</body></html>');
+ w.document.close();w.focus();setTimeout(()=>w.print(),300);
+}
+const opt=(a,v)=>a.map(x=>'<option'+(x[0]===v?' selected':'')+' value="'+e(x[0])+'">'+e(x[1])+'</option>').join('');
+function build(){
+ const B=document.getElementById('listsBody');if(!B)return;
+ const inp='style="padding:6px;width:100%;box-sizing:border-box"';
+ B.innerHTML='<h2>📋 Student Lists — medium-wise / class-wise</h2><p class="mut">Make a list from the student data loaded in <b>Data &amp; Year</b> for submission to a higher authority or for distribution (books, uniform, tab). Students with no medium recorded are counted as Bengali.</p>'+
+ '<div class="tw"><table class="marks-table" style="max-width:980px"><tr><td style="width:150px"><b>Purpose</b></td><td><select id="ls_purpose" onchange="LSL.set(\'purpose\',this.value)" '+inp+'>'+opt(Object.keys(PRE).map(k=>[k,PRE[k].t]),LS.purpose)+'</select></td></tr>'+
+ '<tr><td><b>Headline</b></td><td><input id="ls_head" '+inp+' oninput="LSL.set(\'head\',this.value,1)"></td></tr>'+
+ '<tr><td><b>Subject (Sub:)</b></td><td><input id="ls_sub" '+inp+' oninput="LSL.set(\'sub\',this.value,1)"> <button class="dv-b g" type="button" onclick="LSL.sug()" style="margin-top:4px">↻ Suggest headline &amp; subject</button></td></tr>'+
+ '<tr><td><b>To (authority)</b></td><td><textarea id="ls_to" rows="2" '+inp+' placeholder="Optional — e.g. The Sub-Inspector of Schools…" oninput="LSL.set(\'to\',this.value,1)"></textarea></td></tr>'+
+ '<tr><td><b>Memo no. / Date</b></td><td><input id="ls_memo" style="padding:6px;width:48%" placeholder="Memo no. (optional)" oninput="LSL.set(\'memo\',this.value,1)"> <input id="ls_date" style="padding:6px;width:48%" oninput="LSL.set(\'date\',this.value,1)"></td></tr>'+
+ '<tr><td><b>Class</b><br><small>none ticked = all</small></td><td id="ls_cls"></td></tr>'+
+ '<tr><td><b>Filters</b></td><td id="ls_flt"></td></tr>'+
+ '<tr><td><b>Group by</b></td><td><select id="ls_group" onchange="LSL.set(\'group\',this.value)" style="padding:6px">'+opt([['medium','Medium (separate table & page per medium)'],['class','Class'],['classmedium','Class + Medium'],['none','No grouping']],LS.group)+'</select> &nbsp; Paper <select id="ls_or" onchange="LSL.set(\'orient\',this.value)" style="padding:6px">'+opt([['portrait','A4 portrait'],['landscape','A4 landscape']],LS.orient)+'</select></td></tr>'+
+ '<tr><td><b>Columns</b></td><td id="ls_cols"></td></tr>'+
+ '<tr><td><b>Extras</b></td><td><label><input type="checkbox" id="ls_sum" onchange="LSL.set(\'sum\',this.checked?1:0)"> Class × medium summary table</label> &nbsp; <label><input type="checkbox" id="ls_sign" onchange="LSL.set(\'sign\',this.checked?1:0)"> Signature block</label></td></tr></table></div>'+
+ '<div class="row" style="margin:10px 0"><button class="dv-b" type="button" onclick="LSL.print()">🖨 Print / Save PDF</button><button class="dv-b g" type="button" onclick="LSL.csv()">⬇ Export CSV</button> <span id="ls_cnt" class="mut"></span></div><style>'+CSS+'</style><div id="ls_prev" class="tw" style="background:#fff;padding:14px;border:1px solid #ccc;overflow:auto"></div>';
+ built=true;suggest();fill();
+}
+function fill(){
+ const g=id=>document.getElementById(id);if(!g('ls_cls'))return;
+ g('ls_head').value=LS.head;g('ls_sub').value=LS.sub;g('ls_to').value=LS.to;g('ls_memo').value=LS.memo;g('ls_date').value=LS.date||(LS.date=today());
+ g('ls_sum').checked=!!LS.sum;g('ls_sign').checked=!!LS.sign;
+ g('ls_cls').innerHTML=CO.map(c=>'<label style="margin-right:10px"><input type="checkbox" '+(LS.cls.has(c)?'checked ':'')+'onchange="LSL.cl(\''+c+'\',this.checked)"> '+c+'</label>').join('');
+ const A=all(),sel=(id,lab,v,a)=>lab+' <select onchange="LSL.set(\''+id+'\',this.value)" style="padding:6px;margin-right:8px"><option value="ALL">All</option>'+a.map(x=>'<option'+(x===v?' selected':'')+'>'+e(x)+'</option>').join('')+'</select>';
+ g('ls_flt').innerHTML=sel('med','Medium',LS.med,medsOf())+sel('sec','Section',LS.sec,[...new Set(A.map(s=>s._s))].filter(Boolean).sort())+sel('sex','Sex',LS.sex,['Male','Female'])+sel('caste','Category',LS.caste,[...new Set(A.map(s=>s._k))].sort());
+ g('ls_cols').innerHTML=COLS.map(c=>'<label style="display:inline-block;width:225px"><input type="checkbox" '+(LS.cols.has(c[0])?'checked ':'')+'onchange="LSL.col(\''+c[0]+'\',this.checked)"> '+e(c[1])+'</label>').join('');
+ prev();
+}
+function prev(){const p=document.getElementById('ls_prev');if(!p)return;p.innerHTML=doc();const c=document.getElementById('ls_cnt');if(c)c.textContent=rows().length+' student(s) selected'}
+window.LSL={
+ set(k,v,soft){if(k==='purpose'){LS.purpose=v;LS.cols=new Set(PRE[v].cols);LS.sum=PRE[v].sum;suggest();fill();return}LS[k]=v;if(soft){prev();return}if(['med','cls'].includes(k)||k==='sec'||k==='sex'||k==='caste'){suggest();}fill()},
+ cl(c,on){on?LS.cls.add(c):LS.cls.delete(c);suggest();fill()},
+ col(k,on){on?LS.cols.add(k):LS.cols.delete(k);prev()},
+ sug(){suggest();fill()},print,csv,_doc:doc,_rows:rows
+};
+R.lists=function(){if(!built)build();else fill()};
+})();
+</script>
 </body>
 </html>
