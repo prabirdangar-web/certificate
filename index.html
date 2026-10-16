@@ -11,7 +11,72 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+/* ===== Class IX Registration forms (W.B.B.S.E.) - generated from STUDENT_DB ===== */
+const REGF=(function(){
+ const R=id=>document.getElementById(id),esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ const ORD=['','FIRST','SECOND','THIRD','FOURTH','FIFTH','SIXTH','SEVENTH','EIGHTH','NINTH','TENTH','ELEVENTH','TWELFTH','THIRTEENTH','FOURTEENTH','FIFTEENTH','SIXTEENTH','SEVENTEENTH','EIGHTEENTH','NINETEENTH','TWENTIETH','TWENTY-FIRST','TWENTY-SECOND','TWENTY-THIRD','TWENTY-FOURTH','TWENTY-FIFTH','TWENTY-SIXTH','TWENTY-SEVENTH','TWENTY-EIGHTH','TWENTY-NINTH','THIRTIETH','THIRTY-FIRST'];
+ const ONE=['ZERO','ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','TEN','ELEVEN','TWELVE','THIRTEEN','FOURTEEN','FIFTEEN','SIXTEEN','SEVENTEEN','EIGHTEEN','NINETEEN'],TENS=['','','TWENTY','THIRTY','FORTY','FIFTY','SIXTY','SEVENTY','EIGHTY','NINETY'];
+ const MON=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+ const card=n=>n<20?ONE[n]:TENS[Math.floor(n/10)]+(n%10?'-'+ONE[n%10]:'');
+ const yrW=y=>y>=2000?'TWO THOUSAND'+(y>2000?' '+card(y-2000):''):(card(Math.floor(y/100))+' HUNDRED'+(y%100?' AND '+card(y%100):''));
+ function dobParts(d){const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(d||''));return m?{y:+m[1],m:+m[2],d:+m[3],iso:m[0]}:null}
+ const dobTxt=p=>p?(('0'+p.d).slice(-2)+'-'+('0'+p.m).slice(-2)+'-'+p.y):'';
+ const dobWords=p=>p?'( '+ORD[p.d]+' '+MON[p.m-1]+', '+yrW(p.y)+' )':'';
+ const medOfS=s=>{const m=typeof medN==='function'?medN(s.medium):String(s.medium||'Bengali');return (String(m).trim()||'Bengali').toUpperCase()};
+ const SCHOOL='TALDANGRA FULMATI HIGH SCHOOL [H.S.]';
+ function form(s,o){
+  const p=dobParts(s.dob),ok=p&&p.iso<o.cut,sex=/^f/i.test(s.sex||'')?'GIRLS':'BOYS',caste=String(s.caste||'GENERAL').toUpperCase(),cut=dobTxt(dobParts(o.cut));
+  return '<div class="rf"><div class="wm">'+SCHOOL+'</div>'+
+  '<div class="h1">WEST BENGAL BOARD OF SECONDARY EDUCATION</div>'+
+  '<div class="bsp">BSP-ID: '+esc(s.sikshaId||'')+'</div><div class="yr">IX Registration : '+esc(o.year)+'</div>'+
+  '<div class="el">'+(ok||!p?'D.O.B. before '+cut+' &mdash; YOU ARE ELIGIBLE FOR REGISTRATION IN '+esc(o.year):'<b style="color:#000">D.O.B. on / after '+cut+' &mdash; NOT ELIGIBLE (check age proof)</b>')+'</div>'+
+  '<div class="sch">'+SCHOOL+'</div><hr>'+
+  '<div class="doc">Documents to submit: (1) Self-attested caste certificate [if any] &nbsp; (2) Self-attested disability certificate [if any] &nbsp; (3) Fee Rs. '+esc(o.fee)+' &nbsp; (4) Birth certificate<br>Bring original documents: One B/W passport photo,Admission receipt, Aadhaar, Birth certificate, Caste certificate &amp; Disability certificate</div>'+
+  '<div class="ln"><b>SL/C-S-R:</b> IX'+esc(s.sec||'')+esc(s.roll||'')+' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Class: IX &nbsp;Sec: '+esc(s.sec||'')+' &nbsp;Roll: '+esc(s.roll||'')+'</b></div>'+
+  '<div class="nm"><b>Name: '+esc(s.name)+'</b></div>'+
+  '<div class="ln" style="margin-top:2mm"><b>Sex:</b> '+sex+' <span style="margin-left:14mm"><b>D.O.B.:</b> <b class="db">'+esc(dobTxt(p)||s.dob||'')+'</b></span></div>'+
+  '<div class="dw">'+esc(dobWords(p))+'</div>'+
+  '<div class="nm" style="margin-top:2mm"><b>Father\'s Name: '+esc(s.father||'')+'</b></div>'+
+  '<div class="nm"><b>Mother\'s Name: '+esc(s.mother||'')+'</b></div>'+
+  '<div class="ln"><b>Guardian:</b> <i class="bx"></i> FATHER <i class="bx"></i> MOTHER <i class="bx"></i> OTHER</div>'+
+  '<div class="ln"><b>PWD (Y/N):</b> _______ <small>(If Yes, certificate required)</small></div>'+
+  '<div class="ln"><b>Village:</b> <span class="fb" style="width:36mm"></span> <b style="margin-left:14mm">P.O.:</b> <span class="fb" style="width:36mm"></span></div>'+
+  '<div class="ln"><b>District:</b> <span class="fb" style="width:36mm;margin-left:1mm"></span> <b style="margin-left:14mm">PIN:</b> <span class="fb" style="width:36mm;margin-left:3mm"></span></div>'+
+  '<div class="ln"><b>Mobile No.:</b> '+esc(s.mobile||'')+'</div>'+
+  '<div class="ln"><b>Nationality: INDIAN</b> &nbsp;&nbsp;&nbsp; <b>Religion:</b> HINDUISM / MUSLIM / OTHERS (circle)</div>'+
+  '<div class="ln"><b>Caste:</b> '+esc(caste)+' <small style="margin-left:22mm">(If other than General, certificate required)</small></div>'+
+  '<div class="ln"><b>Language-1: BENGALI &nbsp;&nbsp; Language-2: ENGLISH</b></div>'+
+  '<div class="ln"><b>Medium of Writing:</b> '+esc(medOfS(s))+' <small style="margin-left:20mm">(subjects other than FL &amp; SL)</small></div>'+
+  '<div class="ln"><b>Optional Elective:</b> ___________________________</div>'+
+  '<div class="ln"><b>Class admitted 1st in school:</b> ___________ <small style="margin-left:12mm">(blank if not sure)</small></div>'+
+  '<div class="ln"><b>Date of 1st admission:</b> _______________ <small style="margin-left:8mm">(blank if not sure)</small></div>'+
+  '<div class="ln"><b>Aadhaar No.:</b> ___________________________________<small>(to be filled by student)</small></div>'+
+  '<div class="ph"><span>PASTE HERE<br>RECENT B/W<br>PASSPORT PHOTO</span></div><div class="sg"></div><div class="sgc">(Signature of the student,<br>use black ball-point pen only)</div>'+
+  '<div class="nt">Note: If any data above is found to be wrong, submit / produce supporting documents for correction.</div></div>'}
+ function print(){
+  const o={year:R('rgYear').value.trim()||'2026',cut:R('rgCut').value||'2013-10-31',fee:R('rgFee').value||'70'},sec=R('rgSec').value,from=parseInt(R('rgFrom').value,10),to=parseInt(R('rgTo').value,10);
+  let L=STUDENT_DB.filter(s=>s.cls==='IX'&&(!sec||String(s.sec||'')===sec)&&(isNaN(from)||(+s.roll)>=from)&&(isNaN(to)||(+s.roll)<=to));
+  L.sort((a,b)=>String(a.sec||'').localeCompare(String(b.sec||''))||((+a.roll)-(+b.roll)));
+  if(!L.length){R('rgMsg').textContent='No Class IX students found for this selection.';R('rgMsg').style.color='#b00020';return}
+  const bad=L.filter(s=>{const p=dobParts(s.dob);return p&&p.iso>=o.cut}).length;
+  R('rgMsg').textContent=L.length+' form(s) generated'+(bad?' — '+bad+' student(s) with D.O.B. on/after the cut-off are marked NOT ELIGIBLE':'')+'.';R('rgMsg').style.color=bad?'#b00020':'#0b5a2b';
+  let pages='';for(let i=0;i<L.length;i+=2)pages+='<div class="pg">'+form(L[i],o)+'<div class="cut"></div>'+(L[i+1]?form(L[i+1],o):'')+'</div>';
+  const css='@page{size:A4 portrait;margin:6mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pg{page-break-after:always;height:285mm}.pg:last-child{page-break-after:auto}'+
+   '.rf{position:relative;height:139mm;border:.3mm solid #000;padding:3mm 5mm;overflow:hidden;font-size:8pt}.cut{border-top:.3mm dashed #000;margin:3mm 0}'+
+   '.wm{position:absolute;left:-8mm;top:62mm;width:215mm;text-align:center;font-size:30pt;font-weight:700;color:#ececec;transform:rotate(-24deg);white-space:nowrap;z-index:0}'+
+   '.rf>*:not(.wm){position:relative;z-index:1}.h1{text-align:center;font-weight:700;font-size:10pt;margin-top:1mm}.bsp{position:absolute!important;left:5mm;top:9mm;font-size:7.5pt}.yr{position:absolute!important;right:5mm;top:9mm;font-size:7.5pt}'+
+   '.el{text-align:center;font-style:italic;font-size:7pt;margin-top:3mm}.sch{text-align:center;font-weight:700;font-size:9.5pt;margin-top:1mm}hr{border:0;border-top:.3mm solid #000;margin:2mm 0}'+
+   '.doc{font-style:italic;font-size:6.2pt;line-height:1.5}.ln{margin-top:1.7mm;font-size:7.5pt}.nm{margin-top:1.7mm;font-size:10pt}.db{font-size:10pt}.dw{margin:1.2mm 0 0 17mm;font-style:italic;font-size:7pt}'+
+   '.bx{display:inline-block;width:3mm;height:3mm;border:.3mm solid #000;vertical-align:middle;margin-left:1mm}.fb{display:inline-block;height:5mm;border:.3mm solid #000;vertical-align:middle}small{font-size:6pt}'+
+   '.ph{position:absolute!important;right:5mm;top:34mm;width:44mm;height:54mm;border:.3mm dotted #000;color:#cfcfcf;font-weight:700;font-size:8pt;text-align:center;display:flex;align-items:center;justify-content:center}.ph span{transform:rotate(-28deg);display:block;line-height:1.3}'+
+   '.sg{position:absolute!important;right:5mm;top:93mm;width:56mm;height:19mm;border:.4mm solid #000}.sgc{position:absolute!important;right:5mm;top:114mm;width:56mm;font-size:6pt;line-height:1.4}.nt{position:absolute!important;left:5mm;bottom:3mm;font-size:6pt;font-style:italic}';
+  const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print the forms.');return}
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>IX Registration Forms '+esc(o.year)+'</title><style>'+css+'</style></head><body>'+pages+'</body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),500)}
+ return{print}
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --dashboard-bg: #ecefe6;
@@ -1162,6 +1227,17 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
   <p id="fcMsg">Next year: Class XII students are leaving, so they get no receipt. Pick a class and press Generate.</p>
  </div>
  <div class="dv-c fee-ctl"><h3>Fee structure by class on receipt (Rs.) — editable, saved online for all users</h3><div id="fcFees"></div></div>
+ <div class="dv-c fee-ctl"><h3>Class IX Registration forms (W.B.B.S.E.) &mdash; 2 forms per A4 page, from the student list</h3>
+  <div class="fc-grid">
+   <label>Registration year <input id="rgYear" type="text" value="2026"></label>
+   <label>D.O.B. must be before <input id="rgCut" type="date" value="2013-10-31"></label>
+   <label>Registration fee (Rs.) <input id="rgFee" type="number" min="0" value="70"></label>
+   <label>Section <select id="rgSec"><option value="">All</option><option>A</option><option>B</option><option>C</option></select></label>
+   <label>Roll from <input id="rgFrom" type="number" min="0"></label>
+   <label>Roll to <input id="rgTo" type="number" min="0"></label>
+  </div>
+  <div class="row" style="margin-top:8px"><button class="dv-b" type="button" onclick="REGF.print()">&#128424; Generate &amp; print IX registration forms</button><span id="rgMsg" style="font-size:12px;margin-left:8px"></span></div>
+  <p style="font-size:12px;color:#555;margin:6px 0 0">Filled from the student data: BSP-ID (Banglar Siksha ID), name, sex, D.O.B. (also in words), parents, mobile, caste and medium of writing. Village, P.O., District, PIN, religion, guardian, PWD, optional elective, Aadhaar and signature are left blank for the student to fill in by hand. Allow pop-ups to print.</p></div>
  <div class="fee-wrap"><div id="feeSheets"></div></div>
 </div>
 
