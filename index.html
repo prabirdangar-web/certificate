@@ -3874,8 +3874,9 @@ const W=o=>ref.set(o,{merge:true}),DEL=()=>firebase.firestore.FieldValue.delete(
 const B=(t,c)=>`<span class="bdg ${c}">${t}</span>`,chk=(o,t)=>`<div class="st ${o?'ok':''}">${o?'✅':'⬜'} ${t}</div>`;
 const opt=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
 /* Class V has two sections: A (Bengali) and B (Santali medium) - B is fetched from the student profile medium */
-const secOfS=s=>(s.cls==='V'&&String(s.medium||'').trim()&&medN(s.medium)!==MED0)?'B':s.sec;
-const secsOf=c=>[...new Set(STUDENT_DB.filter(s=>s.cls==c).map(secOfS))].sort();
+const LASTSEC={V:'B',VI:'C',VII:'C',VIII:'C',IX:'C',X:'B'}; /* V: A,B (B Santali) | VI-IX: A,B,C (C Santali) | X: A,B (B Santali) | XI-XII as in data */
+const secOfS=s=>{const L=LASTSEC[s.cls];return (L&&String(s.medium||'').trim()&&medN(s.medium)!==MED0)?L:s.sec};
+const secsOf=c=>[...new Set(STUDENT_DB.filter(s=>s.cls==c).map(secOfS).concat(LASTSEC[c]?[LASTSEC[c]]:[]))].sort();
 const allSecs=()=>C6.flatMap(c=>secsOf(c).map(s=>c+'-'+s));
 const recNo=(c,s,r)=>`${D.session||2027}/${c}-${s}/${String(r).padStart(3,'0')}`;
 const TT={home:'Dashboard',cert:'Certificate',reports:'Student Reports',wifs:'WIFS Data Entry',fees:'Fee Receipts',data:'Data & Year',adm:'Admission',marks:'Marks Entry — Final Exam',setup:'Approvals & Setup',prom:'Merit List & Promotion',lists:'Student Lists'};
@@ -3976,7 +3977,7 @@ function pt_secLock(c,l){if(l){const n=+$('sn_'+c).value;W({secs:{[c]:{n,list:'A
 /* ---------- MARKS (CLASS TEACHER) ---------- */
 function pt_mk(){return ME.role=='admin'?($('mkC')?$('mkC').value:'VI')+'-'+($('mkS')?$('mkS').value:'A'):ME.cls+'-'+ME.sec}
 /* ===== MEDIUM-WISE MARKS: last section (B if 2 sections, C if 3) = Bengali + Santali, entered / ranked / locked separately ===== */
-const lastSec=c=>{const x=secsOf(c).filter(Boolean);return x.length>1?x[x.length-1]:null};
+const lastSec=c=>{if(LASTSEC[c])return LASTSEC[c];const x=secsOf(c).filter(Boolean);return x.length>1?x[x.length-1]:null};
 /* MEDIUM RULE (data-driven): a student's medium is what is recorded in the student data (blank = Bengali).
    With more than one medium, the NON-Bengali medium(s) go to the LAST section; Bengali alternate over the other sections. With one medium only, everyone alternates over all sections. */
 const medOf=(c,sec,m)=>medN(m);
@@ -4002,7 +4003,8 @@ R.marks=()=>{
  if(split){h=MEDL().filter(md=>tm?md==tm:(md=='Bengali'||md=='Santali'||S.some(s=>med(s)==md))).map(md=>{const L=S.filter(s=>med(s)==md),lk=fin||ms[md]=='final';
    return `<h3 style="margin:16px 0 6px">${md} Medium — ${L.length} students ${lk?B('FINAL · LOCKED','ok'):ms[md]=='draft'?B('Draft saved','wa'):B('Not started','er')}</h3>`+(L.length?tbl(L,md)+(lk?'':`<div class="row" style="margin-top:10px"><button class="dv-b g" onclick="pt_saveMarks(false,'${md}')">💾 Save Draft — ${md}</button><button class="dv-b er" onclick="pt_saveMarks(true,'${md}')">🔒 Final &amp; Lock — ${md}</button></div>`):`<p class="mut">No ${md} medium student in this section.${md=='Santali'?' Use the <b>Medium</b> box in the Bengali list to move a student here (only before any lock).':''}</p>`)}).join('')}
  else h=tbl(S,null);
- $('marksTableContainer').innerHTML=S.length?h:'<p class="mut">No students found for this class-section.</p>';
+ const _rl={},_dup=[];S.forEach(s=>{const r=String(s.roll);if(_rl[r])_dup.push(r);_rl[r]=1});
+ $('marksTableContainer').innerHTML=S.length?(_dup.length?'<p style="color:#b00020;font-weight:700">⚠ Duplicate roll no. in this section ('+[...new Set(_dup)].join(', ')+') — marks are saved by roll, so give each student a unique roll in the student data first.</p>':'')+h:'<p class="mut">No students found for this class-section.</p>';
  $('mkBtns').style.display=(!split&&!fin)?'flex':'none';$('lockStatusMsg').style.display=fin?'block':'none';$('mkUnlock').style.display=anyFin&&adm?'inline-block':'none';
  $('marksStat').innerHTML=fin?B('FINAL · LOCKED','ok'):(m.st||anyFin)?B('Draft saved','wa'):B('Not started','er');
  pt_rank();
