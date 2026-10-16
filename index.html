@@ -2545,6 +2545,17 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
   <div class="am-row"><label style="font-size:11px;font-weight:700">Show <select id="apFilt" onchange="ADM.drawApps()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="open">Open (pending / verified / approved)</option><option value="pending">Waiting for staff verification</option><option value="verified">Waiting for admin approval</option><option value="approved">Approved — ready to admit</option><option value="admitted">Admitted</option><option value="rejected">Rejected</option><option value="all">All</option></select></label>
    <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Load applications</button><span id="amRole" class="am-msg" style="margin:0"></span></div>
   <div id="amApps" class="am-box" style="display:none"></div>
+  <div class="am-box" style="margin-top:12px;border:1px solid #c9d6cc;border-radius:10px;padding:10px 12px">
+   <h3 style="margin:0 0 4px;font-size:15px">3b &middot; Class XI merit / selection list &mdash; Science &middot; Arts &middot; Santali</h3>
+   <p class="am-msg" style="margin:0 0 8px">Built from the online Class XI applications, ranked by <b>Madhyamik %</b> (tie: higher total marks, then earlier application). Set the <b>seats</b> the school can give (need-based demand) and the <b>cut-off %</b> (lowest Madhyamik % to be considered); leave seats blank to take everyone above the cut-off. Santali-medium applicants (Science or Arts) are ranked in their own list.</p>
+   <div style="overflow-x:auto"><table class="am-t" style="max-width:640px"><tr><th>List</th><th>Seats</th><th>Cut-off % (min.)</th><th>Waiting list size</th></tr>
+    <tr><td class="l"><b>Science</b></td><td><input id="xiSeatSC" type="number" min="0" style="width:80px"></td><td><input id="xiCutSC" type="number" min="0" max="100" step="0.01" style="width:90px"></td><td><input id="xiWaitSC" type="number" min="0" style="width:80px" placeholder="all"></td></tr>
+    <tr><td class="l"><b>Arts</b></td><td><input id="xiSeatART" type="number" min="0" style="width:80px"></td><td><input id="xiCutART" type="number" min="0" max="100" step="0.01" style="width:90px"></td><td><input id="xiWaitART" type="number" min="0" style="width:80px" placeholder="all"></td></tr>
+    <tr><td class="l"><b>Santali medium</b></td><td><input id="xiSeatSAN" type="number" min="0" style="width:80px"></td><td><input id="xiCutSAN" type="number" min="0" max="100" step="0.01" style="width:90px"></td><td><input id="xiWaitSAN" type="number" min="0" style="width:80px" placeholder="all"></td></tr></table></div>
+   <div class="am-row"><label style="font-size:11px;font-weight:700">Applications included <select id="xiInc" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="live">All except rejected</option><option value="ver">Staff-verified &amp; above</option><option value="app">Admin-approved &amp; admitted only</option></select></label>
+    <button class="dv-b" type="button" onclick="ADM.xiGen()">&#9881; Generate XI list</button><button class="dv-b g" type="button" onclick="ADM.xiPrint()">&#128424; Print</button></div>
+   <div id="xiOut" style="margin-top:8px"></div>
+  </div>
   <details class="am-d"><summary><b>One-time Firebase setup (Firestore rules)</b></summary>
    <p>Your current rules are kept as they are. Add this block (already included in the ready-made <b>firestore.rules</b> file) inside <code>match /databases/{database}/documents { … }</code> after the certDb block, then Publish. It uses your existing <code>isAdmin()</code> / <code>isMarksStaff()</code> (roles in <code>users/{uid}</code>):</p>
 <pre>// ================= ADMISSION (promotion, new admission, online form) — SEPARATE RULE =================
@@ -3280,7 +3291,53 @@ const ADM=(function(){
  window.addEventListener('load',qrDraw);
  if(auth)auth.onAuthStateChanged(u=>{role=null;if(u){roleP=db.collection('users').doc(u.uid).get().then(sn=>{role=sn.exists?String(sn.data().role||''):''}).catch(()=>{role='?'}).then(()=>{live();dash();if(document.body.dataset.view==='adm')refresh(true)})}else stopLive()});
  dash();
- return{pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+
+ /* ---------- 3b. Class XI merit / selection list (Science, Arts, Santali) ---------- */
+ const XIG=[['SC','Science'],['ART','Arts'],['SAN','Santali medium (Science + Arts)']];
+ const xiPct=a=>{let v=parseFloat(String(a.mpPct==null?'':a.mpPct).replace('%','').trim());if(!isFinite(v)){const m=parseFloat(String(a.mpMarks==null?'':a.mpMarks).trim());v=isFinite(m)&&m>0?Math.round(m/7*100)/100:NaN}return isFinite(v)?v:null};
+ const xiMk=a=>parseFloat(a.mpMarks)||0;
+ const xiGroup=a=>{if(/sant/i.test(String(a.medium||'')))return 'SAN';const s=String(a.stream||'').toLowerCase();return s.indexOf('sci')===0?'SC':s.indexOf('art')===0?'ART':'OTH'};
+ let xiRes=null;
+ try{const s=JSON.parse(localStorage.getItem('tfhsXiSel')||'{}');Object.keys(s).forEach(k=>{const e=$(k);if(e)e.value=s[k]})}catch(e){}
+ function xiSave(){const o={};['SC','ART','SAN'].forEach(k=>['Seat','Cut','Wait'].forEach(f=>{o['xi'+f+k]=$('xi'+f+k).value}));try{localStorage.setItem('tfhsXiSel',JSON.stringify(o))}catch(e){}}
+ function xiCompute(){
+  const inc=$('xiInc').value,okS=inc==='app'?['approved','admitted']:inc==='ver'?['verified','approved','admitted']:['pending','verified','approved','admitted'];
+  const list=apps.filter(a=>String(a.cls||'').trim().toUpperCase()==='XI'&&okS.indexOf(a.status)>=0);
+  const g={SC:[],ART:[],SAN:[],OTH:[]};list.forEach(a=>g[xiGroup(a)].push(a));
+  const cmp=(a,b)=>(xiPct(b)-xiPct(a))||(xiMk(b)-xiMk(a))||String(a.ref||'').localeCompare(String(b.ref||''))||String(a.name||'').localeCompare(String(b.name||''));
+  const res={};
+  XIG.forEach(x=>{const k=x[0],seats=parseInt($('xiSeat'+k).value,10)||0,cut=parseFloat($('xiCut'+k).value)||0,w=$('xiWait'+k).value.trim(),wait=w===''?Infinity:(parseInt(w,10)||0);
+   const withP=g[k].filter(a=>xiPct(a)!==null).sort(cmp),nop=g[k].filter(a=>xiPct(a)===null);
+   const elig=withP.filter(a=>xiPct(a)>=cut),below=withP.filter(a=>xiPct(a)<cut);
+   const sel=seats>0?elig.slice(0,seats):elig,rest=seats>0?elig.slice(seats):[];
+   res[k]={title:x[1],seats,cut,total:g[k].length,withP,sel,wl:rest.slice(0,wait),over:rest.slice(wait),below,nop,
+    tie:!!(rest.length&&sel.length&&xiPct(rest[0])===xiPct(sel[sel.length-1]))}});
+  return{res,other:g.OTH.length,list}}
+ function xiHtml(c,pr){
+  const th='<tr><th>Merit</th><th>Ref</th><th>Name</th><th>Category</th><th>Stream / Medium</th><th>Madhyamik roll</th><th>Marks</th><th>%</th><th>Application</th><th>Result</th></tr>';
+  const row=(a,rank,lab,col)=>'<tr><td>'+(rank||'')+'</td><td><small>'+esc(a.ref||'')+'</small></td><td class="l"><b>'+esc(a.name)+'</b><br><small>'+esc(a.father||'')+(a.village?' &middot; '+esc(a.village):'')+'</small></td><td>'+esc(a.caste||'')+'</td><td>'+esc((a.stream||'')+(a.medium?' / '+a.medium:''))+'</td><td>'+esc(a.mpRoll||'')+'</td><td>'+esc(a.mpMarks||'')+'</td><td><b>'+(xiPct(a)===null?'&mdash;':xiPct(a).toFixed(2))+'</b></td><td><small>'+esc(stText[a.status]||a.status)+'</small></td><td style="color:'+col+';font-weight:700">'+lab+'</td></tr>';
+  let h='';
+  XIG.forEach(x=>{const r=c.res[x[0]];if(!r.total)return;
+   const rk=a=>r.withP.indexOf(a)+1,last=r.sel.length?xiPct(r.sel[r.sel.length-1]):null;
+   h+='<h3 style="margin:14px 0 4px;color:#145828">'+esc(r.title)+' &mdash; '+r.total+' applicant(s) &middot; seats '+(r.seats||'open')+' &middot; cut-off '+r.cut+'%</h3>'+
+    '<p style="margin:2px 0 6px;font-size:13px">Selected <b>'+r.sel.length+'</b>'+(last!==null?' (effective merit cut-off <b>'+last.toFixed(2)+'%</b>)':'')+' &middot; Waiting <b>'+r.wl.length+'</b> &middot; Below cut-off <b>'+r.below.length+'</b>'+(r.nop.length?' &middot; <span style="color:#b00020">Madhyamik % missing: <b>'+r.nop.length+'</b></span>':'')+(r.tie?' &middot; <span style="color:#b00020">tie at the last seat &mdash; decide before admitting</span>':'')+'</p>'+
+    '<div style="overflow-x:auto"><table class="am-t">'+th+
+    r.sel.map(a=>row(a,rk(a),'Selected','#0b5a2b')).join('')+
+    r.wl.map((a,i)=>row(a,rk(a),'Waiting W'+(i+1),'#8a5600')).join('')+
+    r.over.map(a=>row(a,rk(a),'Not in list','#666')).join('')+
+    r.below.map(a=>row(a,rk(a),'Below cut-off','#b00020')).join('')+
+    r.nop.map(a=>row(a,'','% missing','#b00020')).join('')+'</table></div>'});
+  if(c.other)h+='<p style="font-size:12px;color:#8a5600">'+c.other+' Class XI applicant(s) with another stream (e.g. Vocational) are not in these lists.</p>';
+  return h||'<p class="am-msg">No Class XI applications found for the selected status.</p>'}
+ function xiGen(){
+  if(!apps.length){msg('Press "Load applications" first.',true,'amAMsg');return}
+  xiSave();xiRes=xiCompute();$('xiOut').innerHTML=xiHtml(xiRes,false)}
+ function xiPrint(){
+  if(!xiRes)xiGen();if(!xiRes)return;
+  const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+  w.document.write('<html><head><title>XI merit list</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px;color:#000}h2{text-align:center;margin:0}h3{margin:12px 0 2px}table{width:100%;border-collapse:collapse;margin-top:4px}th,td{border:1px solid #000;padding:2px 4px;text-align:left}th{background:#eee}p{margin:2px 0}</style></head><body><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><p style="text-align:center"><b>Class XI admission &mdash; merit / selection list on Madhyamik %, session '+ses(yr())+'</b></p>'+xiHtml(xiRes,true).replace(/class="am-t"/g,'').replace(/ style="color:#[0-9a-f]+;font-weight:700"/g,' style="font-weight:700"')+'<p style="margin-top:26px">Headmaster: ______________</p></body></html>');
+  w.document.close();w.focus();setTimeout(()=>w.print(),300)}
+ return{xiGen,xiPrint,pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
 })();
 </script>
 
