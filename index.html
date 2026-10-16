@@ -1161,7 +1161,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
   </div>
   <p id="fcMsg">Next year: Class XII students are leaving, so they get no receipt. Pick a class and press Generate.</p>
  </div>
- <div class="dv-c fee-ctl"><h3>Fee structure by class on receipt (Rs.) — editable, saved in this browser</h3><div id="fcFees"></div></div>
+ <div class="dv-c fee-ctl"><h3>Fee structure by class on receipt (Rs.) — editable, saved online for all users</h3><div id="fcFees"></div></div>
  <div class="fee-wrap"><div id="feeSheets"></div></div>
 </div>
 
@@ -2642,6 +2642,16 @@ const FEE=(function(){
  let fill={enrol:155,proc:30,conv:30,centre:70,misc:25};
  try{const s=localStorage.getItem('tfhsFill');if(s)fill=Object.assign(fill,JSON.parse(s))}catch(e){}
  const fillTot=()=>FK.reduce((a,k)=>a+(+fill[k]||0),0);
+ /* ---- shared online copy: Firestore tfhs/feeStructure (same for every computer / user); localStorage is only an offline cache ---- */
+ const remote=()=>{try{const a=firebase.apps.find(x=>x.name==='tfdb');return a?{db:a.firestore(),auth:a.auth()}:null}catch(e){return null}};
+ const sync=(m,bad)=>{const e=$('fcSync');if(e){e.textContent=m;e.style.color=bad?'#b00020':'#0b5a2b'}};
+ const cache=()=>{try{localStorage.setItem('tfhsFees2',JSON.stringify(fees));localStorage.setItem('tfhsFill',JSON.stringify(fill))}catch(x){}};
+ function applyRemote(d){if(d.fees)Object.keys(d.fees).forEach(k=>{if(fees[k]&&Array.isArray(d.fees[k])&&d.fees[k].length===HEADS.length)fees[k]=d.fees[k].map(v=>+v||0)});if(d.fill)FK.forEach(k=>{if(d.fill[k]!=null)fill[k]=+d.fill[k]||0});cache()}
+ async function pull(){const r=remote();if(!r)return sync('Offline — fees shown from this browser only.',true);if(!r.auth.currentUser)return sync('Sign in to load / save the shared fee structure (shown from this browser for now).',true);
+  try{const s=await r.db.collection('tfhs').doc('feeStructure').get();if(s.exists){applyRemote(s.data());drawFees();sync('Shared fee structure loaded from online — same for all users.')}else{sync('No shared fee structure online yet — press "Save for all users" to publish the values below.',true)}}catch(e){sync('Could not load shared fees: '+(e.code||e.message),true)}}
+ async function push(){cache();const r=remote();if(!r||!r.auth.currentUser)return sync('Not signed in — saved in this browser only.',true);
+  try{await r.db.collection('tfhs').doc('feeStructure').set({fees:JSON.parse(JSON.stringify(fees)),fill:Object.assign({},fill),by:r.auth.currentUser.email||'',updated:firebase.firestore.FieldValue.serverTimestamp()});sync('Saved online ✔ — every computer / user will see these fees.')}catch(e){sync('Online save failed: '+(e.code||e.message)+(e.code==='permission-denied'?' (add a Firestore rule for tfhs/feeStructure)':''),true)}}
+ let pushT=null;const later=()=>{cache();sync('Unsaved changes — saving online…',true);clearTimeout(pushT);pushT=setTimeout(push,1200)};
  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
  const A1=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'],T10=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
  function w2(n){return n<20?A1[n]:T10[Math.floor(n/10)]+(n%10?' '+A1[n%10]:'')}
@@ -2653,9 +2663,10 @@ const FEE=(function(){
   $('fcFees').innerHTML='<div style="overflow-x:auto"><table class="fc-tbl"><tr><th>Class</th>'+HEADS.map(h=>'<th>'+h+'</th>').join('')+'<th>Total</th></tr>'+
    KEYS.map(c=>'<tr><td><b>'+LB(c)+'</b></td>'+fees[c].map((v,i)=>'<td><input type="number" min="0" data-c="'+c+'" data-i="'+i+'" value="'+v+'"></td>').join('')+'<td id="fcT_'+c+'"><b>'+tot(c)+'</b></td></tr>').join('')+'</table></div>'+
    '<h3 style="margin:16px 0 6px;font-size:14px">Form fill-up (sent-up) — Class X &amp; XII (Rs.)</h3><table class="fc-tbl"><tr><th>Enrolment Fee</th><th>Form Processing</th><th>Convenience Fee</th><th>Centre Fee</th><th>Misc Fee</th><th>Total</th></tr><tr>'+FK.map(k=>'<td><input type="number" min="0" data-f="'+k+'" value="'+fill[k]+'"></td>').join('')+'<td id="fcFT"><b>'+fillTot()+'</b></td></tr></table>'+
-   '<p style="font-size:12px;color:#555;margin:8px 0 0">Registration Fee (Class IX &amp; XI) and Identity Card etc. (V–X) are 0 until you type the amount above. Heads with 0 are hidden on the receipt unless they are normally printed for that class.</p>';
-  $('fcFees').querySelectorAll('input[data-c]').forEach(e=>e.oninput=()=>{fees[e.dataset.c][+e.dataset.i]=+e.value||0;$('fcT_'+e.dataset.c).innerHTML='<b>'+tot(e.dataset.c)+'</b>';try{localStorage.setItem('tfhsFees2',JSON.stringify(fees))}catch(x){}});
-  $('fcFees').querySelectorAll('input[data-f]').forEach(e=>e.oninput=()=>{fill[e.dataset.f]=+e.value||0;$('fcFT').innerHTML='<b>'+fillTot()+'</b>';try{localStorage.setItem('tfhsFill',JSON.stringify(fill))}catch(x){}})}
+   '<p style="font-size:12px;color:#555;margin:8px 0 0">Registration Fee (Class IX &amp; XI) and Identity Card etc. (V–X) are 0 until you type the amount above. Heads with 0 are hidden on the receipt unless they are normally printed for that class.</p>'+
+   '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="dv-b" type="button" onclick="FEE.push()">💾 Save for all users</button><button class="dv-b g" type="button" onclick="FEE.pull()">↻ Reload shared fees</button><span id="fcSync" style="font-size:12px"></span></div>';
+  $('fcFees').querySelectorAll('input[data-c]').forEach(e=>e.oninput=()=>{fees[e.dataset.c][+e.dataset.i]=+e.value||0;$('fcT_'+e.dataset.c).innerHTML='<b>'+tot(e.dataset.c)+'</b>';later()});
+  $('fcFees').querySelectorAll('input[data-f]').forEach(e=>e.oninput=()=>{fill[e.dataset.f]=+e.value||0;$('fcFT').innerHTML='<b>'+fillTot()+'</b>';later()})}
  function rowsHtml(fk,f,amt,o){
   if(o.fill){const F=fill,n2=v=>Number(v||0).toFixed(2);return '<tr><td>1. Form Fill-up Fee<br><small>&bull; Enrolment Fee &ndash; Rs.'+(+F.enrol||0)+'<br>&bull; Form Processing &ndash; Rs.'+(+F.proc||0)+'<br>&bull; Convenience Fee &ndash; Rs.'+(+F.conv||0)+'</small></td><td class="fr-r">'+n2((+F.enrol||0)+(+F.proc||0)+(+F.conv||0))+'</td></tr><tr><td>2. Centre Fee</td><td class="fr-r">'+n2(F.centre)+'</td></tr><tr><td>3. Misc Fee</td><td class="fr-r">'+n2(F.misc)+'</td></tr>'}
   const sh=SHOW[fk]||[];let n=0;return HEADS.map((h,i)=>(sh.includes(i)||+f[i]>0)?'<tr><td>'+(++n)+'. '+h+'</td><td class="fr-r">'+amt(f[i])+'</td></tr>':'').join('')}
@@ -2693,7 +2704,9 @@ const FEE=(function(){
  function one(s,sesStr){const no=sesStr+'_'+s.cls+(s.sec||'')+s.roll,reg=s.type==='new'?(ADM.regText(s)||''):null;$('feeSheets').innerHTML='<div class="fee-page">'+card('COUNTERPART (SCHOOL COPY)',no,s.name,s.cls,s.sec||'',s.roll,sesStr,reg,{free:!!s.feeFree,note:s.feeNote,trial:!!s.trial,row:s})+card('ORIGINAL (STUDENT COPY)',no,s.name,s.cls,s.sec||'',s.roll,sesStr,reg,{free:!!s.feeFree,note:s.feeNote,trial:!!s.trial,row:s})+'</div>';print()}
  function print(){if(!$('feeSheets').innerHTML)gen();if(!$('feeSheets').innerHTML)return;document.body.classList.add('print-fee');const d=()=>{document.body.classList.remove('print-fee');window.removeEventListener('afterprint',d)};window.addEventListener('afterprint',d);window.print()}
  mode();drawFees();
- return{gen,print,words,mode,one}
+ try{const r=remote();if(r)r.auth.onAuthStateChanged(u=>{if(u)pull()})}catch(e){}
+ setTimeout(pull,1800);
+ return{gen,print,words,mode,one,pull,push}
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -3860,7 +3873,9 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const W=o=>ref.set(o,{merge:true}),DEL=()=>firebase.firestore.FieldValue.delete();
 const B=(t,c)=>`<span class="bdg ${c}">${t}</span>`,chk=(o,t)=>`<div class="st ${o?'ok':''}">${o?'✅':'⬜'} ${t}</div>`;
 const opt=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
-const secsOf=c=>[...new Set(STUDENT_DB.filter(s=>s.cls==c).map(s=>s.sec))].sort();
+/* Class V has two sections: A (Bengali) and B (Santali medium) - B is fetched from the student profile medium */
+const secOfS=s=>(s.cls==='V'&&String(s.medium||'').trim()&&medN(s.medium)!==MED0)?'B':s.sec;
+const secsOf=c=>[...new Set(STUDENT_DB.filter(s=>s.cls==c).map(secOfS))].sort();
 const allSecs=()=>C6.flatMap(c=>secsOf(c).map(s=>c+'-'+s));
 const recNo=(c,s,r)=>`${D.session||2027}/${c}-${s}/${String(r).padStart(3,'0')}`;
 const TT={home:'Dashboard',cert:'Certificate',reports:'Student Reports',wifs:'WIFS Data Entry',fees:'Fee Receipts',data:'Data & Year',adm:'Admission',marks:'Marks Entry — Final Exam',setup:'Approvals & Setup',prom:'Merit List & Promotion',lists:'Student Lists'};
@@ -3948,7 +3963,7 @@ R.setup=()=>{
  const T=Object.entries(D.teachers||{}),M=D.marks||{},TB='<div class="tw"><table class="marks-table">';
  let h=`<h2>👩‍🏫 Class Teacher Requests</h2>`+(T.length?TB+'<tr><th>Name / Email</th><th>Class</th><th>Sec</th><th>Status</th><th>Action</th></tr>'+T.map(([u,t])=>`<tr><td><b>${esc(t.name)}</b><br><small>${esc(t.email)}</small></td><td><select id="tc_${u}">${opt(C6.slice(0,6),t.cls)}</select></td><td><select id="ts_${u}">${opt(['A','B','C','D'],t.sec)}</select></td><td>${B(t.status,t.status=='approved'?'ok':t.status=='pending'?'wa':'er')}</td><td><button class="dv-b" onclick="pt_tAct('${u}','approved')">Approve</button> <button class="dv-b g" onclick="pt_tAct('${u}','rejected')">Reject</button> <button class="dv-b er" onclick="pt_tDel('${u}')">✕</button></td></tr>`).join('')+'</table></div>':'<p class="mut">No requests yet.</p>');
  h+=`<h2>🔒 Marks Status — Final Exam</h2>${TB}<tr><th>Class-Sec</th><th>Students</th><th>Teacher</th><th>Status</th><th></th></tr>`+allSecs().map(k=>{const [c,s]=k.split('-'),m=M[k],tc=T.find(([,t])=>t.cls==c&&t.sec==s&&t.status=='approved');
-  return `<tr><td><b>${k}</b></td><td>${STUDENT_DB.filter(x=>x.cls==c&&x.sec==s).length}</td><td>${tc?esc(tc[1].email):'—'}</td><td>${m&&m.st=='final'?B('FINAL · LOCKED','ok'):m?B('Draft','wa'):B('Not started','er')}${m&&m.ms&&lastSec(c)==s?'<br><small>Bengali: '+(m.ms.Bengali||'—')+' · Santali: '+(m.ms.Santali||'—')+'</small>':''}</td><td>${m&&m.st=='final'?`<button class="dv-b g" onclick="pt_unlockM('${k}')">🔓 Unlock</button>`:''}</td></tr>`}).join('')+'</table></div>';
+  return `<tr><td><b>${k}</b></td><td>${STUDENT_DB.filter(x=>x.cls==c&&secOfS(x)==s).length}</td><td>${tc?esc(tc[1].email):'—'}</td><td>${m&&m.st=='final'?B('FINAL · LOCKED','ok'):m?B('Draft','wa'):B('Not started','er')}${m&&m.ms&&lastSec(c)==s?'<br><small>Bengali: '+(m.ms.Bengali||'—')+' · Santali: '+(m.ms.Santali||'—')+'</small>':''}</td><td>${m&&m.st=='final'?`<button class="dv-b g" onclick="pt_unlockM('${k}')">🔓 Unlock</button>`:''}</td></tr>`}).join('')+'</table></div>';
  h+=`<h2>🏫 New Session — Sections (Class V–X)</h2><div class="row">Session <input id="sess" type="number" value="${D.session||2027}" style="width:90px;padding:6px"> <button class="dv-b g" onclick="pt_saveSess()">Save</button></div><p class="mut">If <b>more than one medium</b> exists in the student data, the <b>last section holds the non-Bengali medium</b> (e.g. Santali: 3 sections → C, 2 → B); with a single medium all students are spread over all sections. Create and lock before promotion.</p>${TB}<tr><th>Class</th><th>No. of sections</th><th>Sections</th><th></th></tr>`+C6.map(c=>{const S=(D.secs||{})[c]||{},n=S.n||2,L=S.list||'ABCD'.slice(0,n).split('');
   return `<tr><td><b>${c}</b></td><td><select id="sn_${c}" ${S.lock?'disabled':''}>${opt([1,2,3,4],n)}</select></td><td>${L.map((x,i)=>x+(S.lock&&L.length>1&&i==L.length-1?' (Santali)':'')).join(', ')}</td><td>${S.lock?B('LOCKED','ok')+' <button class="dv-b g" onclick="pt_secLock(\''+c+'\',0)">🔓</button>':`<button class="dv-b" onclick="pt_secLock('${c}',1)">🔒 Create & Lock</button>`}</td></tr>`}).join('')+'</table></div>';
  $('setupBody').innerHTML=h;
@@ -3966,7 +3981,7 @@ const lastSec=c=>{const x=secsOf(c).filter(Boolean);return x.length>1?x[x.length
    With more than one medium, the NON-Bengali medium(s) go to the LAST section; Bengali alternate over the other sections. With one medium only, everyone alternates over all sections. */
 const medOf=(c,sec,m)=>medN(m);
 const MEDL=()=>{const a=new Set(['Bengali','Santali']);STUDENT_DB.forEach(s=>a.add(medN(s.medium)));return [...a].sort(medSort)};
-const secMulti=(c,s)=>medsOf(STUDENT_DB.filter(x=>x.cls==c&&x.sec==s)).length>1;
+const secMulti=(c,s)=>medsOf(STUDENT_DB.filter(x=>x.cls==c&&secOfS(x)==s)).length>1;
 const isSplit=(c,s)=>{const l=lastSec(c);return (!!l&&s==l)||secMulti(c,s)};
 const PT_TMP={};
 function pt_snap(k){const o=PT_TMP[k]=PT_TMP[k]||{};document.querySelectorAll('.mk-row').forEach(r=>{const cb=r.querySelector('.mk-ab'),ab=!!(cb&&cb.checked),v=r.querySelector('.mk-p').value;o[r.dataset.roll]={p:(ab||v==='')?null:+v,m:r.querySelector('.mk-m').value,ab:ab?1:0}})}
@@ -3979,10 +3994,10 @@ R.marks=()=>{
  const tmp=PT_TMP[k]||{},rows={...(m.rows||{})};Object.keys(tmp).forEach(q=>{rows[q]={...(rows[q]||{}),...tmp[q]}});
  const tm=(!adm&&ME.med)?ME.med:'';
  $('teacherClassInfo').textContent=`Class ${pc} – Sec ${ps}`+(tm?' · '+tm+' medium only':'')+(split?' · '+MEDL().join(' + ')+' medium (separate entry & rank)':'');
- let S=STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).sort((a,b)=>a.roll-b.roll);
+ let S=STUDENT_DB.filter(s=>s.cls==pc&&secOfS(s)==ps).sort((a,b)=>a.roll-b.roll);
  const med=s=>medOf(pc,ps,(rows[s.roll]||{}).m||s.medium);
  if(tm)S=S.filter(s=>med(s)==tm);
- const tbl=(L,md)=>{const lk=fin||ms[md]=='final';return '<div class="tw"><table class="marks-table mk-tbl" data-med="'+md+'"><tr><th>Roll</th><th>Name</th><th>Medium</th>'+(ab_?'<th>Absent (AB)</th>':'')+'<th>% of Marks</th><th>Rank'+(split?' ('+md+')':'')+'</th>'+(ab_?'<th>Result</th>':'')+'</tr>'+L.map(s=>{const r=rows[s.roll]||{},ab=ab_&&r.ab,rm=md||med(s);return `<tr class="mk-row" data-roll="${s.roll}" data-med="${rm}"${ab?' style="background:#fdeaea"':''}><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${(!split||anyFin)?'disabled':''} onchange="pt_medChg()">${opt(MEDL(),rm)}</select></td>${ab_?`<td style="text-align:center"><input class="mk-ab" type="checkbox" ${ab?'checked':''} ${lk?'disabled':''} onchange="pt_abTog(this)"></td>`:''}<td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${ab||r.p==null?'':r.p}" ${lk||ab?'disabled':''} oninput="pt_rank()"></td><td class="mk-rk" style="text-align:center;font-weight:700">—</td>${ab_?`<td class="mk-res">${ab?B('AB / FAILED','er'):''}</td>`:''}</tr>`}).join('')+'</table></div>'};
+ const tbl=(L,md)=>{const lk=fin||ms[md]=='final';return '<div class="tw"><table class="marks-table mk-tbl" data-med="'+md+'"><tr><th>Roll</th><th>Name</th><th>Medium</th>'+(ab_?'<th>Absent (AB)</th>':'')+'<th>% of Marks</th><th>Rank'+(split?' ('+md+')':'')+'</th>'+(ab_?'<th>Result</th>':'')+'</tr>'+L.map(s=>{const r=rows[s.roll]||{},ab=ab_&&r.ab,rm=md||med(s);return `<tr class="mk-row" data-roll="${s.roll}" data-med="${rm}"${ab?' style="background:#fdeaea"':''}><td>${s.roll}</td><td>${esc(s.name)}</td><td><select class="mk-m" ${(!split||anyFin||String(s.medium||'').trim())?'disabled':''} onchange="pt_medChg()">${opt(MEDL(),rm)}</select></td>${ab_?`<td style="text-align:center"><input class="mk-ab" type="checkbox" ${ab?'checked':''} ${lk?'disabled':''} onchange="pt_abTog(this)"></td>`:''}<td><input class="mk-p" type="number" min="0" max="100" step="0.01" value="${ab||r.p==null?'':r.p}" ${lk||ab?'disabled':''} oninput="pt_rank()"></td><td class="mk-rk" style="text-align:center;font-weight:700">—</td>${ab_?`<td class="mk-res">${ab?B('AB / FAILED','er'):''}</td>`:''}</tr>`}).join('')+'</table></div>'};
  let h;
  if(split){h=MEDL().filter(md=>tm?md==tm:(md=='Bengali'||md=='Santali'||S.some(s=>med(s)==md))).map(md=>{const L=S.filter(s=>med(s)==md),lk=fin||ms[md]=='final';
    return `<h3 style="margin:16px 0 6px">${md} Medium — ${L.length} students ${lk?B('FINAL · LOCKED','ok'):ms[md]=='draft'?B('Draft saved','wa'):B('Not started','er')}</h3>`+(L.length?tbl(L,md)+(lk?'':`<div class="row" style="margin-top:10px"><button class="dv-b g" onclick="pt_saveMarks(false,'${md}')">💾 Save Draft — ${md}</button><button class="dv-b er" onclick="pt_saveMarks(true,'${md}')">🔒 Final &amp; Lock — ${md}</button></div>`):`<p class="mut">No ${md} medium student in this section.${md=='Santali'?' Use the <b>Medium</b> box in the Bengali list to move a student here (only before any lock).':''}</p>`)}).join('')}
@@ -3999,7 +4014,7 @@ function pt_saveMarks(fin,md){
  pt_snap(k);
  const rows={};let miss=0,bad=0,n=0;
  document.querySelectorAll('.mk-row').forEach(r=>{
-  const rl=r.dataset.roll,dm=r.dataset.med,moved=medOf(pc,ps,((cur.rows||{})[rl]||{}).m||(STUDENT_DB.find(s=>s.cls==pc&&s.sec==ps&&String(s.roll)==String(rl))||{}).medium)!=dm;
+  const rl=r.dataset.roll,dm=r.dataset.med,moved=medOf(pc,ps,((cur.rows||{})[rl]||{}).m||(STUDENT_DB.find(s=>s.cls==pc&&secOfS(s)==ps&&String(s.roll)==String(rl))||{}).medium)!=dm;
   if(md&&dm!=md&&!moved)return;n++;
   const cb=r.querySelector('.mk-ab'),ab=!!(cb&&cb.checked),v=ab?'':r.querySelector('.mk-p').value;
   if(!ab&&(!md||dm==md)){if(v==='')miss++;else if(+v<0||+v>100)bad++}
@@ -4011,7 +4026,7 @@ function pt_saveMarks(fin,md){
  if(fin){if(miss)return alert('Enter % for every '+(md?md+' medium ':'')+'student ('+miss+' missing) before Final & Lock.');if(!confirm('Finalise and LOCK '+lbl+'? No edits until Admin unlocks.'))return}
  const o={st:fin?'final':'draft',rows,by:ME.email,ts:Date.now()};
  if(split&&md){const ms={...ms0,[md]:fin?'final':'draft'},all={...(cur.rows||{}),...rows},cnt={};MEDL().forEach(x=>cnt[x]=0);
-  STUDENT_DB.filter(s=>s.cls==pc&&s.sec==ps).forEach(s=>{{const q=medOf(pc,ps,(all[s.roll]||{}).m||s.medium);cnt[q]=(cnt[q]||0)+1}});
+  STUDENT_DB.filter(s=>s.cls==pc&&secOfS(s)==ps).forEach(s=>{{const q=medOf(pc,ps,(all[s.roll]||{}).m||s.medium);cnt[q]=(cnt[q]||0)+1}});
   o.ms=ms;o.st=MEDL().every(x=>!cnt[x]||ms[x]=='final')?'final':'draft'}
  W({marks:{[k]:o}}).then(()=>{Object.keys(rows).forEach(q=>{if(PT_TMP[k])delete PT_TMP[k][q]});alert(fin?(md?md+' medium marks locked ✔':'Marks locked ✔'):'Draft saved ✔')});
 }
@@ -4019,7 +4034,7 @@ function pt_saveMarks(fin,md){
 /* ---------- MERIT & PROMOTION (ADMIN) ---------- */
 function meritOf(c){
  const secs=secsOf(c),M=D.marks||{},ok=secs.length>0&&secs.every(s=>(M[c+'-'+s]||{}).st=='final');
- const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+s.sec]||{}).rows||{})[s.roll]||{};const ab=ABR(c)&&r.ab?1:0;return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:ab?0:+r.p||0,ab,med:medOf(c,s.sec,r.m||s.medium)}});
+ const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+secOfS(s)]||{}).rows||{})[s.roll]||{};const ab=ABR(c)&&r.ab?1:0;return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:ab?0:+r.p||0,ab,med:medOf(c,s.sec,r.m||s.medium)}});
  L.sort((a,b)=>(a.ab-b.ab)||b.p-a.p||a.n.localeCompare(b.n));return{secs,ok,L};
 }
 function assign(list,S){ // MORE than one medium: non-Bengali -> last section, Bengali alternate A,B,A,B… over the others. ONE medium only: everyone alternates over ALL sections
