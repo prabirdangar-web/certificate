@@ -1,28 +1,30 @@
-/* TFHS service worker — app shell cache so the portal installs and opens fast on phones */
-const VER='tfhs-v1';
-const SHELL=['./','./index.html','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
-self.addEventListener('install',e=>{
-  e.waitUntil(caches.open(VER).then(c=>Promise.all(SHELL.map(u=>c.add(u).catch(()=>null)))).then(()=>self.skipWaiting()));
+/* TFHS Smart School Portal - service worker. Bump VERSION to force an update. */
+const VERSION = 'tfhs-v1';
+const SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(VERSION).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => {})))));
+  self.skipWaiting();
 });
-self.addEventListener('activate',e=>{
-  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VER).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
-self.addEventListener('fetch',e=>{
-  const r=e.request;
-  if(r.method!=='GET')return;
-  const u=new URL(r.url);
-  /* live data (Firebase, Google, India Post API) always goes to network */
-  const sameOrigin=u.origin===location.origin, cdn=u.hostname==='cdnjs.cloudflare.com';
-  if(!sameOrigin&&!cdn)return;
-  if(r.mode==='navigate'){
-    /* pages: network first, cached copy when offline */
-    e.respondWith(fetch(r).then(res=>{const cp=res.clone();caches.open(VER).then(c=>c.put(r,cp));return res})
-      .catch(()=>caches.match(r).then(m=>m||caches.match('./index.html'))));
+
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== location.origin) return;           // Firebase / Google scripts: always go to network
+
+  if (req.mode === 'navigate') {                         // pages: network first, offline fallback
+    e.respondWith(fetch(req).then(r => {
+      const copy = r.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return r;
+    }).catch(() => caches.match('./index.html').then(r => r || caches.match('./'))));
     return;
   }
-  /* assets: cache first, refresh in background */
-  e.respondWith(caches.match(r).then(m=>{
-    const net=fetch(r).then(res=>{if(res&&res.status===200){const cp=res.clone();caches.open(VER).then(c=>c.put(r,cp))}return res}).catch(()=>m);
-    return m||net;
+  e.respondWith(caches.match(req).then(hit => {          // static files: cache, refresh in background
+    const net = fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req, copy)); } return r; }).catch(() => hit);
+    return hit || net;
   }));
 });

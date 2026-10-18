@@ -1,33 +1,20 @@
 {
+  "id": "./",
   "name": "TFHS Smart School Portal",
-  "short_name": "TFHS",
-  "description": "Taldangra Fulmati High School \u2014 admission, promotion, marks, certificates and reports",
+  "short_name": "TFHS Portal",
+  "description": "Taldangra Fulmati High School - admission, class lists, certificates, fees, marks and promotion.",
   "start_url": "./index.html",
   "scope": "./",
-  "id": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
-  "background_color": "#ffffff",
+  "background_color": "#145828",
   "theme_color": "#145828",
-  "lang": "en",
+  "lang": "en-IN",
+  "categories": ["education", "productivity"],
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
   ]
 }
