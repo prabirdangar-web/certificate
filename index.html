@@ -4846,8 +4846,8 @@ const enc=k=>encodeURIComponent(k).replace(/'/g,'%27'),dec=k=>decodeURIComponent
 const SCH={name:'TALDANGRA FULMATI HIGH SCHOOL [H.S.]',sub:'Taldangra · Bankura · West Bengal',udise:'19132104401',addr:'P.O. Taldangra, Sub-Division Khatra, Dist. Bankura, West Bengal – 722152',tel:'03243-265114',mail:'highschooltaldangrafulmati@gmail.com'};
 const PRE={cr80l:['CR-80 landscape — 85.6 × 54 mm',85.6,54],cr80p:['CR-80 portrait — 54 × 85.6 mm',54,85.6],cust:['Custom size (enter mm)',85.6,54]};
 const PW=20,PHH=25,PAGE_W=210,PAGE_H=296,MM=3.7795;
-const S={mode:'class',cls:new Set(),sec:'ALL',med:'ALL',phf:'ALL',pick:new Map(),off:new Set(),q:'',preset:'cr80l',w:85.6,h:54,gap:2.5,mar:6,sides:'front',ses:'',valid:'',stripe:1,qr:1,mother:0,outline:1,pv:0};
-const CFG={logo:'',sign:''};
+const S={mode:'class',cls:new Set(),sec:'ALL',med:'ALL',phf:'ALL',pick:new Map(),off:new Set(),q:'',preset:'cr80l',w:85.6,h:54,gap:2.5,mar:6,sides:'front',ses:'',valid:'',stripe:1,qr:1,mother:0,outline:1,mobF:1,ss:1,pv:0};
+const CFG={logo:'',sign:'',seal:'',mob:{}};
 const DEF_LOGO='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" fill="#fff" stroke="#d4a017" stroke-width="2"/><path d="M10 15c5-2 10-1 14 2 4-3 9-4 14-2v19c-5-2-10-1-14 2-4-3-9-4-14-2z" fill="#145828"/><path d="M24 17v19" stroke="#fff" stroke-width="1.6"/></svg>');
 let PHO={},idb=null,built=false,ready=false;
 
@@ -4873,6 +4873,7 @@ const idno=x=>S.ses+'/'+cs(x)+'/'+String(x.s.roll||x.r||'').padStart(3,'0');
 const dob=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s.dob||''))?s.dob.split('-').reverse().join('-'):String(s.dob||'');
 const STR=c=>{const i=CO.indexOf(c);return i<=3?'#0e7490':i<=5?'#b45309':'#7c1d3f'};
 const logo=()=>CFG.logo||DEF_LOGO;
+const mobOf=x=>String((CFG.mob&&CFG.mob[x.k])||x.s.mobile||'').trim();
 function base(){
  if(S.mode==='ind'){const m=new Map(all().map(x=>[x.k,x]));return [...S.pick.keys()].map(k=>m.get(k)).filter(Boolean).sort(cmp)}
  return all().filter(x=>S.cls.has(x.c)&&(S.sec==='ALL'||x.sc===S.sec)&&(S.med==='ALL'||medOf(x.s)===S.med)).sort(cmp)}
@@ -4916,6 +4917,8 @@ const CSS=`.pg{width:${PAGE_W}mm;height:${PAGE_H}mm;position:relative;background
 .sg{display:flex;flex-direction:column;align-items:flex-end;line-height:1}.sg img{height:3.6mm;max-width:14mm;object-fit:contain;display:block}
 .sg em{font-style:normal;font-size:1.6mm;font-weight:700;letter-spacing:.2mm;border-top:.15mm solid #5b6b61;padding-top:.2mm;margin-top:.2mm}
 .ibar{height:1.2mm;flex:none}
+.sg{position:relative}.sg img.sl{position:absolute;right:7mm;bottom:-.4mm;height:8.5mm;width:8.5mm;max-width:none;object-fit:contain;mix-blend-mode:multiply;opacity:.92}
+.dn .r{font-size:2.35mm;margin-top:.3mm;line-height:1.3}.dn .r .l{font-size:2mm;width:11.5mm}
 .bb{flex:1;display:flex;gap:2mm;padding:2mm 2.4mm 0;min-height:0}
 .bl{flex:1;min-width:0}.bl h4{margin:0 0 .8mm;font-size:2.2mm;letter-spacing:.35mm;color:#0d4a22;border-bottom:.2mm solid #cfe0d3;padding-bottom:.4mm}
 .bl ol{margin:0;padding-left:3.2mm;font-size:2.05mm;line-height:1.45;color:#33463a}
@@ -4955,10 +4958,10 @@ function front(x,D){
  return '<div class="ik'+(D.land?'':' p')+'" style="width:'+D.iw+'mm;height:'+D.ih+'mm;transform:scale('+D.k+')">'+
  '<div class="ih"><img src="'+e(logo())+'"><div><b>'+e(SCH.name)+'</b><i>'+e(SCH.sub)+' · UDISE '+SCH.udise+'</i></div></div>'+
  '<div class="it" style="background:'+col+'"><span>STUDENT IDENTITY CARD</span><span>SESSION '+e(S.ses)+'</span></div>'+
- '<div class="ib">'+photoBox(x)+'<div class="id"><div class="nm" style="font-size:'+nf+'mm">'+e(nm)+'</div>'+
+ '<div class="ib">'+photoBox(x)+'<div class="id'+((S.mother&&S.mobF)?' dn':'')+'"><div class="nm" style="font-size:'+nf+'mm">'+e(nm)+'</div>'+
  '<div class="r c"><span class="l">Class</span><span class="pl">'+e(x.c)+(x.sc?' – '+e(x.sc):'')+'</span><span class="l l2">Roll</span><span class="pl">'+e(rollOf(x))+'</span></div>'+
- row('D.O.B.',dob(s))+row('Father',fa)+(S.mother?row('Mother',mo):'')+row('Siksha ID',s.sikshaId)+'</div></div>'+
- '<div class="if"><span>ID No. <b>'+e(idno(x))+'</b></span><span class="sg">'+(CFG.sign?'<img src="'+e(CFG.sign)+'">':'<span style="height:3.6mm"></span>')+'<em>HEADMASTER</em></span></div>'+
+ row('D.O.B.',dob(s))+row('Father',fa)+(S.mother?row('Mother',mo):'')+row('Siksha ID',s.sikshaId)+(S.mobF?row('Mobile',mobOf(x)):'')+'</div></div>'+
+ '<div class="if"><span>ID No. <b>'+e(idno(x))+'</b></span><span class="sg">'+((S.ss&&CFG.seal)?'<img class="sl" src="'+e(CFG.seal)+'">':'')+((S.ss&&CFG.sign)?'<img src="'+e(CFG.sign)+'">':'<span style="height:3.6mm"></span>')+'<em>HEADMASTER</em></span></div>'+
  '<div class="ibar" style="background:'+col+'"></div></div>'}
 function back(x,D){
  const s=x.s,col=S.stripe?STR(x.c):'#1c7a3c',q=S.qr?qr('TFHS|'+idno(x)+'|'+(s.sikshaId||'')):'';
@@ -4967,7 +4970,7 @@ function back(x,D){
  '<div class="it" style="background:'+col+'"><span>IMPORTANT</span><span>'+e(idno(x))+'</span></div>'+
  '<div class="bb"><div class="bl"><h4>INSTRUCTIONS</h4><ol><li>This card is non-transferable; carry it daily.</li><li>Show it to the school authority on demand.</li><li>Report loss to the Headmaster immediately.</li><li>If found, please return to the school address below.</li></ol></div>'+
  (q?'<div class="bq"><img src="'+q+'"><small>Scan to verify</small></div>':'')+'</div>'+
- '<div class="bc">'+(s.father?'<span><span class="l">Guardian </span><b>'+e(String(s.father).toUpperCase())+'</b></span>':'')+(s.mobile?'<span><span class="l">Mobile </span><b>'+e(s.mobile)+'</b></span>':'')+'</div>'+
+ '<div class="bc">'+(s.father?'<span><span class="l">Guardian </span><b>'+e(String(s.father).toUpperCase())+'</b></span>':'')+(mobOf(x)?'<span><span class="l">Mobile </span><b>'+e(mobOf(x))+'</b></span>':'')+'</div>'+
  '<div class="bf">'+e(SCH.addr)+'<br>Ph: '+e(SCH.tel)+' · '+e(SCH.mail)+(S.valid?'<br>Valid up to: <b>'+e(S.valid)+'</b>':'')+'</div>'+
  '<div class="ibar" style="background:'+col+'"></div></div>'}
 const card=(x,side,D)=>'<div class="ic'+(S.outline?' ol':'')+'" style="width:'+D.w+'mm;height:'+D.h+'mm">'+(side==='f'?front(x,D):back(x,D))+'</div>';
@@ -5012,8 +5015,8 @@ function build(){
  '<div class="idc-box"><div class="idc-h">3 · Card size &amp; A4 layout</div><div class="idc-row"><label>Card <select id="idc_pre" onchange="IDC.pre(this.value)">'+opt(Object.keys(PRE).map(k=>[k,PRE[k][0]]),S.preset)+'</select></label><label>W <input type="number" id="idc_w" step="0.1" min="30" value="'+S.w+'" oninput="IDC.lay(\'w\',this.value)"> mm</label><label>H <input type="number" id="idc_h" step="0.1" min="30" value="'+S.h+'" oninput="IDC.lay(\'h\',this.value)"> mm</label><label>Gap <input type="number" id="idc_gap" step="0.5" min="0" value="'+S.gap+'" oninput="IDC.lay(\'gap\',this.value)"> mm</label><label>Min. page margin <input type="number" id="idc_mar" step="0.5" min="0" value="'+S.mar+'" oninput="IDC.lay(\'mar\',this.value)"> mm</label></div>'+
  '<div class="idc-row"><span class="idc-fit" id="idc_fit"></span></div>'+
  '<div class="idc-row"><label>Print <select id="idc_sides" onchange="IDC.opt(\'sides\',this.value)">'+opt([['front','Front only'],['both','Front + Back (alternate pages — double-sided)'],['back','Back only']],S.sides)+'</select></label><label>Session <input type="text" id="idc_ses" style="min-width:80px;width:90px" value="'+e(S.ses)+'" oninput="IDC.opt(\'ses\',this.value,1)"></label><label>Valid up to <input type="text" id="idc_val" style="width:110px;min-width:90px" value="'+e(S.valid)+'" oninput="IDC.opt(\'valid\',this.value,1)"></label><label>Print only <select id="idc_phf" onchange="IDC.opt(\'phf\',this.value)">'+opt([['ALL','All selected students'],['HAS','Students with photo'],['NONE','Students without photo (paste-photo sheet)']],S.phf)+'</select></label></div>'+
- '<div class="idc-row"><label><input type="checkbox" id="idc_o1" onchange="IDC.opt(\'stripe\',this.checked?1:0)"> Colour band by class (V–VIII · IX–X · XI–XII)</label><label><input type="checkbox" id="idc_o2" onchange="IDC.opt(\'qr\',this.checked?1:0)"> QR on back</label><label><input type="checkbox" id="idc_o3" onchange="IDC.opt(\'mother\',this.checked?1:0)"> Mother\'s name on front</label><label><input type="checkbox" id="idc_o4" onchange="IDC.opt(\'outline\',this.checked?1:0)"> Card outline (cut guide)</label></div>'+
- '<div class="idc-row"><label class="dv-b g" style="cursor:pointer">🏫 School logo<input type="file" accept="image/*" style="display:none" onchange="IDC.logo(this)"></label><button class="dv-b g" type="button" onclick="IDC.logoReset()">Reset logo</button><label class="dv-b g" style="cursor:pointer">✍ Headmaster signature<input type="file" accept="image/*" style="display:none" onchange="IDC.sign(this)"></label><button class="dv-b g" type="button" onclick="IDC.signClear()">Remove signature</button><span class="idc-note" id="idc_brand"></span></div>'+
+ '<div class="idc-row"><label><input type="checkbox" id="idc_o1" onchange="IDC.opt(\'stripe\',this.checked?1:0)"> Colour band by class (V–VIII · IX–X · XI–XII)</label><label><input type="checkbox" id="idc_o2" onchange="IDC.opt(\'qr\',this.checked?1:0)"> QR on back</label><label><input type="checkbox" id="idc_o3" onchange="IDC.opt(\'mother\',this.checked?1:0)"> Mother\'s name on front</label><label><input type="checkbox" id="idc_o4" onchange="IDC.opt(\'outline\',this.checked?1:0)"> Card outline (cut guide)</label><label><input type="checkbox" id="idc_o5" onchange="IDC.opt(\'mobF\',this.checked?1:0)"> Mobile no. on front</label></div>'+
+ '<div class="idc-row"><label class="dv-b g" style="cursor:pointer">🏫 School logo<input type="file" accept="image/*" style="display:none" onchange="IDC.logo(this)"></label><button class="dv-b g" type="button" onclick="IDC.logoReset()">Reset logo</button><label class="dv-b g" style="cursor:pointer">✍ Headmaster signature<input type="file" accept="image/*" style="display:none" onchange="IDC.sign(this)"></label><button class="dv-b g" type="button" onclick="IDC.signClear()">Remove signature</button><label class="dv-b g" style="cursor:pointer">🔖 Headmaster seal<input type="file" accept="image/*" style="display:none" onchange="IDC.seal(this)"></label><button class="dv-b g" type="button" onclick="IDC.sealClear()">Remove seal</button><span class="idc-note" id="idc_brand"></span></div><div class="idc-row"><label><b>Headmaster signature &amp; seal on cards</b> <select id="idc_ss" onchange="IDC.opt(\'ss\',+this.value)"><option value="1">With signature &amp; seal</option><option value="0">Without (blank space kept for hand sign / stamp)</option></select></label></div>'+
  '<div class="idc-note">Double-sided: print <b>Front + Back</b> with “flip on long edge”. The back sheet is mirrored so every back sits exactly behind its front. Print at <b>100% / Actual size</b>, colour, A4.</div></div>'+
  '<div class="idc-box"><div class="idc-h">4 · Students &amp; photo status</div><div class="idc-stat" id="idc_stat"></div><div id="idc_ros"></div></div>'+
  '<div class="idc-box"><div class="idc-h">5 · Preview &amp; print</div><div class="idc-row"><button class="dv-b" type="button" onclick="IDC.print()">🖨 Print / Save PDF (A4, colour)</button><button class="dv-b g" type="button" onclick="IDC.pg(-1)">◀</button><span id="idc_pgn" style="font-weight:700;font-size:13px"></span><button class="dv-b g" type="button" onclick="IDC.pg(1)">▶</button></div><div class="idc-pv" id="idc_prev"></div></div>';
@@ -5032,19 +5035,19 @@ function fillSel(){
   fillRes()}}
 function results(){const q=S.q.trim().toUpperCase();if(!q)return[];const A=all(),m=q.match(/^(XII|XI|X|IX|VIII|VII|VI|V)[\s\-_.]*([A-D])[\s\-_.]*0*(\d+)$/);
  if(m)return A.filter(x=>x.c===m[1]&&x.sc===m[2]&&x.r===+m[3]);
- return A.filter(x=>String(x.s.name||'').toUpperCase().includes(q)||String(x.s.father||'').toUpperCase().includes(q)||String(x.s.sikshaId||'').includes(q)||String(x.s.mobile||'').includes(q)).sort(cmp).slice(0,40)}
+ return A.filter(x=>String(x.s.name||'').toUpperCase().includes(q)||String(x.s.father||'').toUpperCase().includes(q)||String(x.s.sikshaId||'').includes(q)||mobOf(x).includes(q)).sort(cmp).slice(0,40)}
 function fillRes(){const R=results(),el=g('idc_res');if(!el)return;
  el.innerHTML=S.q.trim()?(R.length?'<div class="idc-res">'+R.map(x=>'<div><span><b>'+e(x.s.name)+'</b> · '+e(cs(x))+' / Roll '+x.r+' <small style="color:#666">· '+e(x.s.father||'')+'</small></span>'+(S.pick.has(x.k)?'<small style="color:#145828;font-weight:700">added ✔</small>':'<button class="dv-b g" type="button" style="padding:3px 10px" onclick="IDC.add(\''+enc(x.k)+'\')">＋ Add</button>')+'</div>').join('')+'</div>':'<div class="idc-note">No match.</div>'):''}
 function fillRos(){
  const B=base(),L=B.filter(phFilter),el=g('idc_ros'),LIM=400;
  if(!B.length){el.innerHTML='<div class="idc-note">'+(S.mode==='class'?'Select a class above to list its students.':'Add students to see them here.')+'</div>';return}
- el.innerHTML='<div class="idc-tw"><table class="idc-t"><tr><th><input type="checkbox" '+(L.every(x=>!S.off.has(x.k))?'checked ':'')+'onchange="IDC.togAll(this.checked)"></th><th>Class-Sec</th><th>Roll</th><th>Name</th><th>Photo</th><th>Siksha ID</th></tr>'+
- L.slice(0,LIM).map(x=>{const p=photoOf(x),k=enc(x.k);return '<tr><td><input type="checkbox" '+(S.off.has(x.k)?'':'checked ')+'onchange="IDC.tog(\''+k+'\',this.checked)"></td><td>'+e(cs(x))+'</td><td>'+x.r+'</td><td class="l">'+e(x.s.name)+'</td><td><label class="idc-th">'+(p?'<img src="'+e(p)+'">':'<span>＋ Add</span>')+'<input type="file" accept="image/*" onchange="IDC.one(\''+k+'\',this)"></label>'+(PHO[x.k]?'<span class="idc-x" title="Remove photo" onclick="IDC.rm(\''+k+'\')">✕</span>':'')+'</td><td>'+e(x.s.sikshaId||'')+'</td></tr>'}).join('')+'</table></div>'+(L.length>LIM?'<div class="idc-note">Showing first '+LIM+' of '+L.length+' — printing includes all ticked students.</div>':'')}
+ el.innerHTML='<div class="idc-tw"><table class="idc-t"><tr><th><input type="checkbox" '+(L.every(x=>!S.off.has(x.k))?'checked ':'')+'onchange="IDC.togAll(this.checked)"></th><th>Class-Sec</th><th>Roll</th><th>Name</th><th>Photo</th><th>Siksha ID</th><th>Mobile</th></tr>'+
+ L.slice(0,LIM).map(x=>{const p=photoOf(x),k=enc(x.k);return '<tr><td><input type="checkbox" '+(S.off.has(x.k)?'':'checked ')+'onchange="IDC.tog(\''+k+'\',this.checked)"></td><td>'+e(cs(x))+'</td><td>'+x.r+'</td><td class="l">'+e(x.s.name)+'</td><td><label class="idc-th">'+(p?'<img src="'+e(p)+'">':'<span>＋ Add</span>')+'<input type="file" accept="image/*" onchange="IDC.one(\''+k+'\',this)"></label>'+(PHO[x.k]?'<span class="idc-x" title="Remove photo" onclick="IDC.rm(\''+k+'\')">✕</span>':'')+'</td><td>'+e(x.s.sikshaId||'')+'</td><td><input type="text" style="width:100px;padding:3px 5px;border:1px solid #b9c8bd;border-radius:6px;font-size:12px" value="'+e(mobOf(x))+'" placeholder="Mobile no." onchange="IDC.mob(\''+k+'\',this.value)"></td></tr>'}).join('')+'</table></div>'+(L.length>LIM?'<div class="idc-note">Showing first '+LIM+' of '+L.length+' — printing includes all ticked students.</div>':'')}
 function fillStat(){
  const C=chosen(),P=C.filter(photoOf).length,n=Object.keys(PHO).length;
  g('idc_stat').innerHTML='<b>'+C.length+'</b> student(s) ticked · with photo <b>'+P+'</b> · without photo <b>'+(C.length-P)+'</b>';
  g('idc_pst').textContent='Photos stored on this computer: '+n+(idb?'':' (browser storage unavailable — photos will be lost on reload; use Backup)');
- g('idc_brand').textContent=(CFG.logo?'Custom logo ✔':'Default emblem')+' · '+(CFG.sign?'Signature ✔':'No signature (space kept)')}
+ g('idc_brand').textContent=(CFG.logo?'Custom logo ✔':'Default emblem')+' · '+(CFG.sign?'Signature ✔':'No signature')+' · '+(CFG.seal?'Seal ✔':'No seal')+' · Printing '+(S.ss?'WITH':'WITHOUT')+' sign & seal'}
 function fillFit(){const G=grid(),el=g('idc_fit'),L=printable(),np=nPages(L,G);
  el.className='idc-fit'+(G.n?'':' bad');el.textContent=G.n?(G.cols+' × '+G.rows+' = '+G.n+' cards per A4 sheet'+(L.length?' · '+L.length+' card(s) → '+np+' A4 page(s)'+(S.sides==='both'?' (front + back)':''):'')):'Card is larger than A4 — reduce size / margin'}
 function fillPrev(){
@@ -5054,7 +5057,7 @@ function fillPrev(){
  const z=Math.max(.35,Math.min(1,((el.clientWidth||760)-30)/(PAGE_W*MM)));
  el.innerHTML='<div class="pgw" style="zoom:'+z+'">'+pageN(L,S.pv,G,D)+'</div>';
  g('idc_pgn').textContent='Page '+(S.pv+1)+' of '+n+(S.sides==='both'?(S.pv%2?' · back':' · front'):S.sides==='back'?' · back':'')}
-function fillAll(){if(!built)return;g('idc_o1').checked=!!S.stripe;g('idc_o2').checked=!!S.qr;g('idc_o3').checked=!!S.mother;g('idc_o4').checked=!!S.outline;
+function fillAll(){if(!built)return;g('idc_o1').checked=!!S.stripe;g('idc_o2').checked=!!S.qr;g('idc_o3').checked=!!S.mother;g('idc_o4').checked=!!S.outline;g('idc_o5').checked=!!S.mobF;g('idc_ss').value=S.ss?'1':'0';
  g('idc_w').disabled=g('idc_h').disabled=S.preset!=='cust';fillSel();fillRos();fillStat();fillFit();fillPrev()}
 
 /* ---------- print ---------- */
@@ -5103,6 +5106,9 @@ window.IDC={
  async logoReset(){CFG.logo='';await saveCfg();fillStat();fillPrev()},
  async sign(inp){const f=inp.files[0];if(!f)return;try{CFG.sign=await procFit(f,420,150);await saveCfg();fillStat();fillPrev()}catch(x){msg('Could not read signature.',1)}inp.value=''},
  async signClear(){CFG.sign='';await saveCfg();fillStat();fillPrev()},
+ async seal(inp){const f=inp.files[0];if(!f)return;try{CFG.seal=await procFit(f,360,360);await saveCfg();fillStat();fillPrev()}catch(x){msg('Could not read seal.',1)}inp.value=''},
+ async sealClear(){CFG.seal='';await saveCfg();fillStat();fillPrev()},
+ async mob(k,v){k=dec(k);v=String(v).trim();CFG.mob=CFG.mob||{};if(v)CFG.mob[k]=v;else delete CFG.mob[k];await saveCfg();fillPrev()},
  _S:S,_grid:grid,_match:matchName
 };
 (window.pt_R||(window.pt_R={})).idc=function(){if(!built)build();else{fillAll()}};
