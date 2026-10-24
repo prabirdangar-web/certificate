@@ -908,7 +908,7 @@ const REGF=(function(){
 body:not([data-role=admin]):not([data-role=teacher]):not([data-role=user]) :is(.tf-side,.tf-top){display:none!important}
 body[data-role=admin] [data-r]:not([data-r*=a]),body[data-role=teacher] [data-r]:not([data-r*=t]),body[data-role=user] [data-r]:not([data-r*=u]){display:none!important}
 body:not([data-view=cert]):not([data-view=reports]):not([data-view=wifs]):not([data-view=data]):not([data-view=fees]):not([data-view=adm]):not([data-view=prom]) :is(.dashboard-panel,.page,.wifs-panel,.wifs-sheet,#dataView){display:none!important}
-body[data-view=home] #homePanel,body[data-view=setup] #setupPanel,body[data-view=marks] #marksPanel,body[data-view=merit] #meritPanel,body[data-view=lists] #listsPanel{display:block}body[data-view=k2] #k2Panel{display:block}
+body[data-view=home] #homePanel,body[data-view=setup] #setupPanel,body[data-view=marks] #marksPanel,body[data-view=merit] #meritPanel,body[data-view=lists] #listsPanel{display:block}body[data-view=k2] #k2Panel{display:block}body[data-view=idc] #idcPanel{display:block}
 .tf-new-panel{max-width:1040px!important;font-family:'Segoe UI',Arial,sans-serif;border:0!important;border-radius:16px!important;padding:20px 22px!important}
 .tf-new-panel h2{display:flex;align-items:center;gap:8px;margin:24px 0 10px}.tf-new-panel>h2:first-child,.tf-new-panel>div>h2:first-child{margin-top:0}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:16px 0}
@@ -969,7 +969,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 <div class="gp">DAILY</div><button data-v="cert"><span class="ic">📜</span><span class="l">Certificate</span></button>
 <div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button>
 <button data-v="adm"><span class="ic">🎓</span><span class="l">Admission</span></button><button data-v="prom"><span class="ic">🔁</span><span class="l">Promotion</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
-<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button><button data-v="k2"><span class="ic">🌸</span><span class="l">Kanyashree K2</span></button>
+<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button><button data-v="k2"><span class="ic">🌸</span><span class="l">Kanyashree K2</span></button><button data-v="idc"><span class="ic">🆔</span><span class="l">Student ID Cards</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <!-- NEW PANELS -->
@@ -989,6 +989,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 <div id="meritPanel" class="tf-new-panel"><div id="promBody"></div></div>
 <div id="listsPanel" class="tf-new-panel"><div id="listsBody"></div></div>
 <div id="k2Panel" class="tf-new-panel"><div id="k2Body"></div></div>
+<div id="idcPanel" class="tf-new-panel"><div id="idcBody"></div></div>
 
 <div id="dataView">
  <div class="dv-c"><h3>Student database &amp; year</h3><div class="dv-r"><label>Year <select id="dvYear"></select></label>
@@ -2452,7 +2453,7 @@ const WIFS = (function(){
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const T={k2:['Kanyashree K2','Girls aged 18+ as on date — one-time grant (K2) list'],lists:['Student Lists','Medium-wise lists for higher authority and book / uniform / tab distribution'],cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase'],prom:['Promotion','Draft, finalize & lock roll lists for the new session, class-teacher logins'],home:['Dashboard','Taldangra Fulmati H.S.'],marks:['Marks Entry','Final exam % of marks — save draft, finalise & lock'],setup:['Approvals & Setup','Class-teacher approvals, marks unlock, new-session sections'],merit:['Merit List','Combined class merit list, medium-wise, with new section & roll']};
+ const T={idc:['Student ID Cards','Class-wise or individual identity cards — stamp-size photo, A4 bulk colour print'],k2:['Kanyashree K2','Girls aged 18+ as on date — one-time grant (K2) list'],lists:['Student Lists','Medium-wise lists for higher authority and book / uniform / tab distribution'],cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase'],prom:['Promotion','Draft, finalize & lock roll lists for the new session, class-teacher logins'],home:['Dashboard','Taldangra Fulmati H.S.'],marks:['Marks Entry','Final exam % of marks — save draft, finalise & lock'],setup:['Approvals & Setup','Class-teacher approvals, marks unlock, new-session sections'],merit:['Merit List','Combined class merit list, medium-wise, with new section & roll']};
  const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
  function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
  function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
@@ -4142,7 +4143,7 @@ function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a',k2:'au'};
+const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a',k2:'au',idc:'au'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -4833,6 +4834,278 @@ window.K2L={
  print,csv,_data:data,_rows:rows,_K:K
 };
 (window.pt_R||(window.pt_R={})).k2=function(){if(!built)build();else fill()};
+})();
+</script>
+<script>
+/* ===== STUDENT ID CARDS — class-wise / individual · stamp-size photo (20x25 mm) · A4 bulk colour print · front + back ===== */
+(function(){
+const CO=['V','VI','VII','VIII','IX','X','XI','XII'];
+const e=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const g=id=>document.getElementById(id);
+const enc=k=>encodeURIComponent(k).replace(/'/g,'%27'),dec=k=>decodeURIComponent(k);
+const SCH={name:'TALDANGRA FULMATI HIGH SCHOOL [H.S.]',sub:'Taldangra · Bankura · West Bengal',udise:'19132104401',addr:'P.O. Taldangra, Sub-Division Khatra, Dist. Bankura, West Bengal – 722152',tel:'03243-265114',mail:'highschooltaldangrafulmati@gmail.com'};
+const PRE={cr80l:['CR-80 landscape — 85.6 × 54 mm',85.6,54],cr80p:['CR-80 portrait — 54 × 85.6 mm',54,85.6],cust:['Custom size (enter mm)',85.6,54]};
+const PW=20,PHH=25,PAGE_W=210,PAGE_H=296,MM=3.7795;
+const S={mode:'class',cls:new Set(),sec:'ALL',med:'ALL',phf:'ALL',pick:new Map(),off:new Set(),q:'',preset:'cr80l',w:85.6,h:54,gap:2.5,mar:6,sides:'front',ses:'',valid:'',stripe:1,qr:1,mother:0,outline:1,pv:0};
+const CFG={logo:'',sign:''};
+const DEF_LOGO='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" fill="#fff" stroke="#d4a017" stroke-width="2"/><path d="M10 15c5-2 10-1 14 2 4-3 9-4 14-2v19c-5-2-10-1-14 2-4-3-9-4-14-2z" fill="#145828"/><path d="M24 17v19" stroke="#fff" stroke-width="1.6"/></svg>');
+let PHO={},idb=null,built=false,ready=false;
+
+/* ---------- IndexedDB (photos, logo, signature stay on this computer) ---------- */
+function idbOpen(){return new Promise(r=>{try{const q=indexedDB.open('tfhs-idcard',1);q.onupgradeneeded=()=>{q.result.createObjectStore('photos');q.result.createObjectStore('meta')};q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);q.onblocked=()=>r(null)}catch(x){r(null)}})}
+function idbAll(st){return new Promise(r=>{const o={};if(!idb)return r(o);try{const q=idb.transaction(st).objectStore(st).openCursor();q.onsuccess=ev=>{const c=ev.target.result;if(c){o[c.key]=c.value;c.continue()}else r(o)};q.onerror=()=>r(o)}catch(x){r(o)}})}
+function idbMany(st,ents){return new Promise(r=>{if(!idb||!ents.length)return r(!!idb);try{const t=idb.transaction(st,'readwrite'),o=t.objectStore(st);ents.forEach(a=>o.put(a[1],a[0]));t.oncomplete=()=>r(true);t.onerror=()=>r(false);t.onabort=()=>r(false)}catch(x){r(false)}})}
+function idbDel(st,k){return new Promise(r=>{if(!idb)return r(false);try{const t=idb.transaction(st,'readwrite');t.objectStore(st).delete(k);t.oncomplete=()=>r(true);t.onerror=()=>r(false)}catch(x){r(false)}})}
+function idbClear(st){return new Promise(r=>{if(!idb)return r(false);try{const t=idb.transaction(st,'readwrite');t.objectStore(st).clear();t.oncomplete=()=>r(true);t.onerror=()=>r(false)}catch(x){r(false)}})}
+async function init(){if(ready)return;idb=await idbOpen();PHO=await idbAll('photos');const m=await idbAll('meta');Object.assign(CFG,m.cfg||{});ready=true;if(built)fillAll()}
+const saveCfg=()=>idbMany('meta',[['cfg',CFG]]);
+
+/* ---------- students ---------- */
+const keyOf=s=>String(s.sikshaId||'').trim()||(s.cls+'|'+s.sec+'|'+s.roll);
+function all(){return STUDENT_DB.map(s=>({s,k:keyOf(s),c:String(s.cls||'').trim().toUpperCase(),sc:String(s.sec||'').trim().toUpperCase(),r:parseInt(s.roll,10)||0}))}
+const photoOf=x=>PHO[x.k]||x.s.photo||'';
+const medOf=s=>{let m;try{m=typeof medN==='function'?medN(s.medium):s.medium}catch(x){m=s.medium}return String(m||'Bengali').trim()||'Bengali'};
+const cmp=(a,b)=>(CO.indexOf(a.c)-CO.indexOf(b.c))||a.sc.localeCompare(b.sc)||a.r-b.r||String(a.s.name).localeCompare(String(b.s.name));
+const yr=()=>String((g('session')||{}).value||new Date().getFullYear());
+const cs=x=>x.c+(x.sc?'-'+x.sc:'');
+const rollOf=x=>String(x.s.roll||x.r||'').padStart(2,'0');
+const idno=x=>S.ses+'/'+cs(x)+'/'+String(x.s.roll||x.r||'').padStart(3,'0');
+const dob=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s.dob||''))?s.dob.split('-').reverse().join('-'):String(s.dob||'');
+const STR=c=>{const i=CO.indexOf(c);return i<=3?'#0e7490':i<=5?'#b45309':'#7c1d3f'};
+const logo=()=>CFG.logo||DEF_LOGO;
+function base(){
+ if(S.mode==='ind'){const m=new Map(all().map(x=>[x.k,x]));return [...S.pick.keys()].map(k=>m.get(k)).filter(Boolean).sort(cmp)}
+ return all().filter(x=>S.cls.has(x.c)&&(S.sec==='ALL'||x.sc===S.sec)&&(S.med==='ALL'||medOf(x.s)===S.med)).sort(cmp)}
+const phFilter=x=>S.phf==='ALL'||(S.phf==='HAS'?!!photoOf(x):!photoOf(x));
+const chosen=()=>base().filter(x=>!S.off.has(x.k));
+const printable=()=>chosen().filter(phFilter);
+
+/* ---------- layout maths: how many cards fit on A4 ---------- */
+function grid(){const w=+S.w||0,h=+S.h||0,gp=+S.gap||0,m=+S.mar||0;if(w<=0||h<=0)return{cols:0,rows:0,n:0};
+ const cols=Math.max(0,Math.floor((PAGE_W-2*m+gp)/(w+gp))),rows=Math.max(0,Math.floor((PAGE_H-2*m+gp)/(h+gp)));return{cols,rows,n:cols*rows}}
+function dims(){const w=+S.w||85.6,h=+S.h||54,land=w>=h,bw=land?85.6:54,bh=land?54:85.6,k=Math.min(w/bw,h/bh);return{w,h,land,k,iw:w/k,ih:h/k}}
+
+/* ---------- QR (optional, back side) ---------- */
+const qc={};
+function qr(t){if(qc[t]!==undefined)return qc[t];let r='';if(typeof QRCode!=='undefined'){try{const d=document.createElement('div');d.style.cssText='position:absolute;left:-9999px;top:0';document.body.appendChild(d);new QRCode(d,{text:t,width:160,height:160,colorDark:'#0b3319',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});const c=d.querySelector('canvas');r=c?c.toDataURL('image/png'):'';d.remove()}catch(x){r=''}}return qc[t]=r}
+
+/* ---------- card artwork ---------- */
+const CSS=`.pg{width:${PAGE_W}mm;height:${PAGE_H}mm;position:relative;background:#fff;overflow:hidden;box-sizing:border-box}.gr{position:absolute;display:grid}
+.ic{position:relative;overflow:hidden;background:#fff;border-radius:2.2mm;box-sizing:border-box;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:#13261a;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ic.ol:after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;border:.2mm solid #8fa597;border-radius:2.2mm;pointer-events:none}
+.ik{position:absolute;left:0;top:0;transform-origin:0 0;display:flex;flex-direction:column;box-sizing:border-box}
+.ih{height:11mm;flex:none;display:flex;align-items:center;gap:2mm;padding:0 2.4mm;background:linear-gradient(100deg,#0d4a22,#1f8a43);color:#fff}
+.ih img{width:8mm;height:8mm;border-radius:50%;background:#fff;object-fit:contain;flex:none}
+.ih b{display:block;font-size:2.95mm;letter-spacing:.15mm;line-height:1.15;font-weight:800}
+.ih i{display:block;font-style:normal;font-size:1.65mm;opacity:.92;margin-top:.5mm;letter-spacing:.1mm}
+.it{height:4mm;flex:none;white-space:nowrap;display:flex;justify-content:space-between;align-items:center;padding:0 2.4mm;color:#fff;font-size:2mm;font-weight:800;letter-spacing:.35mm}
+.ib{flex:1;display:flex;gap:2.6mm;padding:2.2mm 2.4mm 0;min-height:0}
+.ph{width:${PW}mm;height:${PHH}mm;flex:none;border:.3mm solid #145828;background:#f4f7f5;overflow:hidden;box-sizing:border-box}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph.no{border:.3mm dashed #8a9a8f;display:flex;align-items:center;justify-content:center;text-align:center;color:#8a9a8f;font-size:2mm;font-weight:700;line-height:1.3}
+.ph.no small{font-size:1.5mm;font-weight:600}
+.id{flex:1;min-width:0}
+.nm{font-weight:800;color:#0d4a22;line-height:1.15;margin-bottom:1mm;letter-spacing:.1mm;overflow-wrap:anywhere}
+.r{display:flex;align-items:baseline;font-size:2.7mm;line-height:1.4;margin-top:.8mm}
+.r .l{width:12.5mm;flex:none;color:#5b6b61;font-size:2.2mm}
+.r .l2{width:auto;margin-left:3mm;margin-right:1mm}
+.r b{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.pl{display:inline-block;background:#e8f3ea;border:.2mm solid #b8d4bf;border-radius:.9mm;padding:0 1.4mm;font-weight:800;color:#0d4a22}
+.if{height:6.4mm;flex:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 2.4mm .6mm;border-top:.2mm solid #d3ded6;font-size:2.2mm;color:#3f5246}
+.if b{color:#0d4a22;letter-spacing:.2mm}
+.sg{display:flex;flex-direction:column;align-items:flex-end;line-height:1}.sg img{height:3.6mm;max-width:14mm;object-fit:contain;display:block}
+.sg em{font-style:normal;font-size:1.6mm;font-weight:700;letter-spacing:.2mm;border-top:.15mm solid #5b6b61;padding-top:.2mm;margin-top:.2mm}
+.ibar{height:1.2mm;flex:none}
+.bb{flex:1;display:flex;gap:2mm;padding:2mm 2.4mm 0;min-height:0}
+.bl{flex:1;min-width:0}.bl h4{margin:0 0 .8mm;font-size:2.2mm;letter-spacing:.35mm;color:#0d4a22;border-bottom:.2mm solid #cfe0d3;padding-bottom:.4mm}
+.bl ol{margin:0;padding-left:3.2mm;font-size:2.05mm;line-height:1.45;color:#33463a}
+.bq{width:16mm;flex:none;text-align:center}.bq img{width:15mm;height:15mm;display:block;margin:0 auto}.bq small{display:block;font-size:1.6mm;color:#5b6b61;margin-top:.3mm}
+.bc{display:flex;flex-wrap:wrap;gap:0 4mm;padding:.8mm 2.4mm 0;font-size:2.4mm}.bc .l{color:#5b6b61;font-size:2.1mm}.bc b{overflow-wrap:anywhere}
+.bf{flex:none;text-align:center;font-size:1.85mm;line-height:1.4;color:#3f5246;padding:.8mm 2.4mm 1mm;border-top:.2mm solid #d3ded6;margin-top:1mm}
+.ik.p .ih{height:16.5mm;padding:.6mm 2mm;flex-direction:column;justify-content:center;text-align:center;gap:.5mm}.ik.p .ih img{width:7mm;height:7mm}
+.ik.p .ih b{font-size:2.5mm;line-height:1.12}.ik.p .ih i{font-size:1.45mm;margin-top:0;letter-spacing:0}.ik.p .it{font-size:1.8mm;letter-spacing:.2mm}.ik.p .r{margin-top:.5mm}
+.ik.p .ib{flex-direction:column;align-items:center;gap:.8mm;padding-top:1.4mm}
+.ik.p .id{width:100%;flex:none}.ik.p .nm{text-align:center}.ik.p .r.c{justify-content:center}
+.ik.p .bb{flex-direction:column;align-items:center}.ik.p .bq{order:-1}
+`;
+const UI_CSS=`.idc-box{border:1px solid #d6e2d9;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fbfdfb}
+.idc-h{font-weight:800;color:#145828;font-size:13.5px;margin-bottom:8px;letter-spacing:.2px}
+.idc-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:6px 0;font-size:13px}
+.idc-row label{display:inline-flex;align-items:center;gap:5px}
+.idc-row input[type=number],.idc-row input[type=text],.idc-row select{padding:6px 8px;border:1px solid #b9c8bd;border-radius:7px;font-size:13px}
+.idc-row input[type=number]{width:76px}.idc-row input[type=text]{min-width:150px}
+.idc-tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.idc-tabs button{border:1px solid #b9c8bd;background:#fff;color:#145828;border-radius:99px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer}.idc-tabs button.on{background:#145828;color:#fff;border-color:#145828}
+.idc-chip{display:inline-flex;gap:6px;align-items:center;background:#e8f3ea;border:1px solid #b8d4bf;border-radius:99px;padding:3px 10px;font-size:12px;margin:3px 4px 3px 0}.idc-chip b{cursor:pointer;color:#b00020}
+.idc-res{max-height:240px;overflow:auto;border:1px solid #d6e2d9;border-radius:8px;background:#fff;margin-top:6px}.idc-res>div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid #eef3ef;font-size:12.5px}
+.idc-tw{max-height:420px;overflow:auto;border:1px solid #d6e2d9;border-radius:8px;background:#fff}
+.idc-t{width:100%;border-collapse:collapse;font-size:12.5px}.idc-t th,.idc-t td{border-bottom:1px solid #e3ebe5;padding:4px 6px;text-align:center}.idc-t td.l{text-align:left}.idc-t th{background:#eaf3ec;position:sticky;top:0;z-index:1}
+.idc-th{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.idc-th img{width:26px;height:33px;object-fit:cover;border:1px solid #9bb29d;border-radius:3px}.idc-th span{font-size:11.5px;color:#145828;font-weight:700;border:1px dashed #8aa38f;border-radius:6px;padding:3px 7px}
+.idc-th input{display:none}.idc-x{cursor:pointer;color:#b00020;font-weight:800;margin-left:4px}
+.idc-stat{font-size:12.5px;font-weight:600;color:#145828;margin:6px 0}.idc-fit{font-size:13.5px;font-weight:800;color:#0d4a22;background:#e8f3ea;border:1px solid #b8d4bf;border-radius:8px;padding:5px 12px;display:inline-block}
+.idc-fit.bad{background:#fde4e4;border-color:#e9b0b0;color:#b00020}
+.idc-pv{overflow:auto;background:#cfd8d2;padding:12px;border-radius:10px;text-align:center}.idc-pv .pgw{display:inline-block;text-align:left}.idc-pv .pg{box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.idc-msg{font-size:12.5px;font-weight:700;min-height:16px;color:#145828}.idc-msg.er{color:#b00020}
+.idc-note{font-size:12px;color:#5a6b5f;line-height:1.5}`;
+
+function photoBox(x){const p=photoOf(x);return p?'<div class="ph"><img src="'+e(p)+'"></div>':'<div class="ph no"><span>PASTE<br>PHOTO<br><small>'+PW+' × '+PHH+' mm</small></span></div>'}
+const row=(l,v)=>v?'<div class="r"><span class="l">'+l+'</span><b>'+e(v)+'</b></div>':'';
+function front(x,D){
+ const s=x.s,col=S.stripe?STR(x.c):'#1c7a3c',nm=String(s.name||'').toUpperCase(),fa=String(s.father||'').toUpperCase(),mo=String(s.mother||'').toUpperCase();
+ const nf=D.land?(nm.length>30?2.7:nm.length>24?3.1:3.7):(nm.length>22?2.6:nm.length>18?3.0:3.5);
+ return '<div class="ik'+(D.land?'':' p')+'" style="width:'+D.iw+'mm;height:'+D.ih+'mm;transform:scale('+D.k+')">'+
+ '<div class="ih"><img src="'+e(logo())+'"><div><b>'+e(SCH.name)+'</b><i>'+e(SCH.sub)+' · UDISE '+SCH.udise+'</i></div></div>'+
+ '<div class="it" style="background:'+col+'"><span>STUDENT IDENTITY CARD</span><span>SESSION '+e(S.ses)+'</span></div>'+
+ '<div class="ib">'+photoBox(x)+'<div class="id"><div class="nm" style="font-size:'+nf+'mm">'+e(nm)+'</div>'+
+ '<div class="r c"><span class="l">Class</span><span class="pl">'+e(x.c)+(x.sc?' – '+e(x.sc):'')+'</span><span class="l l2">Roll</span><span class="pl">'+e(rollOf(x))+'</span></div>'+
+ row('D.O.B.',dob(s))+row('Father',fa)+(S.mother?row('Mother',mo):'')+row('Siksha ID',s.sikshaId)+'</div></div>'+
+ '<div class="if"><span>ID No. <b>'+e(idno(x))+'</b></span><span class="sg">'+(CFG.sign?'<img src="'+e(CFG.sign)+'">':'<span style="height:3.6mm"></span>')+'<em>HEADMASTER</em></span></div>'+
+ '<div class="ibar" style="background:'+col+'"></div></div>'}
+function back(x,D){
+ const s=x.s,col=S.stripe?STR(x.c):'#1c7a3c',q=S.qr?qr('TFHS|'+idno(x)+'|'+(s.sikshaId||'')):'';
+ return '<div class="ik'+(D.land?'':' p')+'" style="width:'+D.iw+'mm;height:'+D.ih+'mm;transform:scale('+D.k+')">'+
+ '<div class="ih"><img src="'+e(logo())+'"><div><b>'+e(SCH.name)+'</b><i>STUDENT IDENTITY CARD · SESSION '+e(S.ses)+'</i></div></div>'+
+ '<div class="it" style="background:'+col+'"><span>IMPORTANT</span><span>'+e(idno(x))+'</span></div>'+
+ '<div class="bb"><div class="bl"><h4>INSTRUCTIONS</h4><ol><li>This card is non-transferable; carry it daily.</li><li>Show it to the school authority on demand.</li><li>Report loss to the Headmaster immediately.</li><li>If found, please return to the school address below.</li></ol></div>'+
+ (q?'<div class="bq"><img src="'+q+'"><small>Scan to verify</small></div>':'')+'</div>'+
+ '<div class="bc">'+(s.father?'<span><span class="l">Guardian </span><b>'+e(String(s.father).toUpperCase())+'</b></span>':'')+(s.mobile?'<span><span class="l">Mobile </span><b>'+e(s.mobile)+'</b></span>':'')+'</div>'+
+ '<div class="bf">'+e(SCH.addr)+'<br>Ph: '+e(SCH.tel)+' · '+e(SCH.mail)+(S.valid?'<br>Valid up to: <b>'+e(S.valid)+'</b>':'')+'</div>'+
+ '<div class="ibar" style="background:'+col+'"></div></div>'}
+const card=(x,side,D)=>'<div class="ic'+(S.outline?' ol':'')+'" style="width:'+D.w+'mm;height:'+D.h+'mm">'+(side==='f'?front(x,D):back(x,D))+'</div>';
+function pageHTML(list,side,G,D){
+ const cells=new Array(G.cols*G.rows).fill(null);
+ list.forEach((x,i)=>{const r=Math.floor(i/G.cols),c=i%G.cols;cells[r*G.cols+(side==='b'?G.cols-1-c:c)]=x}); /* back sheet is mirrored so duplex (long-edge) fronts & backs line up */
+ const gw=G.cols*D.w+(G.cols-1)*S.gap,gh=G.rows*D.h+(G.rows-1)*S.gap;
+ return '<div class="pg"><div class="gr" style="left:'+(PAGE_W-gw)/2+'mm;top:'+(PAGE_H-gh)/2+'mm;grid-template-columns:repeat('+G.cols+','+D.w+'mm);grid-auto-rows:'+D.h+'mm;gap:'+S.gap+'mm">'+cells.map(x=>x?card(x,side,D):'<div></div>').join('')+'</div></div>'}
+const per=()=>S.sides==='both'?2:1;
+const nPages=(L,G)=>G.n?Math.ceil(L.length/G.n)*per():0;
+function pageN(L,i,G,D){const pi=Math.floor(i/per()),side=S.sides==='back'?'b':(S.sides==='both'&&i%2?'b':'f');return pageHTML(L.slice(pi*G.n,pi*G.n+G.n),side,G,D)}
+
+/* ---------- photo processing ---------- */
+function loadImg(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+async function procPhoto(file){ /* crop to 4:5 (stamp 20x25 mm), face-biased to the top, 240x300 px (≈300 dpi) JPEG */
+ const im=await loadImg(file),W=240,H=300,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
+ const tr=W/H;let sw=im.width,sh=im.height;if(sw/sh>tr)sw=sh*tr;else sh=sw/tr;
+ x.imageSmoothingQuality='high';x.drawImage(im,(im.width-sw)/2,(im.height-sh)*0.15,sw,sh,0,0,W,H);return c.toDataURL('image/jpeg',.88)}
+async function procFit(file,mw,mh){const im=await loadImg(file),k=Math.min(1,mw/im.width,mh/im.height),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/png')}
+const ROM={5:'V',6:'VI',7:'VII',8:'VIII',9:'IX',10:'X',11:'XI',12:'XII'};
+function matchName(fn,A){
+ const b=fn.replace(/\.[^.]+$/,'').trim().toUpperCase(),nz=v=>String(v||'').trim().replace(/^0+/,''),mid=b.match(/\d{12,14}/);
+ if(mid){const id=nz(mid[0]);return A.find(x=>nz(x.s.sikshaId)===id)}
+ const CL='(XII|XI|X|IX|VIII|VII|VI|V|\\d{1,2})',cv=v=>/^\d/.test(v)?ROM[+v]:v;
+ let m=b.match(new RegExp('^'+CL+'[\\s_\\-.]*([A-D])[\\s_\\-.]*0*(\\d{1,3})(?!\\d)'));
+ if(m){const c=cv(m[1]);return A.find(x=>x.c===c&&x.sc===m[2]&&x.r===+m[3])}
+ m=b.match(new RegExp('^'+CL+'[\\s_\\-.]*0*(\\d{1,3})(?!\\d)'));
+ if(m){const c=cv(m[1]),L=A.filter(x=>x.c===c&&x.r===+m[2]);return L.length===1?L[0]:null}
+ return null}
+
+/* ---------- UI ---------- */
+function msg(t,er){const m=g('idc_msg');if(m){m.textContent=t||'';m.className='idc-msg'+(er?' er':'')}}
+function build(){
+ const B=g('idcBody');if(!B)return;S.ses=S.ses||yr();S.valid=S.valid||('31-12-'+S.ses);
+ const opt=(a,v)=>a.map(x=>'<option value="'+e(x[0])+'"'+(x[0]===v?' selected':'')+'>'+e(x[1])+'</option>').join('');
+ B.innerHTML='<style>'+UI_CSS+CSS+'</style><h2>🆔 Student ID Cards — class-wise / individual</h2>'+
+ '<p class="mut">Pick a class (or search individual students), add photos once (they are kept on this computer), then print on A4 in colour. A stamp-size photo (<b>'+PW+' × '+PHH+' mm</b>) is placed automatically; where a photo is not available an empty dashed box is kept to paste one.</p>'+
+ '<div class="idc-box"><div class="idc-h">1 · Select students</div><div class="idc-tabs"><button type="button" id="idc_t1" onclick="IDC.tab(\'class\')">Class-wise</button><button type="button" id="idc_t2" onclick="IDC.tab(\'ind\')">Individual students</button></div>'+
+ '<div id="idc_cm"></div><div id="idc_im" style="display:none"><div class="idc-row"><input type="text" id="idc_q" style="min-width:260px;flex:1" placeholder="Search name, father, Siksha ID, mobile — or type class-sec-roll e.g. X-A-5" oninput="IDC.q(this.value)"><button class="dv-b g" type="button" onclick="IDC.addAll()">＋ Add all results</button></div><div id="idc_res"></div><div id="idc_pk" style="margin-top:8px"></div></div></div>'+
+ '<div class="idc-box"><div class="idc-h">2 · Photos (stamp size, stored on this computer)</div><div class="idc-row"><label class="dv-b" style="cursor:pointer">📷 Bulk upload photos<input type="file" accept="image/*" multiple style="display:none" onchange="IDC.bulk(this)"></label><button class="dv-b g" type="button" onclick="IDC.expo()">⬇ Backup photos</button><label class="dv-b g" style="cursor:pointer">⬆ Restore backup<input type="file" accept=".json,application/json" style="display:none" onchange="IDC.impo(this)"></label><button class="dv-b g" type="button" style="color:#b00020" onclick="IDC.wipe()">🗑 Delete all photos</button></div>'+
+ '<div class="idc-note">Name each photo file as <b>Class-Sec-Roll</b> (e.g. <code>X-A-05.jpg</code>, <code>IX_B_12.png</code>; for a class with no section <code>X-12.jpg</code>) or with the <b>Banglar Siksha ID</b> — it is matched automatically, cropped to 4:5 and compressed. For a single student use the <b>＋ Add</b> button in the list below.</div><div class="idc-msg" id="idc_msg"></div><div class="idc-stat" id="idc_pst"></div></div>'+
+ '<div class="idc-box"><div class="idc-h">3 · Card size &amp; A4 layout</div><div class="idc-row"><label>Card <select id="idc_pre" onchange="IDC.pre(this.value)">'+opt(Object.keys(PRE).map(k=>[k,PRE[k][0]]),S.preset)+'</select></label><label>W <input type="number" id="idc_w" step="0.1" min="30" value="'+S.w+'" oninput="IDC.lay(\'w\',this.value)"> mm</label><label>H <input type="number" id="idc_h" step="0.1" min="30" value="'+S.h+'" oninput="IDC.lay(\'h\',this.value)"> mm</label><label>Gap <input type="number" id="idc_gap" step="0.5" min="0" value="'+S.gap+'" oninput="IDC.lay(\'gap\',this.value)"> mm</label><label>Min. page margin <input type="number" id="idc_mar" step="0.5" min="0" value="'+S.mar+'" oninput="IDC.lay(\'mar\',this.value)"> mm</label></div>'+
+ '<div class="idc-row"><span class="idc-fit" id="idc_fit"></span></div>'+
+ '<div class="idc-row"><label>Print <select id="idc_sides" onchange="IDC.opt(\'sides\',this.value)">'+opt([['front','Front only'],['both','Front + Back (alternate pages — double-sided)'],['back','Back only']],S.sides)+'</select></label><label>Session <input type="text" id="idc_ses" style="min-width:80px;width:90px" value="'+e(S.ses)+'" oninput="IDC.opt(\'ses\',this.value,1)"></label><label>Valid up to <input type="text" id="idc_val" style="width:110px;min-width:90px" value="'+e(S.valid)+'" oninput="IDC.opt(\'valid\',this.value,1)"></label><label>Print only <select id="idc_phf" onchange="IDC.opt(\'phf\',this.value)">'+opt([['ALL','All selected students'],['HAS','Students with photo'],['NONE','Students without photo (paste-photo sheet)']],S.phf)+'</select></label></div>'+
+ '<div class="idc-row"><label><input type="checkbox" id="idc_o1" onchange="IDC.opt(\'stripe\',this.checked?1:0)"> Colour band by class (V–VIII · IX–X · XI–XII)</label><label><input type="checkbox" id="idc_o2" onchange="IDC.opt(\'qr\',this.checked?1:0)"> QR on back</label><label><input type="checkbox" id="idc_o3" onchange="IDC.opt(\'mother\',this.checked?1:0)"> Mother\'s name on front</label><label><input type="checkbox" id="idc_o4" onchange="IDC.opt(\'outline\',this.checked?1:0)"> Card outline (cut guide)</label></div>'+
+ '<div class="idc-row"><label class="dv-b g" style="cursor:pointer">🏫 School logo<input type="file" accept="image/*" style="display:none" onchange="IDC.logo(this)"></label><button class="dv-b g" type="button" onclick="IDC.logoReset()">Reset logo</button><label class="dv-b g" style="cursor:pointer">✍ Headmaster signature<input type="file" accept="image/*" style="display:none" onchange="IDC.sign(this)"></label><button class="dv-b g" type="button" onclick="IDC.signClear()">Remove signature</button><span class="idc-note" id="idc_brand"></span></div>'+
+ '<div class="idc-note">Double-sided: print <b>Front + Back</b> with “flip on long edge”. The back sheet is mirrored so every back sits exactly behind its front. Print at <b>100% / Actual size</b>, colour, A4.</div></div>'+
+ '<div class="idc-box"><div class="idc-h">4 · Students &amp; photo status</div><div class="idc-stat" id="idc_stat"></div><div id="idc_ros"></div></div>'+
+ '<div class="idc-box"><div class="idc-h">5 · Preview &amp; print</div><div class="idc-row"><button class="dv-b" type="button" onclick="IDC.print()">🖨 Print / Save PDF (A4, colour)</button><button class="dv-b g" type="button" onclick="IDC.pg(-1)">◀</button><span id="idc_pgn" style="font-weight:700;font-size:13px"></span><button class="dv-b g" type="button" onclick="IDC.pg(1)">▶</button></div><div class="idc-pv" id="idc_prev"></div></div>';
+ built=true;init();fillAll()}
+
+function fillSel(){
+ g('idc_t1').className=S.mode==='class'?'on':'';g('idc_t2').className=S.mode==='ind'?'on':'';
+ g('idc_cm').style.display=S.mode==='class'?'':'none';g('idc_im').style.display=S.mode==='ind'?'':'none';
+ if(S.mode==='class'){
+  const A=all(),secs=[...new Set(A.map(x=>x.sc))].filter(Boolean).sort(),meds=[...new Set(A.map(x=>medOf(x.s)))].sort();
+  g('idc_cm').innerHTML='<div class="idc-row"><b>Class</b>'+CO.map(c=>'<label><input type="checkbox" '+(S.cls.has(c)?'checked ':'')+'onchange="IDC.cl(\''+c+'\',this.checked)"> '+c+' <small style="color:#777">('+A.filter(x=>x.c===c).length+')</small></label>').join('')+'<button class="dv-b g" type="button" onclick="IDC.allCls(true)">All classes</button><button class="dv-b g" type="button" onclick="IDC.allCls(false)">Clear</button></div>'+
+  '<div class="idc-row"><label>Section <select onchange="IDC.sec(this.value)"><option value="ALL">All sections</option>'+secs.map(s=>'<option'+(S.sec===s?' selected':'')+'>'+e(s)+'</option>').join('')+'</select></label>'+(meds.length>1?'<label>Medium <select onchange="IDC.med(this.value)"><option value="ALL">All</option>'+meds.map(s=>'<option'+(S.med===s?' selected':'')+'>'+e(s)+'</option>').join('')+'</select></label>':'')+'</div>'+(S.cls.size?'':'<div class="idc-note">Tick one or more classes to list students.</div>');
+ }else{
+  const pk=[...S.pick.values()];
+  g('idc_pk').innerHTML=pk.length?'<div class="idc-note" style="margin-bottom:3px"><b>'+pk.length+'</b> student(s) selected <button class="dv-b g" type="button" style="padding:3px 9px;margin-left:6px" onclick="IDC.clearPick()">Clear</button></div>'+pk.map(x=>'<span class="idc-chip">'+e(x.s.name)+' · '+e(cs(x)+'/'+x.r)+' <b onclick="IDC.unpick(\''+enc(x.k)+'\')">✕</b></span>').join(''):'<div class="idc-note">No student added yet — search above and press ＋ Add.</div>';
+  fillRes()}}
+function results(){const q=S.q.trim().toUpperCase();if(!q)return[];const A=all(),m=q.match(/^(XII|XI|X|IX|VIII|VII|VI|V)[\s\-_.]*([A-D])[\s\-_.]*0*(\d+)$/);
+ if(m)return A.filter(x=>x.c===m[1]&&x.sc===m[2]&&x.r===+m[3]);
+ return A.filter(x=>String(x.s.name||'').toUpperCase().includes(q)||String(x.s.father||'').toUpperCase().includes(q)||String(x.s.sikshaId||'').includes(q)||String(x.s.mobile||'').includes(q)).sort(cmp).slice(0,40)}
+function fillRes(){const R=results(),el=g('idc_res');if(!el)return;
+ el.innerHTML=S.q.trim()?(R.length?'<div class="idc-res">'+R.map(x=>'<div><span><b>'+e(x.s.name)+'</b> · '+e(cs(x))+' / Roll '+x.r+' <small style="color:#666">· '+e(x.s.father||'')+'</small></span>'+(S.pick.has(x.k)?'<small style="color:#145828;font-weight:700">added ✔</small>':'<button class="dv-b g" type="button" style="padding:3px 10px" onclick="IDC.add(\''+enc(x.k)+'\')">＋ Add</button>')+'</div>').join('')+'</div>':'<div class="idc-note">No match.</div>'):''}
+function fillRos(){
+ const B=base(),L=B.filter(phFilter),el=g('idc_ros'),LIM=400;
+ if(!B.length){el.innerHTML='<div class="idc-note">'+(S.mode==='class'?'Select a class above to list its students.':'Add students to see them here.')+'</div>';return}
+ el.innerHTML='<div class="idc-tw"><table class="idc-t"><tr><th><input type="checkbox" '+(L.every(x=>!S.off.has(x.k))?'checked ':'')+'onchange="IDC.togAll(this.checked)"></th><th>Class-Sec</th><th>Roll</th><th>Name</th><th>Photo</th><th>Siksha ID</th></tr>'+
+ L.slice(0,LIM).map(x=>{const p=photoOf(x),k=enc(x.k);return '<tr><td><input type="checkbox" '+(S.off.has(x.k)?'':'checked ')+'onchange="IDC.tog(\''+k+'\',this.checked)"></td><td>'+e(cs(x))+'</td><td>'+x.r+'</td><td class="l">'+e(x.s.name)+'</td><td><label class="idc-th">'+(p?'<img src="'+e(p)+'">':'<span>＋ Add</span>')+'<input type="file" accept="image/*" onchange="IDC.one(\''+k+'\',this)"></label>'+(PHO[x.k]?'<span class="idc-x" title="Remove photo" onclick="IDC.rm(\''+k+'\')">✕</span>':'')+'</td><td>'+e(x.s.sikshaId||'')+'</td></tr>'}).join('')+'</table></div>'+(L.length>LIM?'<div class="idc-note">Showing first '+LIM+' of '+L.length+' — printing includes all ticked students.</div>':'')}
+function fillStat(){
+ const C=chosen(),P=C.filter(photoOf).length,n=Object.keys(PHO).length;
+ g('idc_stat').innerHTML='<b>'+C.length+'</b> student(s) ticked · with photo <b>'+P+'</b> · without photo <b>'+(C.length-P)+'</b>';
+ g('idc_pst').textContent='Photos stored on this computer: '+n+(idb?'':' (browser storage unavailable — photos will be lost on reload; use Backup)');
+ g('idc_brand').textContent=(CFG.logo?'Custom logo ✔':'Default emblem')+' · '+(CFG.sign?'Signature ✔':'No signature (space kept)')}
+function fillFit(){const G=grid(),el=g('idc_fit'),L=printable(),np=nPages(L,G);
+ el.className='idc-fit'+(G.n?'':' bad');el.textContent=G.n?(G.cols+' × '+G.rows+' = '+G.n+' cards per A4 sheet'+(L.length?' · '+L.length+' card(s) → '+np+' A4 page(s)'+(S.sides==='both'?' (front + back)':''):'')):'Card is larger than A4 — reduce size / margin'}
+function fillPrev(){
+ const G=grid(),D=dims(),L=printable(),n=nPages(L,G),el=g('idc_prev');
+ if(!n){el.innerHTML='<div class="idc-note" style="padding:18px">Nothing to preview — select students (and check the “Print only” filter).</div>';g('idc_pgn').textContent='';return}
+ S.pv=Math.max(0,Math.min(n-1,S.pv));
+ const z=Math.max(.35,Math.min(1,((el.clientWidth||760)-30)/(PAGE_W*MM)));
+ el.innerHTML='<div class="pgw" style="zoom:'+z+'">'+pageN(L,S.pv,G,D)+'</div>';
+ g('idc_pgn').textContent='Page '+(S.pv+1)+' of '+n+(S.sides==='both'?(S.pv%2?' · back':' · front'):S.sides==='back'?' · back':'')}
+function fillAll(){if(!built)return;g('idc_o1').checked=!!S.stripe;g('idc_o2').checked=!!S.qr;g('idc_o3').checked=!!S.mother;g('idc_o4').checked=!!S.outline;
+ g('idc_w').disabled=g('idc_h').disabled=S.preset!=='cust';fillSel();fillRos();fillStat();fillFit();fillPrev()}
+
+/* ---------- print ---------- */
+function print(){
+ const L=printable(),G=grid(),D=dims();if(!L.length){alert('No student to print — select students first.');return}if(!G.n){alert('Card size does not fit on A4.');return}
+ const n=nPages(L,G);if(n>60&&!confirm(n+' A4 pages will be generated. Continue?'))return;
+ const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+ let h='';for(let i=0;i<n;i++)h+=pageN(L,i,G,D);
+ w.document.write('<html><head><meta charset="UTF-8"><title>Student ID cards — '+e(S.ses)+'</title><style>@page{size:A4 portrait;margin:0}html,body{margin:0;background:#fff}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}'+CSS+'.pg{page-break-after:always}.pg:last-child{page-break-after:auto}</style></head><body>'+h+'</body></html>');
+ w.document.close();w.focus();
+ const go=()=>{try{w.print()}catch(x){}};
+ Promise.race([Promise.all([...w.document.images].map(im=>im.complete?1:new Promise(r=>{im.onload=im.onerror=r}))),new Promise(r=>setTimeout(r,4000))]).then(()=>setTimeout(go,200))}
+
+/* ---------- actions ---------- */
+async function savePhotos(ents){PHO&&ents.forEach(a=>{PHO[a[0]]=a[1]});return idbMany('photos',ents)}
+window.IDC={
+ tab(m){S.mode=m;S.pv=0;fillAll()},
+ cl(c,on){on?S.cls.add(c):S.cls.delete(c);S.pv=0;fillAll()},
+ allCls(on){S.cls=on?new Set(CO):new Set();S.pv=0;fillAll()},
+ sec(v){S.sec=v;S.pv=0;fillAll()},med(v){S.med=v;S.pv=0;fillAll()},
+ q(v){S.q=v;fillRes()},
+ add(k){k=dec(k);const x=all().find(a=>a.k===k);if(x){S.pick.set(k,x);fillAll()}},
+ addAll(){results().forEach(x=>S.pick.set(x.k,x));fillAll()},
+ unpick(k){S.pick.delete(dec(k));S.off.delete(dec(k));fillAll()},
+ clearPick(){S.pick.clear();fillAll()},
+ tog(k,on){k=dec(k);on?S.off.delete(k):S.off.add(k);fillStat();fillFit();fillPrev()},
+ togAll(on){base().filter(phFilter).forEach(x=>on?S.off.delete(x.k):S.off.add(x.k));fillAll()},
+ pre(v){S.preset=v;if(v!=='cust'){S.w=PRE[v][1];S.h=PRE[v][2]}g('idc_w').value=S.w;g('idc_h').value=S.h;S.pv=0;fillAll()},
+ lay(k,v){S[k]=parseFloat(v)||0;S.pv=0;fillFit();fillPrev()},
+ opt(k,v,soft){const old=S[k];S[k]=v;if(k==='ses'&&S.valid==='31-12-'+old){S.valid='31-12-'+v;const i=g('idc_val');if(i)i.value=S.valid}if(soft){fillPrev();return}S.pv=0;fillAll()},
+ pg(d){S.pv+=d;fillPrev()},
+ print,
+ async one(k,inp){k=dec(k);const f=inp.files[0];if(!f)return;try{const d=await procPhoto(f);await savePhotos([[k,d]]);msg('Photo saved ✔');fillRos();fillStat();fillPrev()}catch(x){msg('Could not read that image.',1)}inp.value=''},
+ async rm(k){k=dec(k);delete PHO[k];await idbDel('photos',k);fillRos();fillStat();fillPrev()},
+ async bulk(inp){
+  const fs=[...inp.files];if(!fs.length)return;const A=all(),ents=[],bad=[];let i=0;
+  for(const f of fs){i++;const x=matchName(f.name,A);if(!x){bad.push(f.name);continue}try{ents.push([x.k,await procPhoto(f)])}catch(er){bad.push(f.name+' (unreadable)')}if(i%8===0){msg('Processing '+i+' / '+fs.length+' …')}}
+  const ok=await savePhotos(ents);inp.value='';
+  msg('✔ '+ents.length+' photo(s) matched & saved'+(ok?'':' (browser storage unavailable — use Backup)')+(bad.length?' · '+bad.length+' not matched: '+bad.slice(0,6).join(', ')+(bad.length>6?' …':'')+' — rename as Class-Sec-Roll or Siksha ID.':''),bad.length&&!ents.length);
+  fillRos();fillStat();fillPrev()},
+ expo(){const n=Object.keys(PHO).length;if(!n){msg('No photos to back up yet.',1);return}
+  const b=new Blob([JSON.stringify({v:1,school:'TFHS',photos:PHO})],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);const d=new Date();a.download='tfhs_id_photos_'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.json';document.body.appendChild(a);a.click();a.remove();msg('✔ Backup of '+n+' photo(s) downloaded.')},
+ impo(inp){const f=inp.files[0];if(!f)return;const fr=new FileReader();fr.onload=async()=>{try{const j=JSON.parse(fr.result),p=j.photos||{},ents=Object.keys(p).map(k=>[k,p[k]]);await savePhotos(ents);msg('✔ '+ents.length+' photo(s) restored.');fillAll()}catch(x){msg('Not a valid photo backup file.',1)}inp.value=''};fr.readAsText(f)},
+ async wipe(){if(!Object.keys(PHO).length){msg('No photos stored.');return}if(!confirm('Delete ALL stored ID-card photos from this computer?\n\nTake a Backup first if you may need them again.'))return;PHO={};await idbClear('photos');msg('All photos deleted.');fillAll()},
+ async logo(inp){const f=inp.files[0];if(!f)return;try{CFG.logo=await procFit(f,240,240);await saveCfg();fillStat();fillPrev()}catch(x){msg('Could not read logo.',1)}inp.value=''},
+ async logoReset(){CFG.logo='';await saveCfg();fillStat();fillPrev()},
+ async sign(inp){const f=inp.files[0];if(!f)return;try{CFG.sign=await procFit(f,420,150);await saveCfg();fillStat();fillPrev()}catch(x){msg('Could not read signature.',1)}inp.value=''},
+ async signClear(){CFG.sign='';await saveCfg();fillStat();fillPrev()},
+ _S:S,_grid:grid,_match:matchName
+};
+(window.pt_R||(window.pt_R={})).idc=function(){if(!built)build();else{fillAll()}};
 })();
 </script>
 </body>
