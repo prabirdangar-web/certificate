@@ -908,7 +908,7 @@ const REGF=(function(){
 body:not([data-role=admin]):not([data-role=teacher]):not([data-role=user]) :is(.tf-side,.tf-top){display:none!important}
 body[data-role=admin] [data-r]:not([data-r*=a]),body[data-role=teacher] [data-r]:not([data-r*=t]),body[data-role=user] [data-r]:not([data-r*=u]){display:none!important}
 body:not([data-view=cert]):not([data-view=reports]):not([data-view=wifs]):not([data-view=data]):not([data-view=fees]):not([data-view=adm]):not([data-view=prom]) :is(.dashboard-panel,.page,.wifs-panel,.wifs-sheet,#dataView){display:none!important}
-body[data-view=home] #homePanel,body[data-view=setup] #setupPanel,body[data-view=marks] #marksPanel,body[data-view=merit] #meritPanel,body[data-view=lists] #listsPanel{display:block}
+body[data-view=home] #homePanel,body[data-view=setup] #setupPanel,body[data-view=marks] #marksPanel,body[data-view=merit] #meritPanel,body[data-view=lists] #listsPanel{display:block}body[data-view=k2] #k2Panel{display:block}
 .tf-new-panel{max-width:1040px!important;font-family:'Segoe UI',Arial,sans-serif;border:0!important;border-radius:16px!important;padding:20px 22px!important}
 .tf-new-panel h2{display:flex;align-items:center;gap:8px;margin:24px 0 10px}.tf-new-panel>h2:first-child,.tf-new-panel>div>h2:first-child{margin-top:0}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:16px 0}
@@ -969,7 +969,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 <div class="gp">DAILY</div><button data-v="cert"><span class="ic">📜</span><span class="l">Certificate</span></button>
 <div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button>
 <button data-v="adm"><span class="ic">🎓</span><span class="l">Admission</span></button><button data-v="prom"><span class="ic">🔁</span><span class="l">Promotion</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
-<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button>
+<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button><button data-v="k2"><span class="ic">🌸</span><span class="l">Kanyashree K2</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <!-- NEW PANELS -->
@@ -988,6 +988,7 @@ body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!i
 
 <div id="meritPanel" class="tf-new-panel"><div id="promBody"></div></div>
 <div id="listsPanel" class="tf-new-panel"><div id="listsBody"></div></div>
+<div id="k2Panel" class="tf-new-panel"><div id="k2Body"></div></div>
 
 <div id="dataView">
  <div class="dv-c"><h3>Student database &amp; year</h3><div class="dv-r"><label>Year <select id="dvYear"></select></label>
@@ -2451,7 +2452,7 @@ const WIFS = (function(){
 const TFDB=(function(){
  const $=id=>document.getElementById(id),CLS=['V','VI','VII','VIII','IX','X','XI','XII'];
  const CFG={apiKey:"AIzaSyCiqQFsnbSi6eCgUI_W3NTybzIkRmCI_54",authDomain:"tfhs-portal.firebaseapp.com",projectId:"tfhs-portal",storageBucket:"tfhs-portal.firebasestorage.app",messagingSenderId:"316041012204",appId:"1:316041012204:web:04ee8b19374c60f63716c9"};
- const T={lists:['Student Lists','Medium-wise lists for higher authority and book / uniform / tab distribution'],cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase'],prom:['Promotion','Draft, finalize & lock roll lists for the new session, class-teacher logins'],home:['Dashboard','Taldangra Fulmati H.S.'],marks:['Marks Entry','Final exam % of marks — save draft, finalise & lock'],setup:['Approvals & Setup','Class-teacher approvals, marks unlock, new-session sections'],merit:['Merit List','Combined class merit list, medium-wise, with new section & roll']};
+ const T={k2:['Kanyashree K2','Girls aged 18+ as on date — one-time grant (K2) list'],lists:['Student Lists','Medium-wise lists for higher authority and book / uniform / tab distribution'],cert:['Certificate','Find a student and print the A4 certificate'],reports:['Student Reports','Class, sex and caste-wise reports'],wifs:['WIFS Data Entry','Monthly Annex-3 report and A4 print'],fees:['Fee Receipts','Next-year admission receipts, class-wise (promoted to next class)'],adm:['Admission','Promote old students, admit new ones, online form, auto roll no.'],data:['Data & Year','Student database by year, live from Firebase'],prom:['Promotion','Draft, finalize & lock roll lists for the new session, class-teacher logins'],home:['Dashboard','Taldangra Fulmati H.S.'],marks:['Marks Entry','Final exam % of marks — save draft, finalise & lock'],setup:['Approvals & Setup','Class-teacher approvals, marks unlock, new-session sections'],merit:['Merit List','Combined class merit list, medium-wise, with new section & roll']};
  const BUILTIN=STUDENT_DB.slice(),CH=300,ok=typeof firebase!=='undefined';let db,auth,year=String(new Date().getFullYear()),src='built-in';
  function msg(m,bad){const e=$('dvMsg');e.textContent=m;e.className=bad?'bad':''}
  function chips(){$('tfYr').textContent='Year '+year+' · '+STUDENT_DB.length+' students';const u=auth&&auth.currentUser;$('tfOn').textContent=u?'● Online':'Offline';$('tfOn').className='tf-chip'+(u?' on':'');$('tfMode').textContent=u?u.email:'Offline mode';$('tfSign').querySelector('.l').textContent=u?'Account':'Sign in'}
@@ -4141,7 +4142,7 @@ function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a'};
+const RMAP={home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a',k2:'au'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -4150,9 +4151,9 @@ R.home=()=>{
  const T=Object.entries(D.teachers||{}),M=D.marks||{},A=Object.values(D.adm||{}),pa=A.filter(a=>a.status=='pending').length,fin=Object.values(M).filter(m=>m.st=='final').length,me=ME.role;
  const tl=(i,v,l)=>`<div class="tile"><i>${i}</i><b>${v}</b><span>${l}</span></div>`;let tiles,qa;
  if(me=='admin'){tiles=tl('👩‍🏫',T.filter(x=>x[1].status=='approved').length,'Class teachers approved')+tl('⏳',T.filter(x=>x[1].status=='pending').length,'Teacher requests pending')+tl('🔒',fin+' / '+allSecs().length,'Sections finalised (marks)')+tl('📒',Object.values(D.plock||{}).filter(Boolean).length+' / 7','Class registers locked');
-  qa=[['setup','✅ Approvals & Setup'],['merit','🔁 Merit List'],['adm','🎓 Admission'],['cert','📜 Certificate']]}
+  qa=[['setup','✅ Approvals & Setup'],['merit','🔁 Merit List'],['adm','🎓 Admission'],['cert','📜 Certificate'],['k2','🌸 Kanyashree K2']]}
  else if(me=='user'){tiles=tl('🎓',STUDENT_DB.length,'Students in database')+tl('📅',(D.session||2027),'Working session');
-  qa=[['cert','📜 Issue Certificate'],['reports','📊 Reports']]}
+  qa=[['cert','📜 Issue Certificate'],['reports','📊 Reports'],['k2','🌸 Kanyashree K2']]}
  else{const k=ME.cls+'-'+ME.sec,m=M[k];tiles=tl('🏫',ME.cls+' – '+ME.sec,'Your allotted class'+(ME.med?' · '+ME.med+' medium':''))+tl(m&&m.st=='final'?'🔒':'✏️',m?(m.st=='final'?'Locked':'Draft'):'Not started','Final exam % status')+tl('🎓',STUDENT_DB.filter(s=>s.cls==ME.cls&&s.sec==ME.sec&&(!ME.med||medN(s.medium)==ME.med)).length,'Students in class');qa=[['marks','✏️ Enter % of Marks']]}
  $('homeBody').innerHTML=`<div class="banner"><div><h3>Dashboard</h3><p>${esc(ME.email)} · Session ${D.session||2027}</p></div><span class="bn-role">${({admin:'Admin',user:'User',teacher:'Class Teacher'})[me]||''}</span></div><div class="tiles">${tiles}</div><div class="qa">${qa.map(([v,t])=>`<button class="dv-b" onclick="pt_go('${v}')">${t}</button>`).join('')}</div>`;
 };
@@ -4707,6 +4708,131 @@ window.LSL={
  sug(){suggest();fill()},print,csv,_doc:doc,_rows:rows
 };
 (window.pt_R||(window.pt_R={})).lists=function(){if(!built)build();else fill()};
+})();
+/* ===== KANYASHREE K2 — girl students who have attained 18+ as on date (WB Kanyashree Prakalpa one-time grant) =====
+   Rule used: unmarried girl, completed 18 years but NOT yet 19 years on the date of application, enrolled in a recognised institution.
+   Girls aged 19+ are shown separately as "crossed age limit". Based on the Sex and Date of Birth in the student data. */
+(function(){
+const CO=['V','VI','VII','VIII','IX','X','XI','XII'];
+const e=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const p2=n=>String(n).padStart(2,'0');
+const isoOf=(y,m,d)=>y+'-'+p2(m)+'-'+p2(d);
+const dmy=iso=>iso?iso.split('-').reverse().join('-'):'';
+const todayISO=()=>{const d=new Date();return isoOf(d.getFullYear(),d.getMonth()+1,d.getDate())};
+const parse=iso=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso||''));return m?{y:+m[1],m:+m[2],d:+m[3]}:null};
+const isGirl=s=>/^(f|female|girl)/i.test(String(s.sex||'').trim());
+/* birthday after n years; 29 Feb falls on 1 Mar in a non-leap year */
+function bday(b,n){const y=b.y+n;if(b.m===2&&b.d===29){const lp=(y%4===0&&y%100!==0)||y%400===0;return lp?isoOf(y,2,29):isoOf(y,3,1)}return isoOf(y,b.m,b.d)}
+function prevDay(iso){const p=parse(iso),d=new Date(p.y,p.m-1,p.d-1);return isoOf(d.getFullYear(),d.getMonth()+1,d.getDate())}
+function addDays(iso,n){const p=parse(iso),d=new Date(p.y,p.m-1,p.d+n);return isoOf(d.getFullYear(),d.getMonth()+1,d.getDate())}
+function ageOn(b,o){let y=o.y-b.y,m=o.m-b.m,d=o.d-b.d;if(d<0){m--;d+=new Date(o.y,o.m-1,0).getDate()}if(m<0){y--;m+=12}return{y,m,d}}
+
+const K={on:todayISO(),cls:new Set(),show:'all',office:1,sign:1,head:'',hm:0,memo:'',to:''};
+let built=false;
+const autoHead=()=>'LIST OF GIRL STUDENTS AGED 18+ FOR KANYASHREE K2 (ONE-TIME GRANT) — AS ON '+dmy(K.on);
+
+function data(){
+ const on=parse(K.on)||parse(todayISO()),onIso=isoOf(on.y,on.m,on.d),soonIso=addDays(onIso,90);
+ const R={girls:0,nodob:0,soon:0,L:[]};
+ STUDENT_DB.forEach(s=>{
+  if(!isGirl(s))return;R.girls++;
+  const b=parse(s.dob);if(!b){R.nodob++;return}
+  const d18=bday(b,18),d19=bday(b,19);
+  if(d18>onIso){if(d18<=soonIso)R.soon++;return}
+  R.L.push(Object.assign({},s,{_c:String(s.cls||'').trim().toUpperCase(),_s:String(s.sec||'').trim().toUpperCase(),_r:parseInt(s.roll,10)||0,_k:String(s.caste||'').trim().toUpperCase()||'—',_a:ageOn(b,on),_by:prevDay(d19),_st:d19>onIso?'W':'X'}));
+ });
+ R.L.sort((a,b)=>(CO.indexOf(a._c)-CO.indexOf(b._c))||a._s.localeCompare(b._s)||a._r-b._r||String(a.name).localeCompare(String(b.name)));
+ return R;
+}
+function rows(R){return R.L.filter(s=>(!K.cls.size||K.cls.has(s._c))&&(K.show==='all'||s._st===K.show))}
+const ageTxt=a=>a.y+'y '+a.m+'m '+a.d+'d';
+const stTxt=s=>s._st==='W'?'Within K2 age window':'Crossed 19 yrs';
+
+const COLS=[['sl','Sl.'],['cs','Class-Sec'],['roll','Roll'],['name','Name of Student'],['dob','Date of Birth'],['age','Age as on date'],['by','Apply by (before 19th birthday)'],['father',"Father's Name"],['caste','Category'],['sikshaId','Banglar Siksha ID'],['mobile','Mobile'],['st','K2 age status']];
+const OFF=[['k1','K1 ID / Transfer cert.'],['um','Unmarried declaration (✓)'],['bk','Bank a/c in own name (✓)'],['rem','Remarks']];
+function cols(){return COLS.concat(K.office?OFF:[])}
+function cv(s,k,i){
+ return k==='sl'?i+1:k==='cs'?s._c+(s._s?'-'+s._s:''):k==='roll'?(s.roll||''):k==='name'?(s.name||''):k==='dob'?dmy(s.dob):k==='age'?ageTxt(s._a):k==='by'?(s._st==='W'?dmy(s._by):'—'):k==='father'?(s.father||''):k==='caste'?s._k:k==='sikshaId'?(s.sikshaId||''):k==='mobile'?(s.mobile||''):k==='st'?stTxt(s):'';
+}
+const CSS='.k2-doc{font-family:Arial,sans-serif;color:#000;font-size:12px}.k2-doc h2{text-align:center;margin:0;font-size:17px}.k2-doc .c{text-align:center;margin:2px 0;font-size:11px}.k2-doc .hd{text-align:center;font-weight:bold;font-size:13.5px;margin:10px 0 2px;text-decoration:underline}.k2-doc .sb{margin:5px 0;font-size:11.5px;line-height:1.45}.k2-doc .mt{display:flex;justify-content:space-between;margin-top:6px}.k2-h2{font-weight:bold;margin:12px 0 4px}.k2-t{width:100%;border-collapse:collapse;margin-bottom:6px}.k2-t th,.k2-t td{border:1px solid #444;padding:3px 4px;text-align:center;font-size:10px;vertical-align:middle}.k2-t td.l{text-align:left}.k2-t th{background:#e9efe9}.k2-t thead{display:table-header-group}.k2-t tr{page-break-inside:avoid}.k2-t td{height:19px}.k2-t tr.x td{color:#8a1f1f;background:#fbf1f1}.k2-t tr.k2-tot td{font-weight:bold;text-align:right;background:#f3f3f3}.k2-sg{display:flex;justify-content:space-between;margin-top:44px;font-size:12px}.k2-sg div{text-align:center;min-width:190px;border-top:1px solid #000;padding-top:3px}.k2-note{font-size:10.5px;margin-top:8px;line-height:1.5}';
+
+function summary(L){
+ const cl=CO.filter(c=>L.some(s=>s._c===c));
+ let h='<div class="k2-h2">Summary — class-wise</div><table class="k2-t" style="max-width:420px"><thead><tr><th>Class</th><th>Girls aged 18+</th><th>Within K2 window (18 to below 19)</th><th>Crossed 19 yrs</th></tr></thead><tbody>';
+ cl.forEach(c=>{const A=L.filter(s=>s._c===c);h+='<tr><td><b>'+c+'</b></td><td>'+A.length+'</td><td>'+A.filter(s=>s._st==='W').length+'</td><td>'+A.filter(s=>s._st==='X').length+'</td></tr>'});
+ return h+'<tr class="k2-tot"><td>Total</td><td>'+L.length+'</td><td>'+L.filter(s=>s._st==='W').length+'</td><td>'+L.filter(s=>s._st==='X').length+'</td></tr></tbody></table>';
+}
+function table(L){
+ const cs=cols();
+ let h='<table class="k2-t"><thead><tr>'+cs.map(c=>'<th>'+e(c[1])+'</th>').join('')+'</tr></thead><tbody>';
+ L.forEach((s,i)=>{h+='<tr'+(s._st==='X'?' class="x"':'')+'>'+cs.map(c=>'<td class="'+(c[0]==='name'||c[0]==='father'?'l':'')+'">'+e(cv(s,c[0],i))+'</td>').join('')+'</tr>'});
+ return h+'<tr class="k2-tot"><td colspan="'+cs.length+'">Total: '+L.length+' girl student(s)</td></tr></tbody></table>';
+}
+function doc(R){
+ const L=rows(R);
+ let h='<div class="k2-doc"><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><div class="c">Taldangra, Bankura, West Bengal &nbsp;·&nbsp; UDISE: 19132104401</div>';
+ if(K.memo||K.on)h+='<div class="mt"><span>'+(K.memo?'Memo No: '+e(K.memo):'')+'</span><span>As on date: '+e(dmy(K.on))+'</span></div>';
+ if(K.to)h+='<div class="sb"><b>To,</b><br>'+e(K.to).replace(/\n/g,'<br>')+'</div>';
+ h+='<div class="hd">'+e(K.head)+'</div>';
+ h+='<div class="sb"><b>Eligibility (West Bengal Kanyashree Prakalpa — K2 one-time grant):</b> unmarried girl who has completed 18 years but has not completed 19 years on the date of application, and is enrolled in a recognised school / institution.</div>';
+ h+='<div class="sb">Selection: '+(K.cls.size?'Class '+CO.filter(c=>K.cls.has(c)).join(', '):'All classes')+' · '+(K.show==='all'?'All girls aged 18+':K.show==='W'?'Within K2 age window only':'Crossed 19 years only')+' &nbsp;|&nbsp; Students: <b>'+L.length+'</b></div>';
+ h+=L.length?table(L):'<p>No girl student matches the selection as on '+e(dmy(K.on))+'.</p>';
+ if(L.length)h+=summary(L);
+ h+='<div class="k2-note"><b>Documents needed for K2 application (through the school, online):</b> age proof (birth certificate / Madhyamik admit card); declaration of being unmarried, signed by the applicant and attested by a competent authority (not older than 3 months); Kanyashree ID if registered under K1 (with Transfer / Inclusion certificate if the institution has changed); bank account in the applicant\'s own name; caste certificate if applicable. A girl who has completed 19 years on the date of application is not eligible. Final eligibility is subject to verification by the Head of Institution.</div>';
+ if(K.sign)h+='<div class="k2-sg"><div>Prepared by (Office)</div><div>Headmaster / Head of Institution<br>(with seal)</div></div>';
+ return h+'</div>';
+}
+
+function print(){
+ const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
+ w.document.write('<html><head><meta charset="UTF-8"><title>'+e(K.head)+'</title><style>@page{size:A4 landscape;margin:10mm}body{margin:0}'+CSS+'</style></head><body>'+doc(data())+'</body></html>');
+ w.document.close();w.focus();setTimeout(()=>w.print(),300);
+}
+function csv(){
+ const R=data(),L=rows(R),cs=cols(),q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+ const out=[cs.map(c=>c[1])].concat(L.map((s,i)=>cs.map(c=>OFF.some(o=>o[0]===c[0])?'':cv(s,c[0],i))));
+ const b=new Blob(['\ufeff'+out.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download='kanyashree_k2_girls_18plus_as_on_'+K.on+'.csv';document.body.appendChild(a);a.click();a.remove();
+}
+
+function build(){
+ const B=document.getElementById('k2Body');if(!B)return;
+ const inp='style="padding:6px;width:100%;box-sizing:border-box"';
+ B.innerHTML='<h2>🌸 Kanyashree K2 — girl students aged 18+</h2>'+
+ '<div class="guide"><b>K2 one-time grant (₹25,000)</b> — an unmarried girl who has <b>completed 18 but not 19 years</b> on the date of application and is enrolled in a recognised institution. This list picks every <b>girl</b> in the student data whose date of birth shows <b>18 years or more as on the chosen date</b>; those already 19+ are marked in red as <i>Crossed 19 yrs</i>. Marital status, bank account and K1 ID are not in the data — tick them in the office-check columns after verification.</div>'+
+ '<div class="tw"><table class="marks-table" style="max-width:980px"><tr><td style="width:150px"><b>As on date</b></td><td><input type="date" id="k2_on" onchange="K2L.set(\'on\',this.value)" style="padding:6px"> <button class="dv-b g" type="button" onclick="K2L.today()">Today</button></td></tr>'+
+ '<tr><td><b>Show</b></td><td><select id="k2_show" onchange="K2L.set(\'show\',this.value)" style="padding:6px"><option value="all">All girls aged 18+ (with status)</option><option value="W">Within K2 age window only (18 to below 19)</option><option value="X">Crossed 19 years only</option></select></td></tr>'+
+ '<tr><td><b>Class</b><br><small>none ticked = all</small></td><td id="k2_cls"></td></tr>'+
+ '<tr><td><b>Headline</b></td><td><input id="k2_head" '+inp+' oninput="K2L.set(\'head\',this.value,1)"></td></tr>'+
+ '<tr><td><b>To (authority)</b></td><td><textarea id="k2_to" rows="2" '+inp+' placeholder="Optional — e.g. The Sub-Inspector of Schools…" oninput="K2L.set(\'to\',this.value,1)"></textarea></td></tr>'+
+ '<tr><td><b>Memo no.</b></td><td><input id="k2_memo" style="padding:6px;width:48%" placeholder="Optional" oninput="K2L.set(\'memo\',this.value,1)"></td></tr>'+
+ '<tr><td><b>Extras</b></td><td><label><input type="checkbox" id="k2_off" onchange="K2L.set(\'office\',this.checked?1:0)"> Office-check columns (K1 ID, unmarried declaration, bank a/c, remarks)</label> &nbsp; <label><input type="checkbox" id="k2_sign" onchange="K2L.set(\'sign\',this.checked?1:0)"> Signature block</label></td></tr></table></div>'+
+ '<div class="row" style="margin:10px 0"><button class="dv-b" type="button" onclick="K2L.print()">🖨 Print / Save PDF</button><button class="dv-b g" type="button" onclick="K2L.csv()">⬇ Export CSV</button> <span id="k2_cnt" class="mut"></span></div>'+
+ '<style>'+CSS+'</style><div id="k2_prev" class="tw" style="background:#fff;padding:14px;border:1px solid #ccc;overflow:auto"></div>';
+ built=true;if(!K.hm)K.head=autoHead();fill();
+}
+function fill(){
+ const g=id=>document.getElementById(id);if(!g('k2_cls'))return;
+ const set=(id,v)=>{const el=g(id);if(el&&document.activeElement!==el)el.value=v};
+ set('k2_on',K.on);set('k2_show',K.show);set('k2_head',K.head);set('k2_to',K.to);set('k2_memo',K.memo);
+ g('k2_off').checked=!!K.office;g('k2_sign').checked=!!K.sign;
+ g('k2_cls').innerHTML=CO.map(c=>'<label style="margin-right:10px"><input type="checkbox" '+(K.cls.has(c)?'checked ':'')+'onchange="K2L.cl(\''+c+'\',this.checked)"> '+c+'</label>').join('');
+ prev();
+}
+function prev(){
+ const p=document.getElementById('k2_prev');if(!p)return;
+ const R=data(),L=rows(R),W=R.L.filter(s=>s._st==='W').length,X=R.L.length-W;
+ p.innerHTML=doc(R);
+ const c=document.getElementById('k2_cnt');
+ if(c)c.innerHTML=L.length+' selected · '+R.girls+' girls in data · 18+ as on '+e(dmy(K.on))+': <b>'+R.L.length+'</b> (K2 window '+W+', crossed 19 yrs '+X+')'+(R.soon?' · '+R.soon+' more turn 18 within 90 days':'')+(R.nodob?' · <span style="color:#b00020">'+R.nodob+' girl(s) without date of birth not counted</span>':'');
+}
+window.K2L={
+ set(k,v,soft){K[k]=v;if(k==='head')K.hm=1;if(k==='on'&&!K.hm){K.head=autoHead();const h=document.getElementById('k2_head');if(h)h.value=K.head}if(soft){prev();return}fill()},
+ today(){K.on=todayISO();if(!K.hm)K.head=autoHead();fill()},
+ cl(c,on){on?K.cls.add(c):K.cls.delete(c);prev()},
+ print,csv,_data:data,_rows:rows,_K:K
+};
+(window.pt_R||(window.pt_R={})).k2=function(){if(!built)build();else fill()};
 })();
 </script>
 </body>
