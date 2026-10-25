@@ -4250,8 +4250,8 @@ function meritOf(c){
  const L=STUDENT_DB.filter(s=>s.cls==c).map(s=>{const r=((M[c+'-'+secOfS(s)]||{}).rows||{})[s.roll]||{};const ab=ABR(c)&&r.ab?1:0;return{n:s.name,f:s.father||'',mo:s.mother||'',sec:s.sec,roll:+s.roll,p:ab?0:+r.p||0,ab,med:medOf(c,s.sec,r.m||s.medium)}});
  L.sort((a,b)=>(a.ab-b.ab)||b.p-a.p||a.n.localeCompare(b.n));return{secs,ok,L};
 }
-function assign(list,S){ // MORE than one medium: non-Bengali -> last section, Bengali alternate A,B,A,B… over the others. ONE medium only: everyone alternates over ALL sections
- const multi=medsOf(list,x=>x.med).length>1,sa=(multi&&S.length>1)?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
+function assign(list,S,T){ // MORE than one medium: non-Bengali -> last section, Bengali alternate A,B,A,B… over the others. ONE medium only: everyone alternates over ALL sections
+ const STD={V:2,VI:3,VII:3,VIII:3,IX:3,X:2},multi=medsOf(list,x=>x.med).length>1||(T&&STD[T]===S.length),sa=(multi&&S.length>1)?S[S.length-1]:null,bn=sa?S.slice(0,-1):S,cnt={};let i=0;S.forEach(s=>cnt[s]=0);
  return list.map(x=>{const sec=(sa&&medN(x.med)!=MED0)?sa:bn[i++%bn.length];return{...x,sec,roll:++cnt[sec]}});
 }
 const ND=c=>['V','VI','VII','VIII'].includes(c);
@@ -4287,7 +4287,7 @@ function pt_lockReg(T){
   if(!S||!S.lock)return alert('Create & lock sections of Class '+T+' first (Approvals & Setup).');
   if(T!='V'&&!pr[P])return alert('Run promotion of Class '+P+' first.');
   if(T!='X'&&!ND(T)&&!pr[T])return alert('Run promotion of Class '+T+' first (to know repeaters).');
-  list=assign([...(T=='V'?[]:pr[P].pass),...(T=='X'||ND(T)?[]:(pr[T]||{}).fail||[]).map(x=>({...x,rep:1}))],S.list)}
+  list=assign([...(T=='V'?[]:pr[P].pass),...(T=='X'||ND(T)?[]:(pr[T]||{}).fail||[]).map(x=>({...x,rep:1}))],S.list,T)}
  if(!confirm('Assign rolls and LOCK Class '+T+' ('+list.length+' students)? New admission approval for this class will become active.'))return;
  W({reg:{[T]:list},plock:{[T]:true}});
 }
