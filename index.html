@@ -4154,7 +4154,7 @@ function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={xiimarks:'au',home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a',k2:'au',idc:'au'};
+const RMAP={xiimarks:'atu',home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a',k2:'au',idc:'au'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -5138,7 +5138,7 @@ window.IDC={
   body[data-view="xiimarks"] #feeView { display: none !important; }
 
   /* Visible only to Staff (user) & Admin (admin); hidden for Class Teacher (teacher) */
-  body[data-role="teacher"] .tf-side button[data-v="xiimarks"] { display: none !important; }
+  body:not([data-role=admin]) .xii-adm{display:none!important}
 
   .xii-pdf-box {
     background: #eef8ef;
@@ -5214,10 +5214,10 @@ window.IDC={
   <p class="mut" style="margin-top:0">
     <b>System Rule:</b> Class XI has a separate portal (XI marks entry not required here; 250 XI Registration Nos. & Subjects are already pre-loaded into Profile).
     Only <b>Class XII</b> students with an active <b>Registration No.</b> are enabled for marks entry.
-    <b>Staff Login</b> can enter marks; <b>Admin Login</b> can enter & modify already entered marks.
+    <b>Subject teachers</b> request a subject, Admin approves, then they enter marks for that subject only. <b>Admin</b> can enter/modify all and alone generates the final list for the WBCHSE portal.
   </p>
 
-  <div class="xii-pdf-box">
+  <div class="xii-pdf-box xii-adm">
     <div style="font-weight:800;color:#145828;font-size:14px;margin-bottom:8px;">
       📄 Load Registration No., Subjects & Profile Fields from PDF or WBCHSE Text (Class XII Loaded 1st, then XI)
     </div>
@@ -5255,6 +5255,7 @@ window.IDC={
     <div id="xiiPdfMsg" class="mut" style="margin-top:6px"></div>
   </div>
 
+  <div id="xiiAcc"></div>
   <div class="xii-ctl-bar">
     <div><label>Class</label><input value="XII" disabled></div>
     <div><label>Section</label><select id="xiiSec" onchange="TF_XII.draw()"></select></div>
@@ -5265,6 +5266,8 @@ window.IDC={
   <div class="row" style="margin-top:12px">
     <button class="dv-b g" type="button" onclick="TF_XII.saveMarks()">💾 Save marks</button>
     <button class="dv-b" type="button" style="background:#0b4f8a" onclick="TF_XII.print()">🖨 Print sheet</button>
+    <button class="dv-b g xii-adm" type="button" onclick="TF_XII.report('csv')">📥 Full list (CSV) — WBCHSE</button>
+    <button class="dv-b xii-adm" type="button" style="background:#8a5600" onclick="TF_XII.report('print')">🖨 Full list (Print)</button>
   </div>
 </div>
 
@@ -5274,14 +5277,14 @@ const $=id=>document.getElementById(id),esc=s=>String(s==null?'':s).replace(/[&<
 const SUBN={BNGA:'Bengali-A',ENGB:'English-B',SNSK:'Sanskrit',MATH:'Mathematics',PHIL:'Philosophy',HIST:'History',SANT:'Santali',COMA:'Computer Application',COMS:'Computer Science',PLSC:'Political Science',GEGR:'Geography',BIOS:'Biological Science',PHYS:'Physics',CHEM:'Chemistry'};
 const PRAC=['PHYS','CHEM','BIOS','COMS','COMA','GEGR'];
 const NM=[[/BENGALI/,'BNGA'],[/ENGLISH/,'ENGB'],[/SANSKRIT/,'SNSK'],[/MATHEMATICS/,'MATH'],[/PHILOSOPHY/,'PHIL'],[/HISTORY/,'HIST'],[/SANTH?ALI/,'SANT'],[/POLITICAL/,'PLSC'],[/COMPUTER\s*APPLICATION/,'COMA'],[/COMPUTER\s*SCIENCE/,'COMS'],[/GEOGRAPHY/,'GEGR'],[/BIOLOGICAL/,'BIOS'],[/PHYSICS/,'PHYS'],[/CHEMISTRY/,'CHEM']];
-let X={prof:{},marks:{},scheme:{}},ref=null,sub=null,dirty=false,DEL=[];
+let X={prof:{},marks:{},scheme:{},req:{}},ref=null,sub=null,dirty=false,DEL=[];
 const cn=c=>String(c==null?'':c).trim().toUpperCase(),nk=n=>String(n||'').toUpperCase().replace(/[^A-Z]/g,''),role=()=>document.body.dataset.role||'';
 function me(){try{const a=firebase.apps.find(x=>x.name==='tfdb');return a.auth().currentUser.email||''}catch(e){return ''}}
 function sc(c){const o=X.scheme[c]||(PRAC.includes(c)?'P':'J');return o==='P'?{t:'Practical',m:30}:o==='J'?{t:'Project',m:20}:null}
 async function put(o){try{localStorage.setItem('tfhs_xii',JSON.stringify(X))}catch(e){}if(ref)await ref.set({xii:o},{merge:true})}
 function init(){if(sub)return;try{X=Object.assign(X,JSON.parse(localStorage.getItem('tfhs_xii')||'{}'))}catch(e){}
  try{const a=firebase.apps.find(x=>x.name==='tfdb');ref=a.firestore().collection('tfhs').doc('portal');
-  sub=ref.onSnapshot(s=>{const d=(s.data()||{}).xii;if(d){if(!dirty)X.prof=d.prof||{};X.marks=d.marks||{};X.scheme=d.scheme||{}}const f=document.activeElement;if(!(f&&f.closest&&f.closest('#xiiMarksPanel')&&/INPUT|SELECT|TEXTAREA/.test(f.tagName)))draw()},e=>msg('Data error: '+e.code))}catch(e){sub=1}}
+  sub=ref.onSnapshot(s=>{const d=(s.data()||{}).xii;if(d){if(!dirty)X.prof=d.prof||{};X.marks=d.marks||{};X.scheme=d.scheme||{};X.req=d.req||{}}const f=document.activeElement;if(!(f&&f.closest&&f.closest('#xiiMarksPanel')&&/INPUT|SELECT|TEXTAREA/.test(f.tagName)))draw()},e=>msg('Data error: '+e.code))}catch(e){sub=1}}
 function msg(t){$('xiiPdfMsg').textContent=t}
 /* ---------- parsing (PDF / pasted WBCHSE text) ---------- */
 function parseText(txt,cls){
@@ -5317,7 +5320,7 @@ function ed(r,k,v){const p=X.prof[r];if(!p)return;p[k]=k==='subj'?v.toUpperCase(
 function sch(c,v){X.scheme[c]=v;dirty=true}
 function rm(r,c){if(!confirm('Remove '+r+'?'))return;delete X.prof[r];DEL.push(r);dirty=true;pf(c)}
 function addRow(c){const r=prompt('Registration No. (10 digits):');if(!r||!/^\d{10}$/.test(r.trim())){if(r)alert('Registration No. must be 10 digits.');return}X.prof[r.trim()]={reg:r.trim(),name:'',cls:c,subj:[]};dirty=true;pf(c)}
-async function saveProf(){if(role()!=='admin'&&role()!=='user'){alert('Not allowed.');return}
+async function saveProf(){if(role()!=='admin'){alert('Admin only.');return}
  const o={prof:Object.assign({},X.prof),scheme:X.scheme};try{DEL.forEach(r=>{o.prof[r]=firebase.firestore.FieldValue.delete()});await put(o);DEL=[];dirty=false;msg('Saved '+Object.keys(X.prof).length+' registration profiles ✔');draw()}catch(e){msg('Save failed: '+(e.code||e.message))}}
 /* ---------- marks entry ---------- */
 const sec=()=>[...new Set(STUDENT_DB.filter(s=>cn(s.cls)==='XII').map(s=>s.sec))].sort();
@@ -5325,15 +5328,44 @@ function rowsOf(){const S=$('xiiSec').value,c=$('xiiSub').value,P=Object.values(
  const all=STUDENT_DB.filter(s=>cn(s.cls)==='XII'),used=new Set(all.map(s=>by[nk(s.name)]).filter(Boolean).map(p=>p.reg)),out=[];
  all.filter(s=>!S||s.sec===S).sort((a,b)=>String(a.sec).localeCompare(b.sec)||(+a.roll-+b.roll)).forEach(s=>{const p=by[nk(s.name)];if(p&&!(p.subj||[]).includes(c))return;out.push({s:s,p:p})});
  if(!S)P.filter(p=>!used.has(p.reg)&&(p.subj||[]).includes(c)).forEach(p=>out.push({s:{name:p.name,sec:'—',roll:'—'},p:p}));return out}
-function draw(){init();const R=role(),ri=$('xiiRoleIndicator');if(ri)ri.textContent=R==='admin'?'Admin — enter & modify':R==='user'?'Staff — enter only':'No access';
+const uid=()=>{try{return firebase.apps.find(x=>x.name==='tfdb').auth().currentUser.uid}catch(e){return ''}};
+const myReq=()=>Object.values(X.req||{}).filter(r=>r.uid===uid());
+const okSub=c=>role()==='admin'||myReq().some(r=>r.code===c&&r.status==='approved');
+const BG={pending:'#b65e00',approved:'#145828',rejected:'#b00020'};
+function acc(){const A=$('xiiAcc');if(!A)return;const adm=role()==='admin',all=Object.keys(SUBN).filter(c=>sc(c)),keep=($('xiiRqN')||{}).value||'';
+ if(adm){const R=Object.entries(X.req||{}).sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)),P=Object.values(X.prof).filter(p=>p.cls==='XII');
+  A.innerHTML='<div class="xii-pdf-box"><b>Subject-teacher approvals</b> <span class="mut">('+R.filter(r=>r[1].status==='pending').length+' pending)</span>'+
+  '<table class="marks-table" style="margin-top:6px"><tr><th>Teacher</th><th>Subject</th><th>Status</th><th></th></tr>'+(R.length?R.map(([k,r])=>'<tr><td>'+esc(r.name)+'<br><small>'+esc(r.email)+'</small></td><td>'+esc(r.code)+' — '+esc(SUBN[r.code]||'')+'</td><td style="color:'+BG[r.status]+';font-weight:700">'+esc(r.status)+'</td><td>'+(r.status!=='approved'?'<button class="dv-b g" type="button" onclick="TF_XII.act(\''+k+'\',\'approved\')">✔ Approve</button> ':'')+(r.status!=='rejected'?'<button class="dv-b" type="button" style="background:#b00020" onclick="TF_XII.act(\''+k+'\',\'rejected\')">'+(r.status==='approved'?'Revoke':'Reject')+'</button>':'')+'</td></tr>').join(''):'<tr><td colspan="4">No requests yet.</td></tr>')+'</table>'+
+  '<div style="margin-top:8px;font-size:12px"><b>Progress:</b> '+all.map(c=>{const t=P.filter(p=>(p.subj||[]).includes(c));if(!t.length)return '';const e=t.filter(p=>X.marks[p.reg]&&X.marks[p.reg][c]).length;return '<span class="bdg '+(e===t.length?'ok':'')+'" style="margin:2px">'+c+' '+e+'/'+t.length+'</span>'}).join(' ')+'</div></div>';return}
+ const M=myReq();A.innerHTML='<div class="xii-pdf-box"><b>Request subject access</b> — Admin must approve; then you can enter marks for that subject only.<div class="xii-ctl-bar" style="margin-top:8px"><div><label>Subject</label><select id="xiiRq">'+all.map(c=>'<option value="'+c+'">'+c+' — '+SUBN[c]+'</option>').join('')+'</select></div><div><label>Your name</label><input id="xiiRqN" value="'+esc(keep)+'"></div><div><label>&nbsp;</label><button class="dv-b g" type="button" style="width:100%" onclick="TF_XII.req()">📨 Send request</button></div></div>'+
+ (M.length?'<div style="font-size:13px">'+M.map(r=>'<span class="bdg" style="background:'+BG[r.status]+';color:#fff;margin:2px">'+esc(r.code)+': '+esc(r.status)+'</span>').join(' ')+'</div>':'')+'</div>'}
+async function req(){const c=$('xiiRq').value,n=$('xiiRqN').value.trim(),k=uid()+'_'+c;if(!n){alert('Enter your name.');return}if(!uid()){alert('Sign in first.');return}
+ if(X.req[k]&&X.req[k].status!=='rejected'){alert('Already requested ('+X.req[k].status+').');return}
+ const o={uid:uid(),email:me(),name:n,code:c,status:'pending',ts:Date.now()};X.req[k]=o;try{await put({req:{[k]:o}});draw();alert('Request sent to Admin ✔')}catch(e){alert('Failed: '+(e.code||e.message))}}
+async function act(k,st){if(role()!=='admin'||!X.req[k])return;X.req[k].status=st;X.req[k].by=me();try{await put({req:{[k]:X.req[k]}});draw()}catch(e){alert('Failed: '+(e.code||e.message))}}
+function draw(){init();const R=role(),adm=R==='admin',ri=$('xiiRoleIndicator');if(ri)ri.textContent=adm?'Admin — all subjects':'Subject teacher';
  const ss=$('xiiSec'),sb=$('xiiSub'),ps=ss.value,pb=sb.value;ss.innerHTML='<option value="">All</option>'+sec().map(v=>'<option'+(v===ps?' selected':'')+'>'+v+'</option>').join('');
- const codes=Object.keys(SUBN).filter(c=>sc(c));sb.innerHTML=codes.map(c=>'<option value="'+c+'"'+(c===(pb||codes[0])?' selected':'')+'>'+c+' — '+SUBN[c]+'</option>').join('');
- const c=sb.value,f=sc(c);if(!f){$('xiiTbl').innerHTML='';return}const L=rowsOf(),can=R==='admin'||R==='user';let ent=0;
+ const codes=Object.keys(SUBN).filter(c=>sc(c)&&okSub(c));sb.innerHTML=codes.map(c=>'<option value="'+c+'"'+(c===(pb||codes[0])?' selected':'')+'>'+c+' — '+SUBN[c]+'</option>').join('');acc();
+ const c=sb.value,f=c&&sc(c);if(!f){$('xiiTbl').innerHTML='<p class="mut">No approved subject yet — send a request above and wait for Admin approval.</p>';$('xiiBan').textContent='';$('xiiStat').textContent='';return}
+ const L=rowsOf(),can=okSub(c);let ent=0;
  $('xiiBan').textContent=SUBN[c]+' — '+f.t+' (FM-'+f.m+')';
  $('xiiTbl').innerHTML='<table class="marks-table"><tr><th>Sec</th><th>Roll</th><th>Reg. No.</th><th>Name</th><th>'+f.t+' (0–'+f.m+' / AB)</th></tr>'+L.map(r=>{const p=r.p,v=p&&X.marks[p.reg]&&X.marks[p.reg][c]?X.marks[p.reg][c].v:'';if(v!=='')ent++;
-  const off=!p||!can||(R==='user'&&v!=='');return '<tr'+(p?'':' class="xii-inactive-row"')+'><td>'+esc(r.s.sec)+'</td><td>'+esc(r.s.roll)+'</td><td>'+(p?esc(p.reg):'No Reg. No.')+'</td><td>'+esc(r.s.name)+'</td><td><input class="xii-mk-inp" data-reg="'+(p?p.reg:'')+'" value="'+esc(v)+'" '+(off?'disabled':'')+'></td></tr>'}).join('')+'</table>';
+  const off=!p||!can||(!adm&&v!=='');return '<tr'+(p?'':' class="xii-inactive-row"')+'><td>'+esc(r.s.sec)+'</td><td>'+esc(r.s.roll)+'</td><td>'+(p?esc(p.reg):'No Reg. No.')+'</td><td>'+esc(r.s.name)+'</td><td><input class="xii-mk-inp" data-reg="'+(p?p.reg:'')+'" value="'+esc(v)+'" '+(off?'disabled':'')+'></td></tr>'}).join('')+'</table>';
  $('xiiStat').textContent=L.length+' students · '+ent+' entered'}
-async function saveMarks(){const c=$('xiiSub').value,f=sc(c),R=role();if(!f||(R!=='admin'&&R!=='user'))return;const o={},bad=[],em=me();
+/* ---------- admin: full list for WBCHSE upload ---------- */
+function repData(){const by={};STUDENT_DB.filter(s=>cn(s.cls)==='XII').forEach(s=>by[nk(s.name)]=s);
+ const P=Object.values(X.prof).filter(p=>p.cls==='XII').map(p=>({p:p,s:by[nk(p.name)]||{sec:'',roll:''}})).sort((a,b)=>String(a.s.sec).localeCompare(b.s.sec)||(+a.s.roll-+b.s.roll)||String(a.p.name).localeCompare(b.p.name));
+ const codes=Object.keys(SUBN).filter(c=>sc(c)&&P.some(r=>(r.p.subj||[]).includes(c)));
+ const mk=(p,c)=>{if(!(p.subj||[]).includes(c))return null;const m=X.marks[p.reg]&&X.marks[p.reg][c];return m?m.v:''};
+ let miss=0;P.forEach(r=>codes.forEach(c=>{if(mk(r.p,c)==='')miss++}));return{P:P,codes:codes,mk:mk,miss:miss}}
+function report(kind){if(role()!=='admin'){alert('Admin only.');return}const d=repData();if(!d.P.length){alert('No Class XII registration profiles loaded.');return}
+ if(d.miss&&!confirm(d.miss+' mark(s) are still missing (shown blank). Generate anyway?'))return;
+ const H=d.codes.map(c=>c+' ('+sc(c).t+' /'+sc(c).m+')');
+ if(kind==='csv'){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',rows=[['Sl','Section','Roll','Registration No','Name'].concat(H)].concat(d.P.map((r,i)=>[i+1,r.s.sec,r.s.roll,r.p.reg,r.p.name].concat(d.codes.map(c=>{const v=d.mk(r.p,c);return v==null?'':v}))));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv'}));a.download='XII_Project_Practical_Marks.csv';a.click();return}
+ const w=window.open('','_blank');w.document.write('<html><head><style>@page{size:A4 landscape;margin:8mm}</style></head><body style="font-family:Arial"><h3 style="text-align:center">TALDANGRA FULMATI HIGH SCHOOL (H.S.)<br>Class XII — Project / Practical Marks (for WBCHSE portal upload)</h3><table border="1" cellpadding="3" style="border-collapse:collapse;width:100%;font-size:11px"><tr><th>Sl</th><th>Sec</th><th>Roll</th><th>Reg. No.</th><th>Name</th>'+H.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>'+
+  d.P.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.s.sec)+'</td><td>'+esc(r.s.roll)+'</td><td>'+esc(r.p.reg)+'</td><td>'+esc(r.p.name)+'</td>'+d.codes.map(c=>{const v=d.mk(r.p,c);return '<td align="center">'+(v==null?'–':esc(v))+'</td>'}).join('')+'</tr>').join('')+'</table></body></html>');w.document.close();w.print()}
+async function saveMarks(){const c=$('xiiSub').value,f=sc(c),R=role();if(!f||!okSub(c))return;const o={},bad=[],em=me();
  document.querySelectorAll('#xiiTbl .xii-mk-inp:not(:disabled)').forEach(i=>{let v=i.value.trim().toUpperCase();if(!v||!i.dataset.reg)return;if(v!=='AB'){const n=Number(v);if(!(n>=0&&n<=f.m)||isNaN(n)){bad.push(i.dataset.reg);return}v=n}(o[i.dataset.reg]=o[i.dataset.reg]||{})[c]={v:v,by:em,ts:Date.now()}});
  if(bad.length){alert('Invalid marks (must be 0–'+f.m+' or AB) for Reg. No.: '+bad.slice(0,8).join(', '));return}
  if(!Object.keys(o).length){alert('Nothing new to save.');return}
@@ -5342,7 +5374,7 @@ function print(){const c=$('xiiSub').value,f=sc(c);if(!f)return;const w=window.o
  w.document.write('<html><body style="font-family:Arial"><h3 style="text-align:center">TALDANGRA FULMATI HIGH SCHOOL (H.S.)<br>Class XII — '+esc(SUBN[c])+' '+f.t+' Marks (FM-'+f.m+')</h3><table border="1" cellpadding="5" style="border-collapse:collapse;width:100%;font-size:13px"><tr><th>Sl</th><th>Sec</th><th>Roll</th><th>Reg. No.</th><th>Name</th><th>Marks</th></tr>'+
  rowsOf().filter(r=>r.p).map((r,i)=>{const m=X.marks[r.p.reg]&&X.marks[r.p.reg][c];return '<tr><td>'+(i+1)+'</td><td>'+esc(r.s.sec)+'</td><td>'+esc(r.s.roll)+'</td><td>'+esc(r.p.reg)+'</td><td>'+esc(r.s.name)+'</td><td align="center">'+(m?esc(m.v):'')+'</td></tr>'}).join('')+'</table></body></html>');w.document.close();w.print()}
 (window.pt_R||(window.pt_R={})).xiimarks=draw;
-return{parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
+return{req,act,report,parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
 })();
 </script>
 </body>
