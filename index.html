@@ -5271,9 +5271,9 @@ window.IDC={
 <script>
 const TF_XII=(function(){
 const $=id=>document.getElementById(id),esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const SUBN={BNGA:'Bengali-A',ENGB:'English-B',SNSK:'Sanskrit',MATH:'Mathematics',PHIL:'Philosophy',HIST:'History',SANT:'Santali',COMA:'Computer Application',COMS:'Computer Science',GEGR:'Geography',BIOS:'Biological Science',PHYS:'Physics',CHEM:'Chemistry'};
+const SUBN={BNGA:'Bengali-A',ENGB:'English-B',SNSK:'Sanskrit',MATH:'Mathematics',PHIL:'Philosophy',HIST:'History',SANT:'Santali',COMA:'Computer Application',COMS:'Computer Science',PLSC:'Political Science',GEGR:'Geography',BIOS:'Biological Science',PHYS:'Physics',CHEM:'Chemistry'};
 const PRAC=['PHYS','CHEM','BIOS','COMS','COMA','GEGR'];
-const NM=[[/BENGALI/,'BNGA'],[/ENGLISH/,'ENGB'],[/SANSKRIT/,'SNSK'],[/MATHEMATICS/,'MATH'],[/PHILOSOPHY/,'PHIL'],[/HISTORY/,'HIST'],[/SANTALI/,'SANT'],[/COMPUTER\s*APPLICATION/,'COMA'],[/COMPUTER\s*SCIENCE/,'COMS'],[/GEOGRAPHY/,'GEGR'],[/BIOLOGICAL/,'BIOS'],[/PHYSICS/,'PHYS'],[/CHEMISTRY/,'CHEM']];
+const NM=[[/BENGALI/,'BNGA'],[/ENGLISH/,'ENGB'],[/SANSKRIT/,'SNSK'],[/MATHEMATICS/,'MATH'],[/PHILOSOPHY/,'PHIL'],[/HISTORY/,'HIST'],[/SANTH?ALI/,'SANT'],[/POLITICAL/,'PLSC'],[/COMPUTER\s*APPLICATION/,'COMA'],[/COMPUTER\s*SCIENCE/,'COMS'],[/GEOGRAPHY/,'GEGR'],[/BIOLOGICAL/,'BIOS'],[/PHYSICS/,'PHYS'],[/CHEMISTRY/,'CHEM']];
 let X={prof:{},marks:{},scheme:{}},ref=null,sub=null,dirty=false,DEL=[];
 const cn=c=>String(c==null?'':c).trim().toUpperCase(),nk=n=>String(n||'').toUpperCase().replace(/[^A-Z]/g,''),role=()=>document.body.dataset.role||'';
 function me(){try{const a=firebase.apps.find(x=>x.name==='tfdb');return a.auth().currentUser.email||''}catch(e){return ''}}
@@ -5285,6 +5285,11 @@ function init(){if(sub)return;try{X=Object.assign(X,JSON.parse(localStorage.getI
 function msg(t){$('xiiPdfMsg').textContent=t}
 /* ---------- parsing (PDF / pasted WBCHSE text) ---------- */
 function parseText(txt,cls){
+ const t=String(txt).replace(/\s+/g,' '),blk=/Certified that (.+?) Son \/ daughter \/ ward of .*?Registration No\. is (\d{10}) .*?Subjects Offered:(.*?)(?= Signature of|$)/g;let m,n=0;
+ while((m=blk.exec(t))){const sj=[],u=m[3].toUpperCase();Object.keys(SUBN).forEach(c=>{if(new RegExp('\\b'+c+'\\b').test(u))sj.push(c)});NM.forEach(([r,c])=>{if(r.test(u)&&!sj.includes(c))sj.push(c)});
+  X.prof[m[2]]={reg:m[2],name:m[1].trim(),cls:cls,subj:sj};n++}
+ if(n){dirty=true;return n}return parseLoose(txt,cls)}
+function parseLoose(txt,cls){
  const t=String(txt).replace(/\s+/g,' '),re=/\b(\d{10})\b/g,hit=[];let m;while((m=re.exec(t)))hit.push([m[1],m.index]);
  let n=0;hit.forEach((h,i)=>{const seg=t.slice(h[1],i+1<hit.length?hit[i+1][1]:t.length).toUpperCase(),subj=[];
   Object.keys(SUBN).forEach(c=>{if(new RegExp('\\b'+c+'\\b').test(seg))subj.push(c)});NM.forEach(([r,c])=>{if(r.test(seg)&&!subj.includes(c))subj.push(c)});
