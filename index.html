@@ -2648,8 +2648,8 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
     <label class="s4 m6">Date of birth <input id="naDob" type="date"></label>
     <div class="na-sec">Class</div>
     <label class="s3 m6">Admit to class <select id="naCls" class="am-yel" onchange="ADM.preview()"><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
-    <label class="s3 m6">Section <select id="naSec" class="am-yel" onchange="ADM.preview()"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
-    <label class="s3 m6"><span>Medium <b style="color:#b00020">*</b></span><select id="naMedium" class="am-yel"><option>Bengali</option><option>Santali</option><option>English</option><option>Other</option></select></label>
+    <label class="s3 m6">Section (auto; XI/XII: A Arts · B Science · C Santali Arts) <select id="naSec" class="am-yel" disabled onchange="ADM.preview()" title="Assigned automatically"><option>A</option><option>B</option><option>C</option><option value="">None</option></select></label>
+    <label class="s3 m6"><span>Medium <b style="color:#b00020">*</b></span><select id="naMedium" class="am-yel" onchange="ADM.preview()"><option>Bengali</option><option>Santali</option><option>English</option><option>Other</option></select></label>
     <label class="s3 m6" id="naRollL">Roll no. (auto) <input id="naRoll" class="am-yel" readonly></label>
     <div class="na-sec">Parents</div>
     <label class="s6">Father's name <input id="naFat" class="na-nm" type="text" list="dlStuFat" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Father's full name"></label>
@@ -2981,8 +2981,19 @@ const ADM=(function(){
   catch(e){msg('Failed: '+(e.code||e.message),true)}}
 
  /* ---------- 2. new admission ---------- */
- function preview(){const c=$('naCls').value,s=$('naSec').value;$('naRoll').value=(db&&auth&&auth.currentUser)?String(maxRoll(c,s)+1):'sign in'}
+ /* AUTO SECTION for new admissions: Bengali alternates A,B,A,B…; other medium goes to the last section */
+ const DEFSEC={V:['A','B'],VI:['A','B','C'],VII:['A','B','C'],VIII:['A','B','C'],IX:['A','B','C'],X:['A','B'],XI:['A','B','C'],XII:['A','B','C']};
+ function secsFor(c){const s=new Set(placed.filter(p=>p.cls===c).map(secOf).filter(Boolean));if(s.size<2)(DEFSEC[c]||['A']).forEach(x=>s.add(x));return Array.from(s).sort()}
+ const STREAM=c=>c==='XI'||c==='XII'; /* XI/XII are stream based: A Arts, B Science, C Santali Arts — chosen manually */
+ function autoSec(d){const c=d.cls;if(STREAM(c))return d.sec||'';const S=secsFor(c);if(S.length<2)return S[0]||'';
+  if(medN(d.medium)!==MED0)return S[S.length-1];
+  const bn=S.slice(0,-1),n=placed.filter(p=>p.type==='new'&&p.cls===c&&medN(p.medium)===MED0).length;return bn[n%bn.length]}
+ function preview(){const c=$('naCls').value,md=$('naMedium')?$('naMedium').value:'Bengali';
+  if(!(db&&auth&&auth.currentUser)){$('naRoll').value='sign in';return}
+  const st=STREAM(c);const s=st?($('naSec')?$('naSec').value:''):autoSec({cls:c,medium:md});if($('naSec')){if(!st)$('naSec').value=s;$('naSec').disabled=!st;$('naSec').title=st?'XI/XII: A = Arts, B = Science, C = Santali Arts':'Section is assigned automatically (admin can change it later with ✎)'}
+  $('naRoll').value=String(maxRoll(c,s)+1)+(s?'  (Sec '+s+')':'')}
  async function allocate(d){ /* atomic next roll + (new admissions) admission-register serial */
+  if(d.type==='new'&&!STREAM(d.cls))d.sec=autoSec(d);
   const y=d.year,c=d.cls,s=d.sec,cref=db.collection('admCounters').doc(cntId(y,c,s));
   const series=d.type==='new'?serOf(c):'',rref=series?db.collection('admCounters').doc('REG_'+y+'_'+series):null;
   const maxReg=placed.filter(p=>p.type==='new'&&(p.regSeries||serOf(p.cls))===series).reduce((m,p)=>Math.max(m,+p.regNo||0),0);
@@ -3004,7 +3015,7 @@ const ADM=(function(){
    const _pn=$('naPIN').value.trim();if(_pn&&!/^\d{6}$/.test(_pn)){nm('PIN code must be 6 digits.',true);return}
   const ver=!!($('naVer')&&$('naVer').checked);
   const ref='ST'+yr()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
-  const d={year:yr(),status:'pending',ref,name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,medium:$('naMedium').value,reqSec:$('naSec').value,dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),po:$('naPO').value.trim(),ps:$('naPS').value.trim(),dist:$('naDist').value.trim(),pin:$('naPIN').value.trim(),feeFree:$('naFee').value==='free',feeNote:$('naFeeWhy').value.trim(),source:'staff-entry',enteredBy:meMail(),ts:firebase.firestore.FieldValue.serverTimestamp()};
+  const d={year:yr(),status:'pending',ref,name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,medium:$('naMedium').value,reqSec:STREAM($('naCls').value)?$('naSec').value:'',dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),po:$('naPO').value.trim(),ps:$('naPS').value.trim(),dist:$('naDist').value.trim(),pin:$('naPIN').value.trim(),feeFree:$('naFee').value==='free',feeNote:$('naFeeWhy').value.trim(),source:'staff-entry',enteredBy:meMail(),ts:firebase.firestore.FieldValue.serverTimestamp()};
   try{const r=await db.collection('admApps').add(d);
    if(ver)await db.collection('admApps').doc(r.id).update({staffOk:{by:meMail(),at:Date.now()},staffNote:'Documents checked (entered by staff)',status:'verified'});
    ['naName','naFat','naMot','naDob','naMob','naSik','naFeeWhy'].forEach(i=>$(i).value='');window.TFV&&TFV.reset();if($('naVer'))$('naVer').checked=false;
@@ -3016,7 +3027,7 @@ const ADM=(function(){
   const mob=$('naMob').value.trim();if(mob&&!/^\d{10}$/.test(mob)){msg('Mobile must be exactly 10 digits.',true);return}
    const _sik=$('naSik').value.trim();if(_sik&&!/^\d{14}$/.test(_sik)){msg('Banglar Siksha Portal ID must be exactly 14 digits.',true);return}
    const _pn=$('naPIN').value.trim();if(_pn&&!/^\d{6}$/.test(_pn)){msg('PIN code must be 6 digits.',true);return}
-  const d={year:yr(),type:'new',name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,medium:$('naMedium').value,sec:$('naSec').value,dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),po:$('naPO').value.trim(),ps:$('naPS').value.trim(),dist:$('naDist').value.trim(),pin:$('naPIN').value.trim(),feeFree:$('naFee').value==='free',feeNote:$('naFeeWhy').value.trim(),by:auth.currentUser.email};
+  const d={year:yr(),type:'new',name,sex:$('naSex').value,father:up($('naFat').value),mother:up($('naMot').value),cls:$('naCls').value,medium:$('naMedium').value,sec:STREAM($('naCls').value)?$('naSec').value:'',dob:$('naDob').value||'',sikshaId:$('naSik').value.trim(),mobile:mob,caste:$('naCaste').value,village:$('naVil').value.trim(),po:$('naPO').value.trim(),ps:$('naPS').value.trim(),dist:$('naDist').value.trim(),pin:$('naPIN').value.trim(),feeFree:$('naFee').value==='free',feeNote:$('naFeeWhy').value.trim(),by:auth.currentUser.email};
   try{const r=await allocate(d);const s=Object.assign({_id:r.id},d,r.reg,{roll:String(r.roll)});placed=placed.filter(x=>x._id!==r.id).concat([s]);placed.sort(sorter);summary();drawPlaced();drawRegister();dash();
    $('naLast').innerHTML='<div class="am-ok">✔ <b>'+esc(name)+'</b> admitted to Class <b>'+d.cls+(d.sec?'-'+d.sec:'')+'</b>'+(d.feeFree?' <b style="color:#0b5a2b">(FREE admission)</b>':'')+', Roll No. <b>'+r.roll+'</b> · Admission Register Sl. No. <b>'+esc(regText(r.reg))+'</b> &nbsp; <button class="dv-b" onclick="ADM.receipt(\''+r.id+'\')">🖨 Print fee receipt</button></div>';
    ['naName','naFat','naMot','naDob','naMob','naSik','naFeeWhy'].forEach(i=>$(i).value='');window.TFV&&TFV.reset();preview();msg('Admitted '+name+' — roll '+r.roll+', register '+regText(r.reg)+'.')}
@@ -3081,7 +3092,7 @@ const ADM=(function(){
    let act='<button class="dv-b g" onclick="ADM.view(\''+a._id+'\')">View</button> ';
    if(a.status==='pending')act+='<button class="dv-b" onclick="ADM.verify(\''+a._id+'\')">Verify (staff)</button>';
    else if(a.status==='verified')act+=isAdmin()?'<button class="dv-b" style="background:#8a5600" onclick="ADM.approve(\''+a._id+'\')">Approve (admin)</button>':'<small>needs admin</small>';
-   else if(a.status==='approved')act+=!isAdmin()?'<small>waiting for admin to admit</small>':'<select onchange="ADM._a(\''+a._id+'\',\'_cls\',this.value)">'+CLS.map(c=>'<option'+(c===a._cls?' selected':'')+'>'+c+'</option>').join('')+'</select><select onchange="ADM._a(\''+a._id+'\',\'_sec\',this.value)">'+['A','B','C',''].map(x=>'<option value="'+x+'"'+(x===a._sec?' selected':'')+'>'+(x||'—')+'</option>').join('')+'</select> <button class="dv-b" onclick="ADM.admit(\''+a._id+'\')">Admit</button>';
+   else if(a.status==='approved')act+=!isAdmin()?'<small>waiting for admin to admit</small>':'<select onchange="ADM._a(\''+a._id+'\',\'_cls\',this.value)">'+CLS.map(c=>'<option'+(c===a._cls?' selected':'')+'>'+c+'</option>').join('')+'</select>'+(STREAM(a._cls)?'<select onchange="ADM._a(\''+a._id+'\',\'_sec\',this.value)">'+['A','B','C'].map(x=>'<option value="'+x+'"'+(x===a._sec?' selected':'')+'>'+x+'</option>').join('')+'</select>':'<small>Sec: auto</small>')+' <button class="dv-b" onclick="ADM.admit(\''+a._id+'\')">Admit</button>';
    else if(a.status==='admitted'&&a.admitted)act+='<b>'+esc(a.admitted.cls)+(a.admitted.sec?'-'+esc(a.admitted.sec):'')+' / Roll '+esc(a.admitted.roll)+'</b>';
    else if(a.status==='rejected')act+='<small>'+esc(a.rejectReason||'')+'</small>';
    if(a.status!=='admitted')act+=' <button class="dv-b g" onclick="ADM.edit(\'a\',\''+a._id+'\')">✎ Edit</button>';
@@ -3126,7 +3137,7 @@ const ADM=(function(){
   if(!(a.staffOk&&a.adminOk&&a.status==='approved')){msg('Needs BOTH staff verification and admin approval first.',true,'amAMsg');return}
   await refresh(true);
   const d={};Object.keys(a).forEach(k=>{if(!SKIP.test(k))d[k]=a[k]});
-  Object.assign(d,{year:yr(),type:'new',appId:a._id,name:up(a.name),father:up(a.father),mother:up(a.mother),cls:a._cls,sec:a._sec,by:meMail(),verifiedBy:a.staffOk.by,approvedBy:a.adminOk.by});
+  Object.assign(d,{year:yr(),type:'new',appId:a._id,name:up(a.name),father:up(a.father),mother:up(a.mother),cls:a._cls,sec:STREAM(a._cls)?(a._sec||''):'',medium:a.medium||'Bengali',by:meMail(),verifiedBy:a.staffOk.by,approvedBy:a.adminOk.by});
   try{const r=await allocate(d);await upd(id,{status:'admitted',admitted:{cls:d.cls,sec:d.sec,roll:String(r.roll),by:meMail(),at:Date.now()}});
    placed=placed.filter(x=>x._id!==r.id).concat([Object.assign({_id:r.id},d,r.reg,{roll:String(r.roll)})]);placed.sort(sorter);summary();drawPlaced();drawRegister();dash();drawApps();
    $('amAMsg').innerHTML='✔ Admitted <b>'+esc(d.name)+'</b> to '+d.cls+(d.sec?'-'+d.sec:'')+', Roll <b>'+r.roll+'</b> · Register Sl. No. <b>'+esc(regText(r.reg))+'</b> &nbsp;<button class="dv-b" onclick="ADM.receipt(\''+r.id+'\')">🖨 Fee receipt</button>';$('amAMsg').className='am-msg'}
