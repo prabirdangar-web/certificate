@@ -833,12 +833,13 @@ const REGF=(function(){
  </div>
  <div id="regGuide" class="gate-box wide" style="display:none">
   <h3 style="color:#b65e00;margin-top:0">New Class Teacher Registration</h3>
-  <div class="guide"><b>Guide:</b><br>1) Enter your name and email.<br>2) Choose a password (minimum 6 characters).<br>3) Select your class and section.<br>4) Press <b>Submit Request</b> — after Admin approval you can log in and enter final-exam % marks for your own class only.<br>5) After <b>Save Draft → Final &amp; Lock</b>, marks stay locked until Admin unlocks them.</div>
+  <div class="guide"><b>Guide:</b><br>1) Enter your name and email.<br>2) Choose a password (minimum 6 characters).<br>3) Select your class and section (for Class XI / XII choose your <b>subject</b>; section is optional).<br>4) Press <b>Submit Request</b> — after Admin approval you can log in and enter final-exam % marks for your own class only.<br>5) After <b>Save Draft → Final &amp; Lock</b>, marks stay locked until Admin unlocks them.</div>
   <input type="text" id="regName" placeholder="Full Name">
   <input type="email" id="regEmail" placeholder="Email Address">
   <input type="password" id="regPass" placeholder="Create Password (min 6)">
-  <div class="ptwo"><select id="regClass"><option value="">-- Class --</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option></select>
+  <div class="ptwo"><select id="regClass" onchange="document.getElementById('regSub').style.display=/^XII?$/.test(this.value)?'block':'none'"><option value="">-- Class --</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select>
   <select id="regSec"><option value="">-- Sec --</option><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+  <select id="regSub" style="display:none"><option value="">-- Subject (Class XI / XII subject teacher) --</option><option value="BNGA">BNGA — Bengali-A</option><option value="ENGB">ENGB — English-B</option><option value="SNSK">SNSK — Sanskrit</option><option value="MATH">MATH — Mathematics</option><option value="PHIL">PHIL — Philosophy</option><option value="HIST">HIST — History</option><option value="SANT">SANT — Santali</option><option value="COMA">COMA — Computer Application</option><option value="COMS">COMS — Computer Science</option><option value="PLSC">PLSC — Political Science</option><option value="GEGR">GEGR — Geography</option><option value="BIOS">BIOS — Biological Science</option><option value="PHYS">PHYS — Physics</option><option value="CHEM">CHEM — Chemistry</option></select>
   <button class="dv-b pbig" onclick="pt_submitTeacherReg()">Submit Request for Approval</button>
   <button class="dv-b pbig g" style="margin:0" onclick="pt_gv('authMenu')">← Back</button>
  </div>
@@ -952,6 +953,7 @@ table.marks-table th,table.marks-table td{border:1px solid #ccc;padding:8px;text
 table.marks-table th{background:#145828;color:#fff}
 #tfSign,body[data-role=teacher] .tf-side .gp{display:none!important}
 body[data-role=teacher][data-ct="1"] .tf-side button[data-v=prom]{display:flex!important}
+body[data-sub="1"] .tf-side button[data-v=marks]{display:none!important}
 @media print{.tf-new-panel,#gatekeeper{display:none!important}}
 
 <style>/* header re-arranged: title | scrolling icon strip | status chips */
@@ -4106,12 +4108,12 @@ async function pt_executeLogin(){
 }
 async function pt_submitTeacherReg(){
  if(needFb())return;
- const n=$('regName').value.trim(),e=$('regEmail').value.trim().toLowerCase(),p=$('regPass').value,c=$('regClass').value,s=$('regSec').value;
- if(!n||!e||p.length<6||!c||!s)return msg('Fill all fields (password min 6)');
+ const n=$('regName').value.trim(),e=$('regEmail').value.trim().toLowerCase(),p=$('regPass').value,c=$('regClass').value,s=$('regSec').value,sb=$('regSub').value,subT=c=='XI'||c=='XII';
+ if(!n||!e||p.length<6||!c||(!s&&!subT)||(subT&&!sb))return msg('Fill all fields (password min 6)'+(subT?' — choose Subject':''));
  REG=true;
  try{
   const cr=await AUTH.createUserWithEmailAndPassword(e,p);
-  await W({teachers:{[cr.user.uid]:{name:n,email:e,cls:c,sec:s,status:'pending',ts:Date.now()}}});
+  await W({teachers:{[cr.user.uid]:{name:n,email:e,cls:c,sec:s||'-',sub:subT?sb:'',status:'pending',ts:Date.now()}}});
   await AUTH.signOut();pt_gv('authMenu');
   msg('Request submitted ✔ Wait for Admin approval, then log in.',true);
  }catch(x){msg('Registration failed ('+x.code+')')}
@@ -4140,7 +4142,7 @@ function resolve(){
   r='teacher';ME.cls=t.cls;ME.sec=t.sec;ME.med=t.med||''}
  if(window.PT_AS&&window.PT_AS!==r){const w=window.PT_AS;window.PT_AS=null;return deny('This account is registered as '+PT_ROLE[r][0]+', not '+PT_ROLE[w][0]+'. Open Login and choose the correct option under "Log in as".')}
  window.PT_AS=null;
- document.body.dataset.ct=ME.ct?'1':'0';
+ ME.sub=r=='teacher'&&/^XII?$/.test(String(ME.cls));document.body.dataset.sub=ME.sub?'1':'0';document.body.dataset.ct=ME.ct?'1':'0';
  if(ME.role!=r)enter(r);else render();
 }
 function placeNewAdm(r){
@@ -4149,7 +4151,7 @@ function placeNewAdm(r){
  else if(c.parentNode===h){sl.parentNode.insertBefore(c,sl.nextSibling);c.classList.remove('na-home');$('naTitle').textContent='2 · New admission — one by one (roll no. & register Sl. No. are automatic · admin only)';$('naBtn').textContent='➕ Admit & assign roll no.'}
 }
 function enter(r){placeNewAdm(r);ME.role=r;document.body.dataset.role=r;$('gatekeeper').style.display='none';
- $('roleChip').textContent={admin:'👑 Admin',user:'🧑‍💼 User',teacher:'👩‍🏫 Class Teacher'}[r]+' · '+ME.email;pt_go('home')}
+ $('roleChip').textContent={admin:'👑 Admin',user:'🧑‍💼 User',teacher:'👩‍🏫 Class Teacher'}[r]+' · '+ME.email;pt_go(ME.sub?'xiimarks':'home')}
 function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"]');if(b)b.click();scrollTo(0,0)}
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
@@ -4173,14 +4175,17 @@ R.home=()=>{
 /* ---------- ADMIN SETUP ---------- */
 R.setup=()=>{
  const T=Object.entries(D.teachers||{}),M=D.marks||{},TB='<div class="tw"><table class="marks-table">';
- let h=`<h2>👩‍🏫 Class Teacher Requests</h2>`+(T.length?TB+'<tr><th>Name / Email</th><th>Class</th><th>Sec</th><th>Status</th><th>Action</th></tr>'+T.map(([u,t])=>`<tr><td><b>${esc(t.name)}</b><br><small>${esc(t.email)}</small></td><td><select id="tc_${u}">${opt(C6.slice(0,6),t.cls)}</select></td><td><select id="ts_${u}">${opt(['A','B','C','D'],t.sec)}</select></td><td>${B(t.status,t.status=='approved'?'ok':t.status=='pending'?'wa':'er')}</td><td><button class="dv-b" onclick="pt_tAct('${u}','approved')">Approve</button> <button class="dv-b g" onclick="pt_tAct('${u}','rejected')">Reject</button> <button class="dv-b er" onclick="pt_tDel('${u}')">✕</button></td></tr>`).join('')+'</table></div>':'<p class="mut">No requests yet.</p>');
+ let h=`<h2>👩‍🏫 Class Teacher Requests</h2>`+(T.length?TB+'<tr><th>Name / Email</th><th>Class</th><th>Sec</th><th>Subject (XI/XII)</th><th>Status</th><th>Action</th></tr>'+T.map(([u,t])=>`<tr><td><b>${esc(t.name)}</b><br><small>${esc(t.email)}</small></td><td><select id="tc_${u}">${opt(CL,t.cls)}</select></td><td><select id="ts_${u}">${opt(['A','B','C','D','-'],t.sec)}</select></td><td><select id="tsb_${u}"><option value="">—</option>${xsOpt(t.sub)}</select></td><td>${B(t.status,t.status=='approved'?'ok':t.status=='pending'?'wa':'er')}</td><td><button class="dv-b" onclick="pt_tAct('${u}','approved')">Approve</button> <button class="dv-b g" onclick="pt_tAct('${u}','rejected')">Reject</button> <button class="dv-b er" onclick="pt_tDel('${u}')">✕</button></td></tr>`).join('')+'</table></div>':'<p class="mut">No requests yet.</p>');
  h+=`<h2>🔒 Marks Status — Final Exam</h2>${TB}<tr><th>Class-Sec</th><th>Students</th><th>Teacher</th><th>Status</th><th></th></tr>`+allSecs().map(k=>{const [c,s]=k.split('-'),m=M[k],tc=T.find(([,t])=>t.cls==c&&t.sec==s&&t.status=='approved');
   return `<tr><td><b>${k}</b></td><td>${STUDENT_DB.filter(x=>x.cls==c&&secOfS(x)==s).length}</td><td>${tc?esc(tc[1].email):'—'}</td><td>${m&&m.st=='final'?B('FINAL · LOCKED','ok'):m?B('Draft','wa'):B('Not started','er')}${m&&m.ms&&lastSec(c)==s?'<br><small>Bengali: '+(m.ms.Bengali||'—')+' · Santali: '+(m.ms.Santali||'—')+'</small>':''}</td><td>${m&&m.st=='final'?`<button class="dv-b g" onclick="pt_unlockM('${k}')">🔓 Unlock</button>`:''}</td></tr>`}).join('')+'</table></div>';
  h+=`<h2>🏫 New Session — Sections (Class V–X)</h2><div class="row">Session <input id="sess" type="number" value="${D.session||2027}" style="width:90px;padding:6px"> <button class="dv-b g" onclick="pt_saveSess()">Save</button></div><p class="mut">If <b>more than one medium</b> exists in the student data, the <b>last section holds the non-Bengali medium</b> (e.g. Santali: 3 sections → C, 2 → B); with a single medium all students are spread over all sections. Create and lock before promotion.</p>${TB}<tr><th>Class</th><th>No. of sections</th><th>Sections</th><th></th></tr>`+C6.map(c=>{const S=(D.secs||{})[c]||{},n=S.n||2,L=S.list||'ABCD'.slice(0,n).split('');
   return `<tr><td><b>${c}</b></td><td><select id="sn_${c}" ${S.lock?'disabled':''}>${opt([1,2,3,4],n)}</select></td><td>${L.map((x,i)=>x+(S.lock&&L.length>1&&i==L.length-1?' (Santali)':'')).join(', ')}</td><td>${S.lock?B('LOCKED','ok')+' <button class="dv-b g" onclick="pt_secLock(\''+c+'\',0)">🔓</button>':`<button class="dv-b" onclick="pt_secLock('${c}',1)">🔒 Create & Lock</button>`}</td></tr>`}).join('')+'</table></div>';
  $('setupBody').innerHTML=h;
 };
-function pt_tAct(u,s){W({teachers:{[u]:{status:s,cls:$('tc_'+u).value,sec:$('ts_'+u).value}}})}
+const XS={'BNGA': 'Bengali-A', 'ENGB': 'English-B', 'SNSK': 'Sanskrit', 'MATH': 'Mathematics', 'PHIL': 'Philosophy', 'HIST': 'History', 'SANT': 'Santali', 'COMA': 'Computer Application', 'COMS': 'Computer Science', 'PLSC': 'Political Science', 'GEGR': 'Geography', 'BIOS': 'Biological Science', 'PHYS': 'Physics', 'CHEM': 'Chemistry'};
+function xsOpt(v){return Object.keys(XS).map(c=>'<option value="'+c+'"'+(c==v?' selected':'')+'>'+c+' — '+XS[c]+'</option>').join('')}
+function pt_tAct(u,s){const t=(D.teachers||{})[u]||{},c=$('tc_'+u).value,sb=$('tsb_'+u)?$('tsb_'+u).value:'',o={teachers:{[u]:{status:s,cls:c,sec:$('ts_'+u).value,sub:sb}}};
+ if((c=='XI'||c=='XII')&&sb)o.xii={req:{[u+'_'+sb]:{uid:u,email:t.email,name:t.name,code:sb,status:s=='approved'?'approved':'rejected',ts:Date.now()}}};W(o)}
 function pt_tDel(u){confirm('Remove this teacher record?')&&W({teachers:{[u]:DEL()}})}
 function pt_unlockM(k){confirm('Unlock '+k+' for editing (both mediums)?')&&W({marks:{[k]:{st:'draft',ms:Object.fromEntries(MEDL().map(x=>[x,'draft']))}}})}
 function pt_secLock(c,l){if(l){const n=+$('sn_'+c).value;W({secs:{[c]:{n,list:'ABCD'.slice(0,n).split(''),lock:true}}})}else if(confirm('Unlock sections of Class '+c+'?'))W({secs:{[c]:{lock:false}}})}
