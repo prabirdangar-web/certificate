@@ -5125,5 +5125,129 @@ window.IDC={
 (window.pt_R||(window.pt_R={})).idc=function(){if(!built)build();else{fillAll()}};
 })();
 </script>
+
+<!-- ==================== TFHS CLASS XII PROJECT/PRACTICAL MARKS & XI-XII REG PDF MODULE ==================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  body[data-view="xiimarks"] #xiiMarksPanel { display: block !important; }
+  body[data-view="xiimarks"] .dashboard-panel,
+  body[data-view="xiimarks"] .page,
+  body[data-view="xiimarks"] .wifs-panel,
+  body[data-view="xiimarks"] .wifs-sheet,
+  body[data-view="xiimarks"] #dataView,
+  body[data-view="xiimarks"] #feeView { display: none !important; }
+
+  /* Visible only to Staff (user) & Admin (admin); hidden for Class Teacher (teacher) */
+  body[data-role="teacher"] .tf-side button[data-v="xiimarks"] { display: none !important; }
+
+  .xii-pdf-box {
+    background: #eef8ef;
+    border: 1.5px solid #9bb29d;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .xii-ctl-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    background: #f4f7f4;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #d5e1d6;
+    margin-bottom: 14px;
+  }
+  .xii-ctl-bar label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #145828;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .xii-ctl-bar select, .xii-ctl-bar input, .xii-ctl-bar textarea {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid #888;
+    border-radius: 6px;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+  .xii-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fffde6;
+    border-left: 5px solid #145828;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 13.5px;
+  }
+  .xii-inactive-row td {
+    background: #fde8e8 !important;
+    color: #8b0000;
+    opacity: 0.78;
+  }
+  .xii-mk-inp {
+    width: 82px;
+    padding: 6px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    border: 2px solid #145828;
+    border-radius: 6px;
+  }
+  .xii-mk-inp:disabled {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+    color: #475569;
+    cursor: not-allowed;
+  }
+</style>
+
+<div id="xiiMarksPanel" class="tf-new-panel">
+  <h2>
+    🎓 Class XII Marks Entry — Project (FM-20) & Practical (FM-30)
+    <span id="xiiRoleIndicator" class="bdg ok" style="margin-left:auto;font-size:12px;"></span>
+  </h2>
+  <p class="mut" style="margin-top:0">
+    <b>System Rule:</b> Class XI has a separate portal (XI marks entry not required here; 250 XI Registration Nos. & Subjects are already pre-loaded into Profile).
+    Only <b>Class XII</b> students with an active <b>Registration No.</b> are enabled for marks entry.
+    <b>Staff Login</b> can enter marks; <b>Admin Login</b> can enter & modify already entered marks.
+  </p>
+
+  <div class="xii-pdf-box">
+    <div style="font-weight:800;color:#145828;font-size:14px;margin-bottom:8px;">
+      📄 Load Registration No., Subjects & Profile Fields from PDF or WBCHSE Text (Class XII Loaded 1st, then XI)
+    </div>
+    <div class="xii-ctl-bar" style="margin-bottom:8px;background:#fff;">
+      <div>
+        <label>1️⃣ Step 1: Load Class XII Registration PDF (1st)</label>
+        <input type="file" id="pdfUploadXII" accept=".pdf" multiple onchange="TF_XII.parsePdfFiles(event, 'XII')">
+      </div>
+      <div>
+        <label>2️⃣ Step 2: Load Class XI Registration PDF (2nd - 250 Preloaded)</label>
+        <input type="file" id="pdfUploadXI" accept=".pdf" multiple onchange="TF_XII.parsePdfFiles(event, 'XI')">
+      </div>
+      <div>
+        <label>Paste WBCHSE Portal Table Text (XII or XI)</label>
+        <button type="button" class="dv-b" style="width:100%;background:#0b4f8a;" onclick="TF_XII.toggleTextPaste()">📋 Paste WBCHSE Reg Table Text</button>
+      </div>
+      <div>
+        <label>Manual / Bulk Reg. & Subject Editor</label>
+        <button type="button" class="dv-b g" style="width:100%" onclick="TF_XII.toggleProfileEditor()">⚙️ Edit / Verify Reg No & Subjects</button>
+      </div>
+    </div>
+
+    <div id="xiiTextPasteBox" style="display:none;background:#fff;border:1px solid #9cc3e6;padding:10px;border-radius:8px;margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <b style="font-size:12.5px;color:#0b4f8a;">Paste WBCHSE Registration Table Text (e.g. HSRF-... RegNo ... Name ... 14-Digit Code)</b>
+        <select id="pasteTargetCls" style="width:180px;padding:4px;">
+          <option value="XII">Load into Class XII (1st)</option>
+          <option value="XI">Load into Class XI (2nd)</option>
+        </select>
+      </div>
+      <textarea id="wbchseRawText" rows="4" placeholder="Paste rows from WBCHSE Registration list here...">
 </body>
 </html>
