@@ -5285,7 +5285,7 @@ function init(){if(sub)return;try{X=Object.assign(X,JSON.parse(localStorage.getI
 function msg(t){$('xiiPdfMsg').textContent=t}
 /* ---------- parsing (PDF / pasted WBCHSE text) ---------- */
 function parseText(txt,cls){
- const t=String(txt).replace(/\s+/g,' '),blk=/Certified that (.+?) Son \/ daughter \/ ward of .*?Registration No\. is (\d{10}) .*?Subjects Offered:(.*?)(?= Signature of|$)/g;let m,n=0;
+ const t=String(txt).replace(/\s+/g,' '),blk=/Certified that (.+?) Son ?\/ ?daughter ?\/ ?ward of .*?Registration No\.? ?is (\d{10}).*?Subjects Offered:?(.*?)(?= Signature of|Certified that|$)/gi;let m,n=0;
  while((m=blk.exec(t))){const sj=[],u=m[3].toUpperCase();Object.keys(SUBN).forEach(c=>{if(new RegExp('\\b'+c+'\\b').test(u))sj.push(c)});NM.forEach(([r,c])=>{if(r.test(u)&&!sj.includes(c))sj.push(c)});
   X.prof[m[2]]={reg:m[2],name:m[1].trim(),cls:cls,subj:sj};n++}
  if(n){dirty=true;return n}return parseLoose(txt,cls)}
@@ -5301,9 +5301,9 @@ async function parsePdfFiles(ev,cls){const fs=[...ev.target.files];if(!fs.length
  if(typeof pdfjsLib==='undefined'){msg('PDF reader not loaded (internet needed). Use the paste option.');return}
  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';let tot=0;
  for(const f of fs){try{const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let all='';
-  for(let p=1;p<=d.numPages;p++){const c=await(await d.getPage(p)).getTextContent(),L={};c.items.forEach(i=>{const y=Math.round(i.transform[5]);(L[y]=L[y]||[]).push(i.str)});all+=Object.keys(L).sort((a,b)=>b-a).map(y=>L[y].join(' ')).join(' \n')+' \n'}
-  tot+=parseText(all,cls)}catch(e){msg('Could not read '+f.name+': '+(e.message||e));return}}
- ev.target.value='';msg('Read '+tot+' registration(s) for Class '+cls+'. Check them below, then press Save.');pf(cls)}
+  for(let p=1;p<=d.numPages;p++){const c=await(await d.getPage(p)).getTextContent(),it=c.items.filter(i=>i.str&&i.str.trim()).map(i=>({s:i.str,x:i.transform[4],y:i.transform[5]})).sort((a,b)=>b.y-a.y),G=[];it.forEach(i=>{const g=G[G.length-1];if(g&&Math.abs(g.y-i.y)<=3)g.a.push(i);else G.push({y:i.y,a:[i]})});all+=G.map(g=>g.a.sort((a,b)=>a.x-b.x).map(i=>i.s).join(' ')).join(' \n')+' \n \n'}
+  const k=parseText(all,cls);tot+=k;if(!k)msg('Read 0 from '+f.name+'. Text seen: '+all.replace(/\s+/g,' ').slice(0,260))}catch(e){msg('Could not read '+f.name+': '+(e.message||e));return}}
+ ev.target.value='';if(tot)msg('Read '+tot+' registration(s) for Class '+cls+'. Check them below, then press Save.');pf(cls)}
 function parsePaste(){const c=$('pasteTargetCls').value,n=parseText($('wbchseRawText').value,c);msg('Read '+n+' registration(s) for Class '+c+'. Check them below, then press Save.');pf(c)}
 function toggleTextPaste(){const b=$('xiiTextPasteBox');b.style.display=b.style.display==='none'?'block':'none'}
 /* ---------- profile editor ---------- */
