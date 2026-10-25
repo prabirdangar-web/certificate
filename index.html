@@ -5327,7 +5327,7 @@ const sec=()=>[...new Set(STUDENT_DB.filter(s=>cn(s.cls)==='XII').map(s=>s.sec))
 function rowsOf(){const S=$('xiiSec').value,c=$('xiiSub').value,P=Object.values(X.prof).filter(p=>p.cls==='XII'),by={};P.forEach(p=>by[nk(p.name)]=p);
  const all=STUDENT_DB.filter(s=>cn(s.cls)==='XII'),used=new Set(all.map(s=>by[nk(s.name)]).filter(Boolean).map(p=>p.reg)),out=[];
  all.filter(s=>!S||s.sec===S).sort((a,b)=>String(a.sec).localeCompare(b.sec)||(+a.roll-+b.roll)).forEach(s=>{const p=by[nk(s.name)];if(p&&!(p.subj||[]).includes(c))return;out.push({s:s,p:p})});
- if(!S)P.filter(p=>!used.has(p.reg)&&(p.subj||[]).includes(c)).forEach(p=>out.push({s:{name:p.name,sec:'—',roll:'—'},p:p}));return out}
+ if(!S)P.filter(p=>!used.has(p.reg)&&(p.subj||[]).includes(c)).forEach(p=>out.push({s:{name:p.name,sec:'—',roll:'—'},p:p}));return out.sort((a,b)=>(a.p?1:2)-(b.p?1:2)||(a.p&&b.p?a.p.reg-b.p.reg:0))}
 const uid=()=>{try{return firebase.apps.find(x=>x.name==='tfdb').auth().currentUser.uid}catch(e){return ''}};
 const myReq=()=>Object.values(X.req||{}).filter(r=>r.uid===uid());
 const okSub=c=>role()==='admin'||myReq().some(r=>r.code===c&&r.status==='approved');
