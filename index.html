@@ -820,6 +820,8 @@ const REGF=(function(){
   <input type="email" id="loginEmail" placeholder="Email address" autocomplete="username">
   <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key=='Enter')pt_executeLogin()">
   <button class="dv-b pbig" onclick="pt_executeLogin()">Sign In</button>
+  <button class="dv-b pbig g" type="button" onclick="pt_googleLogin()">Sign in with Google</button>
+  <button class="dv-b pbig g" type="button" onclick="pt_forgot()">Forgot password? Email me a reset link</button>
   <button class="dv-b pbig g" style="margin:0" onclick="pt_gv('authMenu')">← Back</button>
   <div class="fn-h">What this portal does</div>
   <div class="fn-g">
@@ -973,7 +975,7 @@ body[data-sub="1"] .tf-side button[data-v=marks]{display:none!important}
 <button data-v="adm"><span class="ic">🎓</span><span class="l">Admission</span></button><button data-v="prom"><span class="ic">🔁</span><span class="l">Promotion</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
 <div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button><button data-v="k2"><span class="ic">🌸</span><span class="l">Kanyashree K2</span></button><button data-v="idc"><span class="ic">🆔</span><span class="l">Student ID Cards</span></button><button data-v="xiimarks"><span class="ic">🧪</span><span class="l">XII Proj/Prac Marks</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
-<div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
+<div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b" type="button" onclick="pt_googleLogin()">Google</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <!-- NEW PANELS -->
 <div id="homePanel" class="tf-new-panel"><div id="homeBody"></div><div id="homeNewAdm"></div></div>
 <div id="setupPanel" class="tf-new-panel"><div id="setupBody"></div></div>
@@ -1168,6 +1170,7 @@ body[data-sub="1"] .tf-side button[data-v=marks]{display:none!important}
             <input type="email" id="wfEmail" placeholder="Email" autocomplete="username">
             <input type="password" id="wfPass" placeholder="Password" autocomplete="current-password">
             <button class="wf-btn gray" type="button" onclick="WIFS.login()">Login</button>
+            <button class="wf-btn gray" type="button" onclick="pt_googleLogin()">Google</button>
             <button class="wf-btn gray" type="button" onclick="WIFS.logout()">Logout</button>
         </div>
         <div class="wf-bar">
@@ -4105,6 +4108,25 @@ async function pt_executeLogin(){
  const e=$('loginEmail').value.trim().toLowerCase(),p=$('loginPass').value;
  if(!e||!p)return msg('Email & password required');
  try{await AUTH.signInWithEmailAndPassword(e,p)}catch(x){msg('Login failed ('+x.code+')')}
+}
+function pt_authApp(){return AUTH||(firebase.apps.find(a=>a.name==='tfdb')||{auth:()=>null}).auth()}
+function pt_say(t,ok){try{if($('gMsg')){msg(t,ok);return}}catch(e){}alert(t)}
+async function pt_googleLogin(){
+ const A=pt_authApp();if(!A)return pt_say('Firebase not loaded');
+ const pr=new firebase.auth.GoogleAuthProvider();pr.setCustomParameters({prompt:'select_account'});
+ try{await A.signInWithPopup(pr)}
+ catch(x){
+  if(x.code==='auth/popup-blocked'||x.code==='auth/operation-not-supported-in-this-environment'){try{await A.signInWithRedirect(pr);return}catch(y){x=y}}
+  if(x.code==='auth/popup-closed-by-user'||x.code==='auth/cancelled-popup-request')return;
+  pt_say('Google sign-in failed ('+x.code+')'+(x.code==='auth/unauthorized-domain'?' - add this website domain in Firebase Console > Authentication > Settings > Authorized domains':''));
+ }
+}
+async function pt_forgot(){
+ const A=pt_authApp();if(!A)return pt_say('Firebase not loaded');
+ const e=(($('loginEmail')||{}).value||'').trim().toLowerCase();
+ if(!e)return pt_say('Type your email address first, then click Forgot password');
+ try{await A.sendPasswordResetEmail(e);pt_say('Reset link sent to '+e+' - check Inbox and Spam, set a new password, then sign in.',true)}
+ catch(x){pt_say('Could not send reset email ('+x.code+')')}
 }
 async function pt_submitTeacherReg(){
  if(needFb())return;
