@@ -798,7 +798,7 @@ const REGF=(function(){
  <div id="authMenu" class="gate-box cover">
   <div class="pg-h"><b>Apply online for admission</b><span>Scan the QR code with your phone or open the link — no sign-in needed</span></div>
   <div class="pg-g">
-   <div class="pg-c pg-vx"><div class="pg-t">Classes V – IX</div><div class="pg-qr" id="pgQrVX"></div><div class="pg-l" id="pgLinkVX"></div>
+   <div class="pg-c pg-vx"><div class="pg-t">Classes V – X</div><div class="pg-qr" id="pgQrVX"></div><div class="pg-l" id="pgLinkVX"></div>
     <div class="pg-b"><a class="pg-go" id="pgOpenVX" target="_blank" rel="noopener">Apply now</a><button type="button" onclick="ADM.pubCopy(false)">Copy link</button><button type="button" onclick="ADM.qrSend(false)">WhatsApp</button><button type="button" onclick="ADM.qrPoster(false)">Poster</button></div></div>
    <div class="pg-c pg-xi"><div class="pg-t">Class XI</div><div class="pg-qr" id="pgQrXI"></div><div class="pg-l" id="pgLinkXI"></div>
     <div class="pg-b"><a class="pg-go" id="pgOpenXI" target="_blank" rel="noopener">Apply now</a><button type="button" onclick="ADM.pubCopy(true)">Copy link</button><button type="button" onclick="ADM.qrSend(true)">WhatsApp</button><button type="button" onclick="ADM.qrPoster(true)">Poster</button></div></div>
@@ -2683,9 +2683,55 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
     <label style="font-size:11px;font-weight:700">Show <select id="apprF" onchange="ADM.drawApproved()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="all">All approved</option><option value="todo">Receipt not printed yet</option></select></label>
     <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Refresh</button></div>
    <div id="amApproved" class="am-box"></div></div>
-  <div class="dv-c" id="ctlCard" style="border-top:4px solid #b00020"><h3>🔐 Admission link control — ACTIVE / INACTIVE (admin only)</h3>
-  <p class="am-msg" style="margin:0 0 8px">Links are <b>INACTIVE by default</b>. Switch <b>Classes V–IX</b> ACTIVE for admission <span id="ctlY"></span>. Switch <b>Class XI</b> ACTIVE only after MP-27 result is published. Switching OFF also blocks fake submissions at the server. Optional dates auto-open / auto-close the link.</p>
-  <div id="ctlRows"></div><p class="am-msg" id="ctlMsg"></p></div>
+  <div class="dv-c" id="amCtl" style="border-top:4px solid #b00020"><h3>&#128274; Admission link control &mdash; ACTIVE / INACTIVE (Admin only)</h3>
+  <p class="am-msg" style="margin-top:0">Both public forms stay <b>CLOSED</b> until you set them <b>ACTIVE</b> here. Switch a link INACTIVE any time to stop fake or unwanted submissions &mdash; the Firestore rule also refuses new applications while it is inactive. Session = the year chosen in <b>Admission year</b> above (<b id="ctlSes"></b>).</p>
+  <div class="am-row" style="margin-top:0"><button class="dv-b g" type="button" onclick="ADM.ctlLoad()">&#10227; Load status</button><span id="amCtlMsg" class="am-msg" style="margin:0"></span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:8px">
+  <div style="border:1px solid #c9d6cc;border-radius:12px;padding:10px 12px">
+   <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><b>Form 1 &middot; Classes V &ndash; IX</b><span id="ctlGPill" style="font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:999px;background:#eee">—</span></div>
+   <p class="am-msg" style="margin:4px 0 6px">Link: admission.html. Pick which classes to accept (default V&ndash;IX).</p>
+   <div class="am-row" style="margin:4px 0"><label style="font-size:11px;font-weight:700">Link status <select id="ctlGOn" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="0">INACTIVE — closed</option><option value="1">ACTIVE — accepting applications</option></select></label></div>
+   <div class="am-row" style="margin:6px 0"><span style="font-size:11px;font-weight:700">Classes open:</span><label style="font-size:12px;font-weight:700;display:inline-flex;gap:3px;align-items:center"><input type="checkbox" id="ctlGc_V"> V</label><label style="font-size:12px;font-weight:700;display:inline-flex;gap:3px;align-items:center"><input type="checkbox" id="ctlGc_VI"> VI</label><label style="font-size:12px;font-weight:700;display:inline-flex;gap:3px;align-items:center"><input type="checkbox" id="ctlGc_VII"> VII</label><label style="font-size:12px;font-weight:700;display:inline-flex;gap:3px;align-items:center"><input type="checkbox" id="ctlGc_VIII"> VIII</label><label style="font-size:12px;font-weight:700;display:inline-flex;gap:3px;align-items:center"><input type="checkbox" id="ctlGc_IX"> IX</label><label style="font-size:12px;font-weight:700;display:inline-flex;gap:3px;align-items:center"><input type="checkbox" id="ctlGc_X"> X</label></div>
+   <div class="am-row" style="margin:4px 0"><label style="font-size:11px;font-weight:700">Open from (optional) <input type="datetime-local" id="ctlGFrom" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"></label>
+   <label style="font-size:11px;font-weight:700">Close at (optional) <input type="datetime-local" id="ctlGTo" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"></label></div>
+   <div class="am-row" style="margin:4px 0"><label style="font-size:11px;font-weight:700;flex:1;min-width:220px">Notice shown to visitors (optional, Bengali / English) <input id="ctlGNote" maxlength="160" style="width:100%;padding:6px 9px;border-radius:8px;border:1px solid #c9d6cc"></label></div>
+   <button class="dv-b" type="button" onclick="ADM.ctlSave('gen')">&#128190; Save &amp; apply</button>
+  </div>
+  <div style="border:1px solid #c9d6cc;border-radius:12px;padding:10px 12px">
+   <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><b>Form 2 &middot; Class XI</b><span id="ctlXPill" style="font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:999px;background:#eee">—</span></div>
+   <p class="am-msg" style="margin:4px 0 6px">Link: admission-xi.html. Set ACTIVE only after the Madhyamik result is published.</p>
+   <div class="am-row" style="margin:4px 0"><label style="font-size:11px;font-weight:700">Link status <select id="ctlXOn" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="0">INACTIVE — closed</option><option value="1">ACTIVE — accepting applications</option></select></label></div>
+   
+   <div class="am-row" style="margin:4px 0"><label style="font-size:11px;font-weight:700">Open from (optional) <input type="datetime-local" id="ctlXFrom" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"></label>
+   <label style="font-size:11px;font-weight:700">Close at (optional) <input type="datetime-local" id="ctlXTo" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"></label></div>
+   <div class="am-row" style="margin:4px 0"><label style="font-size:11px;font-weight:700;flex:1;min-width:220px">Notice shown to visitors (optional, Bengali / English) <input id="ctlXNote" maxlength="160" style="width:100%;padding:6px 9px;border-radius:8px;border:1px solid #c9d6cc"></label></div>
+   <button class="dv-b" type="button" onclick="ADM.ctlSave('xi')">&#128190; Save &amp; apply</button>
+  </div>
+  </div>
+  <details class="am-d"><summary><b>One-time Firebase setup &mdash; rules for this switch (publish once)</b></summary><pre>// ===== EASIEST: paste the complete ready file "firestore.rules" (only 3 additive changes vs yours) =====
+// If you prefer to edit by hand, make exactly these 3 changes:
+// 1) add the two helper functions below next to your other functions (after portalApprovedTeacher)
+function admOkFor(d, c) {
+  let k = d.cls == 'XI' ? c.get('xi', {}) : c.get('gen', {});
+  return k.get('open', false) == true
+    &amp;&amp; k.get('year', 0) == d.year
+    &amp;&amp; (k.get('from', 0) == 0 || request.time.toMillis() &gt;= k.get('from', 0))
+    &amp;&amp; (k.get('to', 0) == 0 || request.time.toMillis() &lt;= k.get('to', 0))
+    &amp;&amp; (d.cls == 'XI' || d.cls in k.get('classes', []));
+}
+function admIsOpen(d) {
+  return exists(/databases/$(database)/documents/admConfig/main)
+    &amp;&amp; admOkFor(d, get(/databases/$(database)/documents/admConfig/main).data);
+}
+// 2) in  match /admApps/{id}  -> allow create : add this last condition
+//        &amp;&amp; (isAdmin() || isMarksStaff() || admIsOpen(request.resource.data))
+// 3) add this block right after the admApps block
+match /admConfig/{id} {
+  allow read: if true;
+  allow write: if isAdmin();
+}
+</pre></details>
+  </div>
   <div class="dv-c u-ok"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
   <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><a class="dv-b g" id="amOpen" target="_blank" style="text-decoration:none">Open form ↗</a></div>
   <div class="am-row" style="margin-top:6px"><span class="am-link" id="amLinkXI"></span><button class="dv-b" type="button" onclick="ADM.copyLink(true)">Copy Class XI link</button><a class="dv-b g" id="amOpenXI" target="_blank" style="text-decoration:none">Open XI form ↗</a></div>
@@ -2709,11 +2755,8 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
 <pre>// ================= ADMISSION (promotion, new admission, online form) — SEPARATE RULE =================
     // Public online form (admission.html) can only CREATE a "pending" application, no login needed.
     // Staff (staff/teacher) verify; only admin approves; admit needs admin approval to exist first.
-    // Admin ON/OFF switch for the public links (read by the form; only admin writes)
-    match /admControl/{id} { allow read: if true; allow write: if isAdmin(); }
     match /admApps/{id} {
       allow create: if request.resource.data.status == 'pending'
-        &amp;&amp; get(/databases/$(database)/documents/admControl/$(string(request.resource.data.year) + '_' + (request.resource.data.cls == 'XI' ? 'XI' : 'VX'))).data.open == true
         &amp;&amp; request.resource.data.name is string &amp;&amp; request.resource.data.name.size() &lt; 120
         &amp;&amp; request.resource.data.keys().size() &lt; 90
         &amp;&amp; request.resource.data.get('photo', '').size() &lt; 150000
@@ -2892,6 +2935,38 @@ const ADM=(function(){
  function msg(m,bad,id){const e=$(id||'amMsg');e.textContent=m;e.className='am-msg'+(bad?' bad':'')}
  function need(id){if(!db){msg('Firebase is not available (check internet).',true,id);return false}
   if(!(auth&&auth.currentUser)){msg('Sign in first (sidebar → Sign in).',true,id);return false}return true}
+
+ /* ---------- Admission link control: admConfig/main {gen:{open,year,classes,from,to,note}, xi:{open,year,from,to,note}} ---------- */
+ const CTLP={gen:'ctlG',xi:'ctlX'},CTLCL=['V','VI','VII','VIII','IX','X'];let ctlData={};
+ const ms2dt=m=>{if(!m)return '';const d=new Date(m),z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+'T'+z(d.getHours())+':'+z(d.getMinutes())};
+ function ctlPaint(){$('ctlSes').textContent=ses(yr());
+  ['gen','xi'].forEach(k=>{const c=ctlData[k]||{},p=CTLP[k],n=Date.now();
+   $(p+'On').value=c.open===true?'1':'0';$(p+'From').value=ms2dt(c.from);$(p+'To').value=ms2dt(c.to);$(p+'Note').value=c.note||'';
+   if(k==='gen'){const cl=c.classes||['V','VI','VII','VIII','IX'];CTLCL.forEach(x=>{$('ctlGc_'+x).checked=cl.indexOf(x)>=0})}
+   let t='INACTIVE',bg='#fde0e0',fg='#b00020';
+   if(c.open===true){if(+c.year!==yr()){t='ACTIVE for '+ses(+c.year||0)+' (not the selected year)';bg='#fff3c4';fg='#8a5600'}
+    else if(c.from&&n<c.from){t='ACTIVE — waiting for start time';bg='#fff3c4';fg='#8a5600'}
+    else if(c.to&&n>c.to){t='ACTIVE — but time window ended';bg='#fff3c4';fg='#8a5600'}
+    else{t='ACTIVE — accepting applications';bg='#dff3e3';fg='#145828'}}
+   const e=$(p+'Pill');e.textContent=t;e.style.background=bg;e.style.color=fg})}
+ async function ctlLoad(){
+  if(!need('amCtlMsg'))return;await roleP;
+  if(!isAdmin()){msg('Only an ADMIN login can control the admission links.',true,'amCtlMsg');return}
+  try{const sn=await db.collection('admConfig').doc('main').get();ctlData=sn.exists?sn.data():{};ctlPaint();
+   msg(sn.exists?'Status loaded.':'Nothing saved yet — both forms are CLOSED. Set ACTIVE and Save to open one.',false,'amCtlMsg')}
+  catch(e){msg('Load failed: '+(e.code||e.message)+(e.code==='permission-denied'?' — publish the admConfig rule first (see setup below).':''),true,'amCtlMsg')}}
+ async function ctlSave(k){
+  if(!need('amCtlMsg'))return;await roleP;
+  if(!isAdmin()){msg('Only an ADMIN login can control the admission links.',true,'amCtlMsg');return}
+  const p=CTLP[k],on=$(p+'On').value==='1',from=$(p+'From').value?new Date($(p+'From').value).getTime():0,to=$(p+'To').value?new Date($(p+'To').value).getTime():0;
+  if(from&&to&&to<=from){msg('Close time must be after the open time.',true,'amCtlMsg');return}
+  const o={open:on,year:yr(),from:from,to:to,note:$(p+'Note').value.trim()};
+  if(k==='gen'){o.classes=CTLCL.filter(x=>$('ctlGc_'+x).checked);if(on&&!o.classes.length){msg('Tick at least one class to accept.',true,'amCtlMsg');return}}
+  if(on&&!confirm('Make the '+(k==='xi'?'Class XI':'Classes '+(o.classes||[]).join(', '))+' form ACTIVE for session '+ses(yr())+'?\nAnyone with the link can then submit an application.'))return;
+  try{await db.collection('admConfig').doc('main').set({[k]:o,updated:{by:meMail(),at:Date.now()}},{merge:true});
+   ctlData=Object.assign({},ctlData,{[k]:o});ctlPaint();
+   msg((k==='xi'?'Class XI':'Classes V–IX')+' form is now '+(on?'ACTIVE':'INACTIVE')+' ✔',false,'amCtlMsg')}
+  catch(e){msg('Save failed: '+(e.code||e.message)+(e.code==='permission-denied'?' — publish the admConfig rule first (see setup below).':''),true,'amCtlMsg')}}
  const docId=(y,c,s,r)=>y+'_'+c+'_'+(s||'-')+'_'+r;
  const cntId=(y,c,s)=>y+'_'+c+'_'+(s||'-');
  const maxRoll=(c,s)=>placed.filter(p=>p.cls===c&&secOf(p)===(s||'')).reduce((m,p)=>Math.max(m,parseInt(p.roll,10)||0),0);
@@ -3088,8 +3163,8 @@ const ADM=(function(){
   ['Bank (scholarship)',[['accName','Account holder'],['bank','Bank & branch'],['accNo','A/C no.'],['ifsc','IFSC']]]];
  const when=t=>t?new Date(t).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'';
  const stText={pending:'Waiting for staff verification',verified:'Verified by staff — waiting for admin',approved:'Approved — ready to admit',admitted:'Admitted',rejected:'Rejected'};
- function link(xi){return new URL('admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()+(xi?'&c=xi':'')}
- function copyLink(xi){const t=link(xi);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($(xi?'amLinkXI':'amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
+ function link(xi){return new URL(xi?'admission-xi.html':'admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()}
+ function copyLink(xi){const t=link(xi);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html and admission-xi.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($(xi?'amLinkXI':'amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
  async function loadApps(){
   if(!need('amAMsg'))return;await roleP;await refresh(true);
   try{const q=await db.collection('admApps').where('year','==',yr()).get();
@@ -3447,7 +3522,7 @@ const ADM=(function(){
  /* ---------- init ---------- */
  const y0=new Date().getFullYear();$('amYear').innerHTML=[y0,y0+1,y0+2].map(v=>'<option'+(v===y0+1?' selected':'')+'>'+v+'</option>').join('');
  $('amSes').value=ses(yr());$('amLink').textContent=link();$('amLinkXI').textContent=link(true);$('csDate').value=today();pubDraw();
- const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{profDraw();refresh(true);if(document.body.dataset.role==='user')setTimeout(()=>{try{loadApps()}catch(e){}},300)});
+ const ob=document.querySelector('.tf-side button[data-v=adm]');if(ob)ob.addEventListener('click',()=>{profDraw();refresh(true);setTimeout(()=>{try{ctlLoad()}catch(e){}},600);if(document.body.dataset.role==='user')setTimeout(()=>{try{loadApps()}catch(e){}},300)});
  if(isApply)location.replace(new URL('admission.html',location.href.split('?')[0]).href+'?y='+(+param('y')||y0+1));
  $('amOpen').href=link();
  window.addEventListener('load',qrDraw);
@@ -3499,7 +3574,7 @@ const ADM=(function(){
   const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
   w.document.write('<html><head><title>XI merit list</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px;color:#000}h2{text-align:center;margin:0}h3{margin:12px 0 2px}table{width:100%;border-collapse:collapse;margin-top:4px}th,td{border:1px solid #000;padding:2px 4px;text-align:left}th{background:#eee}p{margin:2px 0}</style></head><body><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><p style="text-align:center"><b>Class XI admission &mdash; merit / selection list on Madhyamik %, session '+ses(yr())+'</b></p>'+xiHtml(xiRes,true).replace(/class="am-t"/g,'').replace(/ style="color:#[0-9a-f]+;font-weight:700"/g,' style="font-weight:700"')+'<p style="margin-top:26px">Headmaster: ______________</p></body></html>');
   w.document.close();w.focus();setTimeout(()=>w.print(),300)}
- return{xiGen,xiPrint,pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses}
+ return{xiGen,xiPrint,pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses,ctlLoad,ctlSave}
 })();
 </script>
 
@@ -5409,21 +5484,6 @@ function print(){const c=$('xiiSub').value,f=sc(c);if(!f)return;const w=window.o
 (window.pt_R||(window.pt_R={})).xiimarks=draw;
 return{req,act,report,parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
 })();
-</script>
-<script>
-(function(){const $=id=>document.getElementById(id);let db=null,au=null;try{const a=firebase.apps.find(x=>x.name==='tfdb');db=a.firestore();au=a.auth()}catch(e){}
-const G=[['VX','Classes V – IX'],['XI','Class XI (after MP-27 result)']],yr=()=>+$('amYear').value||new Date().getFullYear()+1,m=(t,b)=>{$('ctlMsg').textContent=t;$('ctlMsg').className='am-msg'+(b?' bad':'')};
-async function load(){$('ctlY').textContent=yr();if(!db||!au||!au.currentUser){$('ctlRows').innerHTML='<p>Sign in as admin to control the links.</p>';return}
- let h='';for(const g of G){let c={};try{const s=await db.collection('admControl').doc(yr()+'_'+g[0]).get();c=s.exists?s.data():{}}catch(e){}
-  h+='<div class="am-row" style="align-items:flex-end;flex-wrap:wrap;border-bottom:1px solid #dde;padding-bottom:8px"><b style="min-width:150px">'+g[1]+'</b><b style="color:'+(c.open?'#0b5a2b':'#b00020')+'">'+(c.open?'● ACTIVE':'○ INACTIVE')+'</b>'+
-  '<label style="font-size:11px">From <input type="date" id="cf'+g[0]+'" value="'+(c.from||'')+'"></label><label style="font-size:11px">To <input type="date" id="ct'+g[0]+'" value="'+(c.to||'')+'"></label>'+
-  '<label style="font-size:11px;flex:1;min-width:180px">Closed message (Bengali / English) <input id="cm'+g[0]+'" value="'+String(c.msg||'').replace(/"/g,'&quot;')+'"></label>'+
-  '<button class="dv-b" type="button" style="background:'+(c.open?'#b00020':'#145828')+'" onclick="ADMCTL.set(\''+g[0]+'\','+(!c.open)+')">'+(c.open?'Deactivate':'Activate')+'</button><button class="dv-b g" type="button" onclick="ADMCTL.set(\''+g[0]+'\','+(!!c.open)+')">Save dates / message</button></div>'}
- $('ctlRows').innerHTML=h}
-window.ADMCTL={load,async set(g,open){if(!db||!au||!au.currentUser){m('Sign in as admin first.',1);return}
- if(open&&!confirm('ACTIVATE the public admission link for '+(g==='XI'?'Class XI':'Classes V–IX')+' '+yr()+'? Anyone with the link can then submit.'))return;
- try{await db.collection('admControl').doc(yr()+'_'+g).set({open,from:$('cf'+g).value||'',to:$('ct'+g).value||'',msg:$('cm'+g).value.trim(),year:yr(),by:au.currentUser.email||'',ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});m('Saved ✔ — link is now '+(open?'ACTIVE':'INACTIVE')+'.');load()}catch(e){m('Only admin can change this (check Firestore rules block).',1)}}};
-const b=document.querySelector('.tf-side button[data-v=adm]');if(b)b.addEventListener('click',()=>setTimeout(load,400));if($('amYear'))$('amYear').addEventListener('change',load);if(au)au.onAuthStateChanged(()=>setTimeout(load,600))})();
 </script>
 </body>
 </html>
