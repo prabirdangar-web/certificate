@@ -798,7 +798,7 @@ const REGF=(function(){
  <div id="authMenu" class="gate-box cover">
   <div class="pg-h"><b>Apply online for admission</b><span>Scan the QR code with your phone or open the link — no sign-in needed</span></div>
   <div class="pg-g">
-   <div class="pg-c pg-vx"><div class="pg-t">Classes V – X</div><div class="pg-qr" id="pgQrVX"></div><div class="pg-l" id="pgLinkVX"></div>
+   <div class="pg-c pg-vx"><div class="pg-t">Classes V – IX</div><div class="pg-qr" id="pgQrVX"></div><div class="pg-l" id="pgLinkVX"></div>
     <div class="pg-b"><a class="pg-go" id="pgOpenVX" target="_blank" rel="noopener">Apply now</a><button type="button" onclick="ADM.pubCopy(false)">Copy link</button><button type="button" onclick="ADM.qrSend(false)">WhatsApp</button><button type="button" onclick="ADM.qrPoster(false)">Poster</button></div></div>
    <div class="pg-c pg-xi"><div class="pg-t">Class XI</div><div class="pg-qr" id="pgQrXI"></div><div class="pg-l" id="pgLinkXI"></div>
     <div class="pg-b"><a class="pg-go" id="pgOpenXI" target="_blank" rel="noopener">Apply now</a><button type="button" onclick="ADM.pubCopy(true)">Copy link</button><button type="button" onclick="ADM.qrSend(true)">WhatsApp</button><button type="button" onclick="ADM.qrPoster(true)">Poster</button></div></div>
@@ -2683,6 +2683,9 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
     <label style="font-size:11px;font-weight:700">Show <select id="apprF" onchange="ADM.drawApproved()" style="padding:6px;border-radius:8px;border:1px solid #c9d6cc"><option value="all">All approved</option><option value="todo">Receipt not printed yet</option></select></label>
     <button class="dv-b g" type="button" onclick="ADM.loadApps()">⟳ Refresh</button></div>
    <div id="amApproved" class="am-box"></div></div>
+  <div class="dv-c" id="ctlCard" style="border-top:4px solid #b00020"><h3>🔐 Admission link control — ACTIVE / INACTIVE (admin only)</h3>
+  <p class="am-msg" style="margin:0 0 8px">Links are <b>INACTIVE by default</b>. Switch <b>Classes V–IX</b> ACTIVE for admission <span id="ctlY"></span>. Switch <b>Class XI</b> ACTIVE only after MP-27 result is published. Switching OFF also blocks fake submissions at the server. Optional dates auto-open / auto-close the link.</p>
+  <div id="ctlRows"></div><p class="am-msg" id="ctlMsg"></p></div>
   <div class="dv-c u-ok"><h3>3 · Online admission applications (Classes V – XI) — verify → approve → admit</h3>
   <div class="am-row" style="margin-top:0"><span class="am-link" id="amLink"></span><button class="dv-b" type="button" onclick="ADM.copyLink()">Copy link</button><a class="dv-b g" id="amOpen" target="_blank" style="text-decoration:none">Open form ↗</a></div>
   <div class="am-row" style="margin-top:6px"><span class="am-link" id="amLinkXI"></span><button class="dv-b" type="button" onclick="ADM.copyLink(true)">Copy Class XI link</button><a class="dv-b g" id="amOpenXI" target="_blank" style="text-decoration:none">Open XI form ↗</a></div>
@@ -2706,8 +2709,11 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
 <pre>// ================= ADMISSION (promotion, new admission, online form) — SEPARATE RULE =================
     // Public online form (admission.html) can only CREATE a "pending" application, no login needed.
     // Staff (staff/teacher) verify; only admin approves; admit needs admin approval to exist first.
+    // Admin ON/OFF switch for the public links (read by the form; only admin writes)
+    match /admControl/{id} { allow read: if true; allow write: if isAdmin(); }
     match /admApps/{id} {
       allow create: if request.resource.data.status == 'pending'
+        &amp;&amp; get(/databases/$(database)/documents/admControl/$(string(request.resource.data.year) + '_' + (request.resource.data.cls == 'XI' ? 'XI' : 'VX'))).data.open == true
         &amp;&amp; request.resource.data.name is string &amp;&amp; request.resource.data.name.size() &lt; 120
         &amp;&amp; request.resource.data.keys().size() &lt; 90
         &amp;&amp; request.resource.data.get('photo', '').size() &lt; 150000
@@ -3082,8 +3088,8 @@ const ADM=(function(){
   ['Bank (scholarship)',[['accName','Account holder'],['bank','Bank & branch'],['accNo','A/C no.'],['ifsc','IFSC']]]];
  const when=t=>t?new Date(t).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'';
  const stText={pending:'Waiting for staff verification',verified:'Verified by staff — waiting for admin',approved:'Approved — ready to admit',admitted:'Admitted',rejected:'Rejected'};
- function link(xi){return new URL(xi?'admission-xi.html':'admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()}
- function copyLink(xi){const t=link(xi);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html and admission-xi.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($(xi?'amLinkXI':'amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
+ function link(xi){return new URL('admission.html',location.href.split('#')[0].split('?')[0]).href+'?y='+yr()+(xi?'&c=xi':'')}
+ function copyLink(xi){const t=link(xi);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Link copied. Upload admission.html next to index.html first.',false,'amAMsg')).catch(()=>{const r=document.createRange();r.selectNodeContents($(xi?'amLinkXI':'amLink'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg('Select-copy the link shown.',false,'amAMsg')})}
  async function loadApps(){
   if(!need('amAMsg'))return;await roleP;await refresh(true);
   try{const q=await db.collection('admApps').where('year','==',yr()).get();
@@ -5403,6 +5409,21 @@ function print(){const c=$('xiiSub').value,f=sc(c);if(!f)return;const w=window.o
 (window.pt_R||(window.pt_R={})).xiimarks=draw;
 return{req,act,report,parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
 })();
+</script>
+<script>
+(function(){const $=id=>document.getElementById(id);let db=null,au=null;try{const a=firebase.apps.find(x=>x.name==='tfdb');db=a.firestore();au=a.auth()}catch(e){}
+const G=[['VX','Classes V – IX'],['XI','Class XI (after MP-27 result)']],yr=()=>+$('amYear').value||new Date().getFullYear()+1,m=(t,b)=>{$('ctlMsg').textContent=t;$('ctlMsg').className='am-msg'+(b?' bad':'')};
+async function load(){$('ctlY').textContent=yr();if(!db||!au||!au.currentUser){$('ctlRows').innerHTML='<p>Sign in as admin to control the links.</p>';return}
+ let h='';for(const g of G){let c={};try{const s=await db.collection('admControl').doc(yr()+'_'+g[0]).get();c=s.exists?s.data():{}}catch(e){}
+  h+='<div class="am-row" style="align-items:flex-end;flex-wrap:wrap;border-bottom:1px solid #dde;padding-bottom:8px"><b style="min-width:150px">'+g[1]+'</b><b style="color:'+(c.open?'#0b5a2b':'#b00020')+'">'+(c.open?'● ACTIVE':'○ INACTIVE')+'</b>'+
+  '<label style="font-size:11px">From <input type="date" id="cf'+g[0]+'" value="'+(c.from||'')+'"></label><label style="font-size:11px">To <input type="date" id="ct'+g[0]+'" value="'+(c.to||'')+'"></label>'+
+  '<label style="font-size:11px;flex:1;min-width:180px">Closed message (Bengali / English) <input id="cm'+g[0]+'" value="'+String(c.msg||'').replace(/"/g,'&quot;')+'"></label>'+
+  '<button class="dv-b" type="button" style="background:'+(c.open?'#b00020':'#145828')+'" onclick="ADMCTL.set(\''+g[0]+'\','+(!c.open)+')">'+(c.open?'Deactivate':'Activate')+'</button><button class="dv-b g" type="button" onclick="ADMCTL.set(\''+g[0]+'\','+(!!c.open)+')">Save dates / message</button></div>'}
+ $('ctlRows').innerHTML=h}
+window.ADMCTL={load,async set(g,open){if(!db||!au||!au.currentUser){m('Sign in as admin first.',1);return}
+ if(open&&!confirm('ACTIVATE the public admission link for '+(g==='XI'?'Class XI':'Classes V–IX')+' '+yr()+'? Anyone with the link can then submit.'))return;
+ try{await db.collection('admControl').doc(yr()+'_'+g).set({open,from:$('cf'+g).value||'',to:$('ct'+g).value||'',msg:$('cm'+g).value.trim(),year:yr(),by:au.currentUser.email||'',ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});m('Saved ✔ — link is now '+(open?'ACTIVE':'INACTIVE')+'.');load()}catch(e){m('Only admin can change this (check Firestore rules block).',1)}}};
+const b=document.querySelector('.tf-side button[data-v=adm]');if(b)b.addEventListener('click',()=>setTimeout(load,400));if($('amYear'))$('amYear').addEventListener('change',load);if(au)au.onAuthStateChanged(()=>setTimeout(load,600))})();
 </script>
 </body>
 </html>
