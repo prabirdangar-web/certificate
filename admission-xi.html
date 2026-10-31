@@ -48,15 +48,36 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
 .cnt{font-weight:800;font-size:13px;margin:4px 0 10px}.cnt.ok{color:#145828}.cnt.no{color:#b00020}
 @media print{body{background:#fff}.no-print{display:none!important}.card{box-shadow:none;border:1px solid #999}.hero{background:#fff;color:#000;border:1px solid #000}.hero .ses{border:1px solid #000;background:#fff}}
 </style>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@500;700&display=swap" rel="stylesheet">
+<style>
+.bn{display:block;font-weight:700;color:#8a3b00;font-size:11.5px;font-family:'Noto Sans Bengali','Vrinda','Nirmala UI','Segoe UI',Arial,sans-serif;line-height:1.35}
+.bnh{font-weight:700;color:#5a6b60;font-size:12px;font-family:'Noto Sans Bengali','Nirmala UI',Arial,sans-serif}
+.card h2{flex-wrap:wrap}
+.mdl{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;justify-content:center;overflow:auto;padding:14px}
+.mdl .box{background:#fff;border-radius:16px;max-width:720px;width:100%;margin:auto;box-shadow:0 12px 44px rgba(0,0,0,.45);overflow:hidden}
+.mdl .hd{background:linear-gradient(135deg,var(--g2),var(--g));color:#fff;padding:14px 18px}
+.mdl .hd h2{margin:0;font-size:18px;font-family:'Noto Sans Bengali','Nirmala UI',Arial,sans-serif}.mdl .hd p{margin:3px 0 0;font-size:12.5px;opacity:.92}
+.mdl .bd{padding:12px 18px;font-size:14px;max-height:62vh;overflow:auto;font-family:'Noto Sans Bengali','Nirmala UI','Segoe UI',Arial,sans-serif}
+.mdl ol{padding-left:20px;margin:4px 0}.mdl li{margin:7px 0;line-height:1.5}.mdl li i{display:block;color:#5a6b60;font-style:normal;font-size:12px;font-family:'Segoe UI',Arial,sans-serif}
+.mdl .warn{background:#fff3c4;border:1px solid #b78600;border-radius:10px;padding:8px 12px;margin:8px 0;font-size:13px}
+.mdl .ft{padding:12px 18px;border-top:1px solid var(--line);background:#fafcfa}
+.mdl .ft label{flex-direction:row;align-items:flex-start;gap:9px;font-size:13px;font-weight:700;margin-bottom:10px}
+.mdl .ft input{width:20px;height:20px;flex:none}
+.gate{text-align:center;padding:26px 18px}.gate h2{justify-content:center;font-size:19px;color:#b00020}.gate.chk h2{color:var(--g)}
+.gate p{margin:6px 0;font-size:14px}.gate .bnb{font-family:'Noto Sans Bengali','Nirmala UI',Arial,sans-serif;font-weight:700;color:#8a3b00;font-size:15px}
+</style>
 </head>
 <body>
 <div class="wrap">
  <div class="hero">
   <h1>Taldangra Fulmati High School [H.S.]</h1>
   <p>P.O. Taldangra, District: Bankura, PIN: 722152 &nbsp;|&nbsp; Ph: 03243-265114</p>
-  <span class="ses" id="ses">Admission application — Class XI</span>
+  <button type="button" class="sec" id="insBtn" style="float:right;padding:6px 12px;font-size:12.5px">ℹ নির্দেশাবলী / Instructions</button><span class="ses" id="ses">Admission application — Class XI</span>
  </div>
- <form id="f" autocomplete="off" novalidate>
+ <div id="gate" class="hide"></div>
+ <div id="ins" class="mdl hide"></div>
+ <form id="f" class="hide" autocomplete="off" novalidate>
  <div class="card"><h2><b>1</b> Admission sought</h2>
   <div class="grid">
    <label>Class applying for<input id="cls" class="key ro" value="XI" readonly></label>
@@ -95,11 +116,15 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
   <div class="grid">
    <label>Father's name<input id="father" class="key req" maxlength="80"></label>
    <label>Father's occupation <small>(choose NA if none)</small><select id="fatherOcc" class="req"></select></label>
-   <label>Father's education<input id="fatherEdu" maxlength="40"></label>
+   <label class="full hide" id="wFOccO">Father's occupation — specify<input id="fatherOccO" maxlength="40"></label>
+   <label>Father's education <small>(highest)</small><select id="fatherEdu" class="req"></select></label>
+   <label class="full hide" id="wFEduO">Father's education — specify<input id="fatherEduO" maxlength="40"></label>
    <label>Father's mobile <small>(optional)</small><input id="fatherMob" inputmode="numeric" maxlength="10"></label>
    <label>Mother's name<input id="mother" maxlength="80"></label>
    <label>Mother's occupation <small>(choose NA if none)</small><select id="motherOcc" class="req"></select></label>
-   <label>Mother's education<input id="motherEdu" maxlength="40"></label>
+   <label class="full hide" id="wMOccO">Mother's occupation — specify<input id="motherOccO" maxlength="40"></label>
+   <label>Mother's education <small>(highest)</small><select id="motherEdu" class="req"></select></label>
+   <label class="full hide" id="wMEduO">Mother's education — specify<input id="motherEduO" maxlength="40"></label>
    <label>Mother's mobile <small>(optional)</small><input id="motherMob" inputmode="numeric" maxlength="10"></label>
    <label>Guardian's name <small>(only if different from parents)</small><input id="guardian" maxlength="80"></label>
    <label>Primary contact mobile <small>(school will call / SMS here)</small><input id="mobile" class="key req" inputmode="numeric" maxlength="10" placeholder="10 digits"></label>
@@ -132,9 +157,9 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
   <div class="grid">
    <label class="full">Name of last school<input id="prevSchool" class="req" maxlength="100"></label>
    <label class="full">Address of last school<input id="prevAddr" class="req" maxlength="120"></label>
-   <label>Last class passed<input id="prevClass" class="req" maxlength="20" placeholder="e.g. IV, VIII"></label>
+   <label>Last class passed<select id="prevClass" class="req"></select></label>
    <label>Board / type<select id="prevBoard" class="req"><option value="">— select —</option><option>WBBPE (Primary)</option><option>WBBSE</option><option>WBCHSE</option><option>CBSE</option><option>ICSE</option><option>Madrasah</option><option>Private / Other</option></select></label>
-   <label>Year of passing<input id="prevYear" class="req" inputmode="numeric" maxlength="4"></label>
+   <label>Year of passing<select id="prevYear" class="req"></select></label>
    <label>Marks / percentage obtained<input id="prevMarks" class="req" maxlength="20"></label>
    <label>Transfer Certificate (TC) no.<input id="tcNo" class="req" maxlength="30"></label>
    <label>TC date<input id="tcDate" class="req" type="date"></label>
@@ -146,7 +171,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
   <p class="note">Student's own / joint account with parent. Used only for scholarship &amp; Kanyashree payments.</p>
   <div class="grid">
    <label>Account holder name<input id="accName" maxlength="80"></label>
-   <label>Bank &amp; branch<input id="bank" maxlength="80"></label>
+   <label>Bank &amp; branch <small>(choose or type)</small><input id="bank" maxlength="80" list="bkl"></label><datalist id="bkl"><option value="State Bank of India"><option value="Bandhan Bank"><option value="United Bank of India (PNB)"><option value="UCO Bank"><option value="Punjab National Bank"><option value="Bank of Baroda"><option value="Central Bank of India"><option value="Canara Bank"><option value="Bangiya Gramin Vikash Bank"><option value="India Post Payments Bank"><option value="Post Office Savings Account"><option value="HDFC Bank"><option value="Bankura Central Co-operative Bank"></datalist>
    <label>Account number<input id="accNo" inputmode="numeric" maxlength="20"></label>
    <label>IFSC code<input id="ifsc" maxlength="11" style="text-transform:uppercase"></label>
   </div>
@@ -194,6 +219,7 @@ button.sec{padding:10px 16px;border:0;border-radius:10px;background:#e1e9e3;colo
   <p class="note">Bring these originals when called for verification:</p>
   <ul class="docs"><li>Birth certificate / age proof</li><li>Transfer Certificate &amp; last mark-sheet / progress report, Madhyamik admit card &amp; mark-sheet</li><li>Caste certificate (if SC / ST / OBC)</li><li>Aadhaar of student &amp; parent, passport-size photos (2)</li><li>Bank passbook copy (if account given), Kanyashree / disability documents (if applicable)</li></ul>
   <label class="chk" style="margin-top:12px"><input type="checkbox" id="decl"> I declare that the information given above is true and complete. I understand that this is only an application: admission is confirmed only after verification by the school staff and approval by the Headmaster / Admin.</label>
+  <p class="note bn" style="margin:6px 0 10px">আমি ঘোষণা করছি যে উপরের সব তথ্য সত্য ও সম্পূর্ণ। এটি কেবল আবেদন — স্কুলের যাচাই ও প্রধান শিক্ষকের অনুমোদনের পরই ভর্তি নিশ্চিত হবে।</p>
   <input class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
   <button class="submit" id="btn" type="submit">Submit application</button>
   <p class="err" id="err"></p>
@@ -355,10 +381,12 @@ const VILLAGES=[
 const DRIVE_URL='https://script.google.com/macros/s/AKfycbyzuDKWOq2gD_Sre3zy-tcwwlSR64u5GTTyJpyhb2xnXYdw0cwmiuDFM1ArFh1ADslFTg/exec';
 const DRIVE_KEY='tfhs-adm-7Qx92Lm4';
 const $=id=>document.getElementById(id);
-const qs=new URLSearchParams(location.search),YEAR=+qs.get('y')||new Date().getFullYear()+1;
-const SES=YEAR+'-'+String(YEAR+1).slice(-2);
-$('ses').textContent=(XI?'Admission application — Class XI':'Admission application — Classes V to X')+' — Session '+SES;
-document.title='Admission Application '+(XI?'XI ':'')+SES+' — TFHS';
+const qs=new URLSearchParams(location.search);let YEAR=+qs.get('y')||new Date().getFullYear()+1,SES='';
+function paint(){SES=YEAR+'-'+String(YEAR+1).slice(-2);
+ const cl=(typeof CFGV!=='undefined'&&CFGV.classes&&CFGV.classes.length)?['V','VI','VII','VIII','IX','X'].filter(x=>CFGV.classes.indexOf(x)>=0):[];
+ const lab=XI?'Class XI':(cl.length?(cl.length>1?'Classes '+cl[0]+' to '+cl[cl.length-1]:'Class '+cl[0]):'Classes V to IX');
+ $('ses').textContent='Admission application — '+lab+' — Session '+SES;
+ document.title='Admission Application '+(XI?'XI ':'')+SES+' — TFHS'}
 let db=null;try{if(typeof firebase!=='undefined'){const a=firebase.apps.find(x=>x.name==='adm')||firebase.initializeApp(CFG,'adm');db=a.firestore()}}catch(e){}
 let photo='';
 const up=s=>String(s||'').trim().replace(/\s+/g,' ').toUpperCase();
@@ -372,8 +400,19 @@ const OCC=['NA','Farmer / Agriculture','Agricultural labourer','Daily wage labou
 fill('fatherOcc',OCC);fill('motherOcc',OCC);
 fill('guardianRel',['Father','Mother','Guardian','Brother','Sister','Grandfather','Grandmother','Uncle','Aunt','Other']);
 fill('medium',XI?['Bengali','Santali']:['Bengali','Santali','English','Other']);
-if(!XI)fill('cls',['V','VI','VII','VIII','IX','X']);
+if(!XI)fill('cls',[]);
 $('vl').innerHTML=VILLAGES.map(x=>'<option value="'+x.v+'">').join('');
+
+/* ===== Dropdown lists (value stays English so the portal / register keep working; label is bilingual) ===== */
+function fillB(id,arr){const cur=$(id).value;$(id).innerHTML='<option value="">— select / বাছুন —</option>'+arr.map(x=>{const a=Array.isArray(x)?x:[x,''];return '<option value="'+a[0]+'">'+a[0]+(a[1]?' — '+a[1]:'')+'</option>'}).join('');if(cur)$(id).value=cur}
+const OCCB=[['NA','প্রযোজ্য নয় / নেই'],['Farmer / Agriculture','কৃষক / চাষি'],['Agricultural labourer','কৃষি শ্রমিক'],['Daily wage labourer','দিনমজুর'],['Migrant worker','পরিযায়ী শ্রমিক'],['Business / Shop','ব্যবসা / দোকান'],['Small trader / Hawker','ছোট ব্যবসায়ী / ফেরিওয়ালা'],['Private service','বেসরকারি চাকরি'],['Government service','সরকারি চাকরি'],['Teacher','শিক্ষক / শিক্ষিকা'],['Doctor / Health worker','চিকিৎসক / স্বাস্থ্যকর্মী'],['Police / Army / Security','পুলিশ / সেনা / নিরাপত্তাকর্মী'],['Driver','চালক'],['Mechanic / Electrician / Mason','মিস্ত্রি / ইলেকট্রিশিয়ান / রাজমিস্ত্রি'],['Artisan / Craftsman / Tailor','কারিগর / দর্জি'],['Anganwadi / ASHA / Cook / Helper','অঙ্গনওয়াড়ি / আশা / রাঁধুনি / সহায়িকা'],['Home-based work (bidi, etc.)','বাড়িতে কাজ (বিড়ি ইত্যাদি)'],['Retired / Pensioner','অবসরপ্রাপ্ত / পেনশনভোগী'],['Homemaker / Housewife','গৃহিণী'],['Unemployed','বেকার'],['Deceased','প্রয়াত'],['Other','অন্যান্য (লিখুন)']];
+const EDUB=[['NA','প্রযোজ্য নয় / প্রয়াত'],['Illiterate','নিরক্ষর'],['Can read & write (no schooling)','সাক্ষর (স্কুলে পড়েননি)'],['Primary (up to Class IV)','প্রাথমিক (চতুর্থ শ্রেণি পর্যন্ত)'],['Class V – VIII','পঞ্চম – অষ্টম শ্রেণি'],['Class IX – X (not passed Madhyamik)','নবম – দশম (মাধ্যমিক পাশ নয়)'],['Madhyamik pass','মাধ্যমিক পাশ'],['Higher Secondary (XII) pass','উচ্চ মাধ্যমিক পাশ'],['ITI / Diploma / Polytechnic','আইটিআই / ডিপ্লোমা'],['Graduate (BA / BSc / BCom etc.)','স্নাতক'],['Post-graduate','স্নাতকোত্তর'],['Professional degree (B.Ed / Engg / Medical / Law etc.)','পেশাদার ডিগ্রি (B.Ed / ইঞ্জিনিয়ারিং / মেডিক্যাল / আইন ইত্যাদি)'],['Other','অন্যান্য (লিখুন)']];
+fillB('fatherOcc',OCCB);fillB('motherOcc',OCCB);fillB('fatherEdu',EDUB);fillB('motherEdu',EDUB);
+fillB('prevClass',XI?['X','Other']:['IV','V','VI','VII','VIII','IX','X','Other']);
+function yrOpts(){const a=[];for(let i=0;i<6;i++)a.push(String(YEAR-i));fillB('prevYear',a);if(XI)fill('mpYear',a)}
+yrOpts();
+[['fatherOcc','wFOccO'],['motherOcc','wMOccO'],['fatherEdu','wFEduO'],['motherEdu','wMEduO']].forEach(p=>$(p[0]).addEventListener('change',()=>$(p[1]).classList.toggle('hide',$(p[0]).value!=='Other')));
+
 function cond(){
  $('wKanya').classList.toggle('hide',$('sex').value!=='Female');
  $('wDisab').classList.toggle('hide',$('disab').value!=='Yes');
@@ -457,6 +496,84 @@ $('sign').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;c
   im.onerror=()=>{$('err').textContent='Could not read that signature image. Please use a JPG or PNG.'};im.src=r.result};
  r.readAsDataURL(f)});
 $('signClr').addEventListener('click',()=>{signImg='';$('sign').value='';$('sv').src=SIGN_BLANK});
+
+const BN={cls:'ভর্তির শ্রেণি',medium:'শিক্ষার মাধ্যম',stream:'স্ট্রিম (বিভাগ)',name:'ছাত্র/ছাত্রীর পূর্ণ নাম (জন্ম সনদ অনুযায়ী, ইংরেজিতে)',nameBn:'বাংলায় নাম (ঐচ্ছিক)',sex:'লিঙ্গ',dob:'জন্ম তারিখ',pob:'জন্মস্থান (গ্রাম/শহর, জেলা)',nationality:'জাতীয়তা',nationalityO:'জাতীয়তা লিখুন',religion:'ধর্ম',tongue:'মাতৃভাষা',tongueO:'মাতৃভাষা লিখুন',caste:'জাতি / শ্রেণি (GEN/OBC/SC/ST)',casteCert:'জাতিগত শংসাপত্র নম্বর (SC/ST/OBC হলে)',blood:'রক্তের গ্রুপ (ঐচ্ছিক)',sikshaId:'বাংলার শিক্ষা পোর্টাল আইডি (১৪ সংখ্যা)',aadhaar:'ছাত্র/ছাত্রীর আধার নম্বর (১২ সংখ্যা)',kanya:'কন্যাশ্রী আইডি / আবেদন নম্বর (ছাত্রী, থাকলে)',disab:'বিশেষভাবে সক্ষম?',disabType:'প্রতিবন্ধকতার ধরন ও শতাংশ (UDID থাকলে)',bpl:'পরিবার কি দারিদ্র্যসীমার নিচে (BPL/AAY)?',bplNo:'BPL / রেশন কার্ড নম্বর',
+father:'পিতার নাম',fatherOcc:'পিতার পেশা (না থাকলে NA)',fatherOccO:'পিতার পেশা লিখুন',fatherEdu:'পিতার শিক্ষাগত যোগ্যতা (সর্বোচ্চ)',fatherEduO:'পিতার শিক্ষাগত যোগ্যতা লিখুন',fatherMob:'পিতার মোবাইল (ঐচ্ছিক)',mother:'মাতার নাম',motherOcc:'মাতার পেশা (না থাকলে NA)',motherOccO:'মাতার পেশা লিখুন',motherEdu:'মাতার শিক্ষাগত যোগ্যতা (সর্বোচ্চ)',motherEduO:'মাতার শিক্ষাগত যোগ্যতা লিখুন',motherMob:'মাতার মোবাইল (ঐচ্ছিক)',guardian:'অভিভাবকের নাম (পিতা-মাতা ভিন্ন হলে)',mobile:'প্রধান যোগাযোগের মোবাইল (স্কুল এই নম্বরে ফোন/SMS করবে)',guardianRel:'যোগাযোগকারীর সঙ্গে ছাত্র/ছাত্রীর সম্পর্ক',whatsapp:'হোয়াটসঅ্যাপ নম্বর (আলাদা হলে)',income:'বার্ষিক পারিবারিক আয়',email:'ইমেল (ঐচ্ছিক)',
+village:'গ্রাম / শহর',po:'ডাকঘর',ps:'থানা',block:'ব্লক',dist:'জেলা',pin:'পিন কোড',state:'রাজ্য',transport:'স্কুলে কীভাবে আসে',permAddr:'স্থায়ী ঠিকানা',
+prevSchool:'শেষ যে স্কুলে পড়েছে তার নাম',prevAddr:'সেই স্কুলের ঠিকানা',prevClass:'শেষ পাশ করা শ্রেণি',prevBoard:'বোর্ড / স্কুলের ধরন',prevYear:'পাশের সাল',prevMarks:'প্রাপ্ত নম্বর / শতাংশ',tcNo:'ছাড়পত্র (TC) নম্বর',tcDate:'TC-র তারিখ',sibling:'ভাই/বোন এই স্কুলে পড়ে? (নাম ও শ্রেণি)',
+accName:'অ্যাকাউন্ট হোল্ডারের নাম',bank:'ব্যাংক ও শাখা',accNo:'অ্যাকাউন্ট নম্বর',ifsc:'IFSC কোড',photo:'ছাত্র/ছাত্রীর পাসপোর্ট সাইজ ছবি (আবশ্যিক)',sign:'ছাত্র/ছাত্রীর স্বাক্ষরের ছবি (ঐচ্ছিক)',
+mpRoll:'মাধ্যমিকের রোল ও নম্বর',mpYear:'মাধ্যমিক পাশের সাল',mpMarks:'মোট প্রাপ্ত নম্বর (৭০০-র মধ্যে)',mpPct:'মাধ্যমিক শতাংশ (নিজে থেকে হবে)',mpMA:'গণিত (১০০-র মধ্যে)',mpPS:'ভৌতবিজ্ঞান (১০০-র মধ্যে)',mpLS:'জীবনবিজ্ঞান (১০০-র মধ্যে)',mpGE:'ভূগোল (১০০-র মধ্যে)',lang1:'ভাষা ১ (নিজে থেকে)',lang2:'ভাষা ২ (নিজে থেকে)',trade:'বৃত্তিমূলক ট্রেড / কোর্স',el1:'ঐচ্ছিক বিষয় ১',el2:'ঐচ্ছিক বিষয় ২',el3:'ঐচ্ছিক বিষয় ৩',opt:'অতিরিক্ত ঐচ্ছিক বিষয় (বাধ্যতামূলক নয়)'};
+const BNH=[[/Admission sought/,'ভর্তির বিবরণ'],[/Student details/,'ছাত্র/ছাত্রীর তথ্য — * চিহ্নিত ঘর আবশ্যিক'],[/Parents/,'পিতা-মাতা / অভিভাবকের তথ্য'],[/Address/,'ঠিকানা — পিন কোড বা গ্রামের নাম লিখুন'],[/Previous school/,'পূর্বের স্কুলের তথ্য — সব ঘর আবশ্যিক'],[/Bank account/,'বৃত্তির জন্য ব্যাংক অ্যাকাউন্ট (ঐচ্ছিক)'],[/Madhyamik/,'মাধ্যমিক পরীক্ষার ফল'],[/Subjects for/,'একাদশ শ্রেণির বিষয় বাছাই'],[/Photo/,'ছবি ও ঘোষণা']];
+function addBn(){
+ Object.keys(BN).forEach(function(id){var el=$(id);if(!el)return;var l=el.closest('label');if(!l||l.querySelector(':scope>.bn'))return;
+  var sp=document.createElement('span');sp.className='bn';sp.textContent=BN[id];
+  var t=null;for(var n=l.firstChild;n;n=n.nextSibling){if(n.nodeType===3&&n.textContent.trim()){t=n;break}}
+  if(t)l.insertBefore(sp,t.nextSibling);else l.insertBefore(sp,l.firstChild)});
+ document.querySelectorAll('.card>h2').forEach(function(h){if(h.querySelector('.bnh'))return;var tx=h.textContent;
+  for(var i=0;i<BNH.length;i++){if(BNH[i][0].test(tx)){var s=document.createElement('span');s.className='bnh';s.textContent='· '+BNH[i][1];h.appendChild(s);break}}})}
+
+
+/* ===== Instructions popup (Bengali + English) ===== */
+function insHTML(){
+ const cl=(CFGV.classes&&CFGV.classes.length)?CL_ORDER.filter(x=>CFGV.classes.indexOf(x)>=0):[];
+ const what=XI?'একাদশ শ্রেণি (Class XI)':('পঞ্চম থেকে নবম শ্রেণি (Classes '+(cl.length?cl.join(', '):'V to IX')+')');
+ const L=XI?[
+  ['মাধ্যমিক পরীক্ষার ফল প্রকাশের পর এই আবেদন করা যাবে। মাধ্যমিকের মার্কশিট দেখে রোল-নম্বর ও প্রতিটি বিষয়ের নম্বর হুবহু লিখুন।','Apply only after the Madhyamik result. Copy the roll number and marks exactly from the mark-sheet.'],
+  ['স্ট্রিম বাছুন (Science / Arts / Vocational)। বিষয় বাছাই মাধ্যমিকের নম্বরের উপর নির্ভর করে — যে বিষয়ে ন্যূনতম ৩৫ নম্বর নেই তা বাছা যাবে না।','Choose a stream. Electives depend on Madhyamik marks — a subject is locked unless the minimum 35 is met.'],
+  ['ন্যূনতম ৫টি বিষয় লাগবে: ২টি ভাষা (নিজে থেকে আসবে) + ৩টি ঐচ্ছিক বিষয়।','Minimum 5 subjects: 2 languages (automatic) + 3 electives.'],
+  ['ভর্তি মাধ্যমিকের শতাংশের মেধাক্রম ও আসন সংখ্যার উপর নির্ভর করবে — আবেদন করলেই ভর্তি নিশ্চিত নয়।','Admission is by merit (Madhyamik %) and available seats — applying does not guarantee admission.']
+ ]:[
+  ['নিচের ফর্মে ছাত্র/ছাত্রীর সব তথ্য সঠিকভাবে পূরণ করুন। * চিহ্নিত ঘর আবশ্যিক।','Fill every detail carefully. Fields marked * are compulsory.'],
+  ['শেষ স্কুলের ছাড়পত্র (TC) নম্বর ও তারিখ, শেষ পাশ করা শ্রেণি ও সাল লাগবে।','You need the Transfer Certificate (TC) number and date, last class passed and year.'],
+  ['ভর্তির শ্রেণি ও মাধ্যম (বাংলা/সাঁওতালি/ইংরেজি) ঠিকমতো বাছুন।','Choose the class and medium correctly.']
+ ];
+ const C=[
+  ['হাতের কাছে রাখুন: জন্ম সনদ, শেষ স্কুলের TC ও মার্কশিট/প্রগ্রেস রিপোর্ট, ছাত্র/ছাত্রীর আধার, বাংলার শিক্ষা পোর্টাল আইডি (১৪ সংখ্যা), পিতা-মাতার আধার, পাসপোর্ট সাইজ ছবি, জাতিগত শংসাপত্র (SC/ST/OBC হলে)।','Keep ready: birth certificate, TC & last mark-sheet, student Aadhaar, 14-digit Banglar Siksha Portal ID, parent Aadhaar, passport photo, caste certificate (if SC/ST/OBC).'],
+  ['নাম ইংরেজিতে জন্ম সনদ অনুযায়ী লিখুন — বড় হাতের অক্ষরে নিজে থেকে হবে।','Write the name in English exactly as in the birth certificate (capitals are automatic).'],
+  ['পিতা-মাতার পেশা ও শিক্ষাগত যোগ্যতা তালিকা থেকে বাছুন। তালিকায় না থাকলে “Other / অন্যান্য” বেছে নিজে লিখুন।','Choose parents\' occupation and education from the list; pick “Other” and type if not listed.'],
+  ['ঠিকানার জন্য পিন কোড বা গ্রামের নাম লিখুন — বাকি ঘর নিজে থেকে ভরবে; ঠিক আছে কিনা দেখে নিন।','Type the PIN code or village; the other address boxes fill automatically — please check them.'],
+  ['মোবাইল নম্বর ১০ সংখ্যার হতে হবে। যে নম্বরে স্কুল ফোন করবে সেটাই দিন।','Mobile must be 10 digits. Give the number on which the school can reach you.'],
+  ['একই পোর্টাল আইডি দিয়ে দ্বিতীয়বার আবেদন করা যাবে না।','The same Portal ID cannot apply twice.'],
+  ['ভুল বা মিথ্যা তথ্য দিলে আবেদন বাতিল হবে। এটি কেবল আবেদন — স্কুলের যাচাই ও প্রধান শিক্ষকের অনুমোদনের পরই ভর্তি নিশ্চিত হবে।','False or wrong information leads to rejection. This is only an application — admission is confirmed after school verification and Headmaster approval.'],
+  ['জমা দেওয়ার পর রেফারেন্স নম্বর লিখে/ছবি তুলে রাখুন। স্কুল ফোন করলে মূল নথিপত্র নিয়ে আসবেন।','After submitting, save the reference number. Bring the original documents when the school calls.']
+ ];
+ const li=a=>a.map(x=>'<li>'+x[0]+'<i>'+x[1]+'</i></li>').join('');
+ return '<div class="box"><div class="hd"><h2>ভর্তির আবেদন — শিক্ষাবর্ষ '+SES+'</h2><p>Taldangra Fulmati High School [H.S.] · Admission '+SES+' · '+(XI?'Class XI':'Classes '+(cl.length?cl.join(', '):'V – IX'))+'</p></div>'+
+  '<div class="bd"><p style="margin:2px 0 6px;font-weight:700">'+what+'-এ ভর্তির অনলাইন আবেদন। অনুগ্রহ করে নির্দেশাবলী মন দিয়ে পড়ুন।</p><ol>'+li(L)+li(C)+'</ol>'+
+  '<div class="warn">⚠ <b>সতর্কতা:</b> ভুয়া বা অন্যের তথ্য দিয়ে আবেদন করলে তা বাতিল হবে ও আইনানুগ ব্যবস্থা নেওয়া হতে পারে।<br><small style="font-family:Segoe UI,Arial">Fake or someone else\'s details will be rejected and may lead to action.</small></div></div>'+
+  '<div class="ft"><label><input type="checkbox" id="insOk"><span>আমি নির্দেশাবলী পড়েছি ও বুঝেছি।<br><small style="font-weight:500;color:#5a6b60;font-family:Segoe UI,Arial">I have read and understood the instructions.</small></span></label>'+
+  '<button class="submit" id="insGo" type="button" disabled>ফর্ম পূরণ শুরু করুন / Start the form</button></div></div>'}
+function showIns(first){
+ const m=$('ins');m.innerHTML=insHTML();m.classList.remove('hide');document.body.style.overflow='hidden';
+ const ok=$('insOk'),go=$('insGo');ok.addEventListener('change',()=>go.disabled=!ok.checked);
+ go.addEventListener('click',()=>{m.classList.add('hide');m.innerHTML='';document.body.style.overflow='';if(first)T0=Date.now()})}
+$('insBtn').addEventListener('click',()=>showIns(false));
+
+/* ===== Admin ON / OFF gate: reads admConfig/main (written from the portal by the Admin) ===== */
+const FK=XI?'xi':'gen',CL_ORDER=['V','VI','VII','VIII','IX','X'];let CFGV={},T0=0,OPENED=false;
+const fdt=m=>new Date(m).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+function whyClosed(c){const n=Date.now();
+ if(c.open!==true)return 'off';if(+c.year!==YEAR)return 'year';if(c.from&&n<c.from)return 'early';if(c.to&&n>c.to)return 'late';
+ if(!XI&&!(c.classes&&c.classes.length))return 'off';return ''}
+function gateShow(h){$('f').classList.add('hide');$('done').innerHTML='';const g=$('gate');g.classList.remove('hide');g.innerHTML=h}
+function showClosed(why,c){
+ const T={off:XI?['একাদশ শ্রেণিতে ভর্তির আবেদন এখনও শুরু হয়নি / বন্ধ আছে।','Class XI online admission is not open yet (it opens after the Madhyamik result is published).']:['বর্তমানে ভর্তির অনলাইন আবেদন বন্ধ আছে।','Online admission applications are currently CLOSED.'],
+  year:['এই লিংকটি অন্য শিক্ষাবর্ষের। বিদ্যালয়ের সর্বশেষ লিংক ব্যবহার করুন।','This link is for a different session. Please use the latest link from the school.'],
+  early:['আবেদন শুরু হবে: '+(c.from?fdt(c.from):''),'Applications will open on '+(c.from?fdt(c.from):'')],
+  late:['আবেদনের সময়সীমা শেষ হয়েছে ('+(c.to?fdt(c.to):'')+')।','The application window closed on '+(c.to?fdt(c.to):'')+'.']}[why];
+ gateShow('<div class="card gate"><h2>🔒 '+T[0]+'</h2><p>'+T[1]+'</p>'+(c.note?'<p class="warn" style="background:#fff3c4;border:1px solid #b78600;border-radius:10px;padding:8px 12px"><b>'+esc(c.note)+'</b></p>':'')+'<p class="bnb">বিস্তারিত জানতে স্কুল অফিসে যোগাযোগ করুন — ফোন: 03243-265114</p><p style="font-size:12.5px;color:#5a6b60">For details contact the school office: 03243-265114</p></div>')}
+function gateErr(m){gateShow('<div class="card gate"><h2>⚠ '+m+'</h2><p class="bnb">ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।</p><p><button class="sec" type="button" id="gRetry">↻ আবার চেষ্টা করুন / Retry</button></p></div>');$('gRetry').onclick=loadGate}
+async function fetchCfg(){const sn=await db.collection('admConfig').doc('main').get();return sn.exists?(sn.data()[FK]||{}):{}}
+async function loadGate(){
+ gateShow('<div class="card gate chk"><h2>⏳ যাচাই করা হচ্ছে… / Checking…</h2></div>');
+ if(!db){gateErr('Cannot connect to the school server');return}
+ let c;try{c=await fetchCfg()}catch(e){gateErr('Could not check whether admission is open');return}
+ CFGV=c;if(!qs.get('y')&&+c.year){YEAR=+c.year;paint();yrOpts()}
+ const w=whyClosed(c);if(w){showClosed(w,c);return}
+ const allowed=CL_ORDER.filter(x=>(c.classes||[]).indexOf(x)>=0);
+ if(!XI){fill('cls',allowed);if(allowed.length===1)$('cls').value=allowed[0];paint()}
+ $('gate').classList.add('hide');$('gate').innerHTML='';$('f').classList.remove('hide');OPENED=true;showIns(true)}
+
 /* Aadhaar checksum (Verhoeff) */
 const VD=[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
 const VP=[[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
@@ -496,7 +613,7 @@ function drawSubj(){
 function pct(){const v=val('mpMarks');$('mpPct').value=/^\d+$/.test(v)&&+v<=700?(+v/7).toFixed(2)+' %':''}
 if(XI){
  fill('stream',['Science','Arts','Vocational']);
- const y=new Date().getFullYear();fill('mpYear',[y,y-1,y-2,y-3,y-4,y-5]);
+ 
  $('stream').addEventListener('change',()=>{SLOTS.forEach(s=>$(s).value='');drawSubj()});
  $('medium').addEventListener('change',()=>{if(!val('tongue')){$('tongue').value=val('medium')==='Santali'?'Santali':'Bengali';cond()}drawSubj()});
  ['mpMA','mpPS','mpLS','mpGE','trade'].forEach(i=>$(i).addEventListener('input',drawSubj));
@@ -525,6 +642,10 @@ function check(){
  if(val('father').length<2)E('father','Enter father\'s name.');
  if(!val('fatherOcc'))E('fatherOcc','Select father\'s occupation (NA if none).');
  if(!val('motherOcc'))E('motherOcc','Select mother\'s occupation (NA if none).');
+ [['fatherOcc',"father's occupation"],['motherOcc',"mother's occupation"],['fatherEdu',"father's education"],['motherEdu',"mother's education"]].forEach(p=>{if(val(p[0])==='Other'&&val(p[0]+'O').length<2)E(p[0]+'O','Specify '+p[1]+'.')});
+ if(!val('fatherEdu'))E('fatherEdu','Select father\'s education (NA if none).');
+ if(!val('motherEdu'))E('motherEdu','Select mother\'s education (NA if none).');
+ if(!XI&&val('cls')&&(CFGV.classes||[]).indexOf(val('cls'))<0)E('cls','This class is not open for admission.');
  if(!/^[6-9]\d{9}$/.test(val('mobile')))E('mobile','Primary contact mobile must be a valid 10-digit number.');
  if(!val('guardianRel'))E('guardianRel','Select the relation of the primary contact person with the student.');
  ['fatherMob','motherMob','whatsapp'].forEach(i=>{if(val(i)&&!/^[6-9]\d{9}$/.test(val(i)))E(i,'Mobile number in "'+i.replace(/([A-Z])/g,' $1').toLowerCase()+'" must be a valid 10-digit number.')});
@@ -565,7 +686,10 @@ $('f').addEventListener('submit',async ev=>{
  if($('hp').value)return;
  const er=check();if(er.length){$('err').textContent='Please fix:\n• '+er.join('\n• ');const b=document.querySelector('.bad');if(b)b.scrollIntoView({behavior:'smooth',block:'center'});return}
  if(!db){$('err').textContent='Cannot connect to the school server. Check your internet and try again.';return}
+ if(!OPENED||(Date.now()-T0)<60000){$('err').textContent='Please re-check all details once more, then press Submit. / সব তথ্য আরেকবার মিলিয়ে নিয়ে তারপর জমা দিন।';return}
+ try{const fc=await fetchCfg();const w=whyClosed(fc);if(w){showClosed(w,fc);return}if(!XI&&(fc.classes||[]).indexOf(val('cls'))<0){$('err').textContent='This class is not open for admission.';return}}catch(e){$('err').textContent='Could not confirm that admission is open. Please try again.';return}
  const d={year:YEAR,status:'pending'};IDS.forEach(i=>{d[i]=val(i)});
+ ['fatherOcc','motherOcc','fatherEdu','motherEdu'].forEach(k=>{if(d[k]==='Other')d[k]='Other: '+val(k+'O')});
  if(d.nationality==='Other')d.nationality=up(val('nationalityO'));
  if(d.tongue==='Other')d.tongue=up(val('tongueO'));
  ['name','father','mother','guardian','accName'].forEach(k=>d[k]=up(d[k]));d.ifsc=up(d.ifsc);
@@ -583,6 +707,7 @@ $('f').addEventListener('submit',async ev=>{
   $('done').innerHTML='<div class="card ack"><h2 style="justify-content:center">✔ Application received</h2><div>Your application reference number</div><div class="ref">'+esc(d.ref)+'</div>'+
    '<table><tr><td>Student</td><td><b>'+esc(d.name)+'</b></td></tr><tr><td>Class applied</td><td>'+esc(d.cls)+(d.stream?' ('+esc(d.stream)+')':'')+'</td></tr><tr><td>Portal ID</td><td>'+esc(d.sikshaId)+'</td></tr><tr><td>Date of birth</td><td>'+esc(d.dob)+'</td></tr><tr><td>Father</td><td>'+esc(d.father)+'</td></tr><tr><td>Contact</td><td>'+esc(d.mobile)+'</td></tr><tr><td>Session</td><td>'+SES+'</td></tr></table>'+
    '<p style="font-size:13.5px">Please keep this reference number. The school will <b>verify</b> your application (staff) and then it will be <b>approved</b> (Headmaster / Admin). You will be called on <b>'+esc(d.mobile)+'</b> to bring the original documents.</p>'+
+   '<p style="font-size:13.5px">আপনার আবেদন গৃহীত হয়েছে। রেফারেন্স নম্বরটি লিখে বা ছবি তুলে রাখুন। যাচাই ও অনুমোদনের পর স্কুল আপনাকে ফোন করবে — তখন মূল নথিপত্র নিয়ে আসবেন।</p>'+
    '<p class="no-print"><button class="sec" onclick="window.print()">🖨 Print / Save acknowledgement</button></p></div>';
   window.scrollTo(0,0);
   if(DRIVE_URL){try{fetch(DRIVE_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:DRIVE_KEY,session:SES,cls:d.cls,stream:d.stream||'',ref:d.ref,portal:d.sikshaId,aadhaar:d.aadhaar,name:d.name,photo:photo})}).catch(()=>{})}catch(x){}}}
@@ -590,6 +715,7 @@ $('f').addEventListener('submit',async ev=>{
   if(e.code==='permission-denied'){$('sikshaId').classList.add('bad');$('err').textContent='An application with Banglar Siksha Portal ID '+d.sikshaId+' has already been submitted for session '+SES+'. A duplicate application is not allowed.\nIf you think this is a mistake, please contact the school.'}
   else $('err').textContent='Could not submit ('+(e.code||e.message)+'). Please try again later or contact the school.'}
 });
+addBn();paint();loadGate();
 </script>
 <style>
 .fh{font-size:11px;font-weight:600;min-height:13px;color:#778}.fh.ok{color:#2b8a3e}.fh.no{color:#c92a2a}
