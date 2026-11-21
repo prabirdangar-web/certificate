@@ -2612,6 +2612,7 @@ body.apply-mode #applyView{display:block;max-width:640px;margin:0 auto;padding:1
    <label>Class <select id="pfCls" onchange="ADM.profDraw()"><option value="">All</option><option>V</option><option>VI</option><option>VII</option><option>VIII</option><option>IX</option><option>X</option><option>XI</option><option>XII</option></select></label>
    <label>Search <input id="pfQ" oninput="ADM.profDraw()" placeholder="name / father / mobile / Portal ID / roll"></label>
   </div>
+  <div class="am-row" id="pfAddRow" style="margin-top:8px"><button class="dv-b" id="pfAddBtn" type="button" style="background:#145828" onclick="ADM.addCur()" title="Admin only: add a student who is missing from the current-year database">➕ Add student (current year)</button><small style="font-weight:700;color:#555">Use when a student is not found in the current-year list.</small></div>
   <p id="pfInfo" class="am-msg" style="margin:8px 0 0"></p><p id="pfMsg" class="am-msg"></p>
   <div id="pfBox" class="am-box"></div>
  </div>
@@ -3322,7 +3323,44 @@ const ADM=(function(){
   let rows=(cur?STUDENT_DB.slice():placed.slice()).filter(s=>(!c||String(s.cls).toUpperCase()===c)&&(!q||up([s.name,s.father,s.mother,s.mobile,s.sikshaId,s.cls+' '+(s.sec||'')+' '+s.roll,s.cls+(s.sec||'')+s.roll].join(' ')).indexOf(q)>=0));
   rows.sort(sorter);const tot=rows.length;rows=rows.slice(0,80);pfRows=rows;
   $('pfInfo').textContent=(cur?'Current database · Year '+TFDB.getYear()+' · '+STUDENT_DB.length+' students':'New session '+ses(yr())+' · '+placed.length+' placed students'+((db&&auth&&auth.currentUser)?'':' (sign in to load)'))+' · '+(tot>rows.length?'showing first '+rows.length+' of '+tot+' — type in Search to narrow':tot+' match(es)');
-  box.innerHTML=rows.length?'<table class="am-t"><tr><th>Class</th><th>Sec</th><th>Roll</th><th>Name</th><th>Father</th><th>Mobile</th><th></th></tr>'+rows.map((s,i)=>'<tr><td>'+esc(s.cls)+'</td><td>'+esc(secOf(s))+'</td><td><b>'+esc(s.roll)+'</b></td><td class="l"><b>'+esc(s.name)+'</b></td><td class="l">'+esc(s.father)+'</td><td>'+esc(s.mobile)+'</td><td><button class="dv-b" onclick="ADM.edit(\''+(cur?'c\','+i:'s\',\''+s._id+'\'')+')">✎ Edit</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No student found.</p>'}
+  box.innerHTML=rows.length?'<table class="am-t"><tr><th>Class</th><th>Sec</th><th>Roll</th><th>Name</th><th>Father</th><th>Mobile</th><th></th></tr>'+rows.map((s,i)=>'<tr><td>'+esc(s.cls)+'</td><td>'+esc(secOf(s))+'</td><td><b>'+esc(s.roll)+'</b></td><td class="l"><b>'+esc(s.name)+'</b></td><td class="l">'+esc(s.father)+'</td><td>'+esc(s.mobile)+'</td><td><button class="dv-b" onclick="ADM.edit(\''+(cur?'c\','+i:'s\',\''+s._id+'\'')+')">✎ Edit</button></td></tr>').join('')+'</table>':'<p style="padding:10px;font-size:13px">No student found.'+(cur?' <button class="dv-b" type="button" onclick="ADM.addCur()">➕ Add this student to current year</button>':'')+'</p>';
+  const ar=$('pfAddRow');if(ar)ar.style.display=cur?'flex':'none'}
+
+ /* ---------- ADMIN-ONLY: add a missing student to the CURRENT-YEAR database (Admission view only) ---------- */
+ async function addCur(){
+  if(!need('pfMsg'))return;await roleP;
+  if(!isAdmin()){msg('Only admin can add a student.',true,'pfMsg');alert('Only an ADMIN login can add a student to the current-year database.');return}
+  const c0=$('pfCls').value||'X',q=String($('pfQ').value||'').trim(),nm=/^[A-Za-z .]{3,}$/.test(q)?up(q):'';
+  const sel=(id,arr,v)=>'<select id="'+id+'">'+arr.map(x=>'<option value="'+esc(x)+'"'+(x===v?' selected':'')+'>'+(x===''?'—':esc(x))+'</option>').join('')+'</select>';
+  let m=$('addModal');if(!m){m=document.createElement('div');m.id='addModal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto';document.body.appendChild(m)}
+  m.style.display='flex';
+  const H=t=>'<h3 style="margin:10px 0 6px;color:#145828;border-bottom:1px solid #ccc">'+t+'</h3>';
+  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:820px;width:100%;padding:16px 20px;font-family:Segoe UI,Arial,sans-serif;color:#1d2b22"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #ddd;padding-bottom:8px"><h2 style="margin:0;flex:1;font-size:17px">➕ Add student — current year '+esc(TFDB.getYear())+'</h2><button class="dv-b" type="button" onclick="ADM.saveAdd()">💾 Save student</button><button class="dv-b g" type="button" onclick="ADM.closeAdd()">Cancel</button></div><p id="adMsg" class="am-msg">Fill the details and press Save. Class, section and roll no. are typed by you (no new register serial is used).</p>'+
+   H('Student')+'<div class="ed-g"><label>Name *<input id="ad_name" value="'+esc(nm)+'" autocapitalize="characters"></label><label>Sex'+sel('ad_sex',['Male','Female','Other'],'Male')+'</label><label>Date of birth<input id="ad_dob" type="date"></label><label>Category'+sel('ad_caste',['GENERAL','OBC-A','OBC-B','SC','ST'],'GENERAL')+'</label><label>Medium'+sel('ad_medium',['Bengali','Santali','English','Other'],'Bengali')+'</label><label>Banglar Siksha Portal ID (14 digits)<input id="ad_sikshaId" inputmode="numeric" maxlength="14"></label></div>'+
+   H('Class (current year)')+'<div class="ed-g"><label>Class *'+sel('ad_cls',CLS,c0)+'</label><label>Section'+sel('ad_sec',['','A','B','C'],'A')+'</label><label>Roll no. *<input id="ad_roll" type="number" min="1" inputmode="numeric"></label></div>'+
+   H('Parents / contact')+'<div class="ed-g"><label>Father<input id="ad_father" autocapitalize="characters"></label><label>Mother<input id="ad_mother" autocapitalize="characters"></label><label>Mobile (10 digits)<input id="ad_mobile" inputmode="numeric" maxlength="10"></label></div></div>';
+  setTimeout(()=>{const e=$('ad_name');if(e)e.focus()},50)}
+ function closeAdd(){const m=$('addModal');if(m)m.style.display='none'}
+ async function saveAdd(){
+  if(!need('adMsg'))return;await roleP;if(!isAdmin()){msg('Only admin can add a student.',true,'adMsg');return}
+  const g=k=>String($('ad_'+k).value||'').trim(),bad=t=>{msg(t,true,'adMsg')};
+  const rec={name:up(g('name')),sex:g('sex'),father:up(g('father')),mother:up(g('mother')),cls:g('cls'),sec:g('sec'),roll:String(parseInt(g('roll'),10)||''),dob:g('dob'),sikshaId:g('sikshaId').replace(/\D/g,''),mobile:g('mobile'),caste:g('caste'),medium:g('medium')};
+  if(rec.name.length<3)return bad('Student name is required.');
+  if(!(parseInt(rec.roll,10)>0))return bad('Roll no. must be a positive number.');
+  if(rec.sikshaId&&!/^\d{14}$/.test(rec.sikshaId))return bad('Banglar Siksha Portal ID must be 14 digits.');
+  if(rec.mobile&&!/^\d{10}$/.test(rec.mobile))return bad('Mobile must be 10 digits.');
+  const lab=s=>s.cls+(s.sec?'-'+s.sec:'')+' roll '+s.roll;
+  const same=rec.sikshaId?STUDENT_DB.find(s=>String(s.sikshaId)===rec.sikshaId):null;
+  const clash=STUDENT_DB.find(s=>s!==same&&String(s.cls)===rec.cls&&String(s.sec||'')===rec.sec&&String(s.roll)===rec.roll);
+  if(clash)return bad('Roll '+rec.roll+' is already taken in class '+rec.cls+(rec.sec?'-'+rec.sec:'')+' by '+clash.name+'. Choose another roll no.');
+  let doneMsg;
+  if(same){
+   if(!confirm(same.name+' is ALREADY in the current-year database (Class '+lab(same)+', same Portal ID).\n\nOK = do NOT duplicate; change that student to Class '+lab(rec)+' and update the details you typed.\nCancel = go back.'))return;
+   Object.keys(rec).forEach(k=>{if(rec[k]!=='')same[k]=rec[k]});doneMsg=same.name+' updated to Class '+lab(rec)}
+  else{STUDENT_DB.push(rec);doneMsg=rec.name+' added to Class '+lab(rec)}
+  TFDB.touch();msg('Saving online…',false,'adMsg');
+  const ok=await TFDB.saveOnline();closeAdd();$('pfQ').value=rec.name;profDraw();
+  msg(ok?'Saved ✔ — '+doneMsg+' (year '+TFDB.getYear()+').':'Changed on this screen only — online save FAILED (admin sign-in needed). Reloading will lose it.',!ok,'pfMsg')}
 
  /* ---------- ADMIN-ONLY profile editor (placed students + applications) ---------- */
  let EDIT=null;
@@ -3574,7 +3612,7 @@ const ADM=(function(){
   const w=window.open('','_blank');if(!w){alert('Allow pop-ups to print.');return}
   w.document.write('<html><head><title>XI merit list</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px;color:#000}h2{text-align:center;margin:0}h3{margin:12px 0 2px}table{width:100%;border-collapse:collapse;margin-top:4px}th,td{border:1px solid #000;padding:2px 4px;text-align:left}th{background:#eee}p{margin:2px 0}</style></head><body><h2>TALDANGRA FULMATI HIGH SCHOOL [H.S.]</h2><p style="text-align:center"><b>Class XI admission &mdash; merit / selection list on Madhyamik %, session '+ses(yr())+'</b></p>'+xiHtml(xiRes,true).replace(/class="am-t"/g,'').replace(/ style="color:#[0-9a-f]+;font-weight:700"/g,' style="font-weight:700"')+'<p style="margin-top:26px">Headmaster: ______________</p></body></html>');
   w.document.close();w.focus();setTimeout(()=>w.print(),300)}
- return{xiGen,xiPrint,pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses,ctlLoad,ctlSave}
+ return{xiGen,xiPrint,pubDraw,pubCopy,drawApproved,printApprovedReceipt,qrWa,qrSend,qrPoster,qrDraw,pop,profDraw,addCur,saveAdd,closeAdd,regText,edit,saveEdit,closeEdit,drawRegister,printRegister,csv,assignReg,live,dash,refresh,loadProm,autoRoll,savePromo,revertPromo,wipeTrial,toggleFree,csShow,csPrint,csSave,csShare,csCsv,_p,_a,preview,addNew,receipt,del,toReceipts,copyLink,loadApps,drawApps,verify,approve,view,printApp,admit,reject,delApp,publish,drawPlaced,rows:()=>placed.slice(),year:yr,ses,ctlLoad,ctlSave}
 })();
 </script>
 
