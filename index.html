@@ -969,11 +969,11 @@ body[data-sub="1"] .tf-side button[data-v=marks]{display:none!important}
 <header class="tf-top"><div><h1 id="tfT">Certificate</h1><p id="tfS"></p></div><div class="ad-strip" id="admStrip" onclick="ADM.pop()" title="Live new admissions — click for details"></div><div><span class="tf-chip" id="tfYr"></span><span class="tf-chip" id="tfOn">Offline</span><span class="tf-chip" id="roleChip"></span><button class="dv-b g" style="margin-left:8px" onclick="pt_logout()">Sign Out</button></div></header>
 <div class="ad-pop" id="admPop"><div id="admLiveDash" class="ad-live"></div></div>
 <nav class="tf-side"><div class="br"><div class="lg">🎓</div><div><b>TFHS</b><small>Taldangra Fulmati H.S.</small></div></div>
-<div class="gp">MAIN</div><button data-v="home" class="on"><span class="ic">🏠</span><span class="l">Dashboard</span></button>
+<div class="gp">MAIN</div><button data-v="home" class="on"><span class="ic">🏠</span><span class="l">Dashboard</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button>
 <div class="gp">DAILY</div><button data-v="cert"><span class="ic">📜</span><span class="l">Certificate</span></button>
 <div class="gp">ON DEMAND</div><button data-v="reports"><span class="ic">📊</span><span class="l">Student Reports</span></button><button data-v="wifs"><span class="ic">📝</span><span class="l">WIFS Data Entry</span></button><button data-v="fees"><span class="ic">🧾</span><span class="l">Fee Receipts (Next Yr)</span></button>
 <button data-v="adm"><span class="ic">🎓</span><span class="l">Admission</span></button><button data-v="prom"><span class="ic">🔁</span><span class="l">Promotion</span></button><button data-v="data"><span class="ic">🗄️</span><span class="l">Data &amp; Year</span></button>
-<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="lists"><span class="ic">📋</span><span class="l">Student Lists</span></button><button data-v="k2"><span class="ic">🌸</span><span class="l">Kanyashree K2</span></button><button data-v="idc"><span class="ic">🆔</span><span class="l">Student ID Cards</span></button><button data-v="xiimarks"><span class="ic">🧪</span><span class="l">XII Proj/Prac Marks</span></button>
+<div class="gp">TASKS</div><button data-v="marks"><span class="ic">✏️</span><span class="l">Marks Entry</span></button><button data-v="setup"><span class="ic">✅</span><span class="l">Approvals &amp; Setup</span></button><button data-v="merit"><span class="ic">🏅</span><span class="l">Merit List</span></button><button data-v="k2"><span class="ic">🌸</span><span class="l">Kanyashree K2</span></button><button data-v="idc"><span class="ic">🆔</span><span class="l">Student ID Cards</span></button><button data-v="xiimarks"><span class="ic">🧪</span><span class="l">XII Proj/Prac Marks</span></button>
 <div class="fo"><div id="tfMode">Offline mode</div><button id="tfSign"><span class="ic">👤</span><span class="l">Sign in</span></button><button id="tfCol"><span class="ic">«</span><span class="l">Collapse</span></button></div></nav>
 <div id="tfLogin"><b style="font-size:13px">Firebase sign in</b><input type="email" id="tfE" placeholder="Email" autocomplete="username"><input type="password" id="tfP" placeholder="Password" autocomplete="current-password"><button class="dv-b" type="button" onclick="TFDB.login()">Sign in</button><button class="dv-b" type="button" onclick="pt_googleLogin()">Google</button><button class="dv-b g" type="button" onclick="TFDB.logout()">Sign out</button><span id="tfLm" style="font-size:11px;color:#b00020"></span></div>
 <!-- NEW PANELS -->
@@ -4297,7 +4297,7 @@ function pt_go(v){const b=document.querySelector('.tf-side button[data-v="'+v+'"
 function render(f){const a=document.activeElement;
  if(!f&&a&&a.closest&&a.closest('.tf-new-panel')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  (R[document.body.dataset.view]||(()=>{}))()}
-const RMAP={xiimarks:'atu',home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'a',k2:'au',idc:'au'};
+const RMAP={xiimarks:'atu',home:'atu',cert:'au',reports:'au',wifs:'au',fees:'au',adm:'au',data:'au',prom:'a',marks:'at',setup:'a',merit:'a',lists:'au',k2:'au',idc:'au'};
 document.querySelectorAll('.tf-side button[data-v]').forEach(b=>b.dataset.r=RMAP[b.dataset.v]||'a');
 document.querySelector('.tf-side').addEventListener('click',e=>{if(e.target.closest('button[data-v]'))render(true)});
 
@@ -4306,9 +4306,9 @@ R.home=()=>{
  const T=Object.entries(D.teachers||{}),M=D.marks||{},A=Object.values(D.adm||{}),pa=A.filter(a=>a.status=='pending').length,fin=Object.values(M).filter(m=>m.st=='final').length,me=ME.role;
  const tl=(i,v,l)=>`<div class="tile"><i>${i}</i><b>${v}</b><span>${l}</span></div>`;let tiles,qa;
  if(me=='admin'){tiles=tl('👩‍🏫',T.filter(x=>x[1].status=='approved').length,'Class teachers approved')+tl('⏳',T.filter(x=>x[1].status=='pending').length,'Teacher requests pending')+tl('🔒',fin+' / '+allSecs().length,'Sections finalised (marks)')+tl('📒',Object.values(D.plock||{}).filter(Boolean).length+' / 7','Class registers locked');
-  qa=[['setup','✅ Approvals & Setup'],['merit','🔁 Merit List'],['adm','🎓 Admission'],['cert','📜 Certificate'],['k2','🌸 Kanyashree K2']]}
+  qa=[['lists','📋 Student Lists'],['setup','✅ Approvals & Setup'],['merit','🔁 Merit List'],['adm','🎓 Admission'],['cert','📜 Certificate'],['k2','🌸 Kanyashree K2']]}
  else if(me=='user'){tiles=tl('🎓',STUDENT_DB.length,'Students in database')+tl('📅',(D.session||2027),'Working session');
-  qa=[['cert','📜 Issue Certificate'],['reports','📊 Reports'],['k2','🌸 Kanyashree K2']]}
+  qa=[['lists','📋 Student Lists'],['cert','📜 Issue Certificate'],['reports','📊 Reports'],['k2','🌸 Kanyashree K2']]}
  else{const k=ME.cls+'-'+ME.sec,m=M[k];tiles=tl('🏫',ME.cls+' – '+ME.sec,'Your allotted class'+(ME.med?' · '+ME.med+' medium':''))+tl(m&&m.st=='final'?'🔒':'✏️',m?(m.st=='final'?'Locked':'Draft'):'Not started','Final exam % status')+tl('🎓',STUDENT_DB.filter(s=>s.cls==ME.cls&&s.sec==ME.sec&&(!ME.med||medN(s.medium)==ME.med)).length,'Students in class');qa=[['marks','✏️ Enter % of Marks']]}
  $('homeBody').innerHTML=`<div class="banner"><div><h3>Dashboard</h3><p>${esc(ME.email)} · Session ${D.session||2027}</p></div><span class="bn-role">${({admin:'Admin',user:'User',teacher:'Class Teacher'})[me]||''}</span></div><div class="tiles">${tiles}</div><div class="qa">${qa.map(([v,t])=>`<button class="dv-b" onclick="pt_go('${v}')">${t}</button>`).join('')}</div>`;
 };
