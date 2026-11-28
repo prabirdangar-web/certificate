@@ -5418,6 +5418,22 @@ window.IDC={
     <div id="xrSum" style="font-size:13px;font-weight:700;margin-bottom:6px"></div>
     <div id="xrOut" style="overflow:auto;max-height:560px"></div>
     <div id="xrMsg" class="mut" style="margin-top:6px"></div>
+    <div id="xdBox" style="margin-top:14px;border-top:2px dashed #9bb29d;padding-top:10px">
+      <div style="font-weight:800;color:#8a5600;font-size:14px;margin-bottom:4px">📦 Result Distribution &amp; Semester-IV Form Fill-up Fee Record</div>
+      <div class="mut" style="font-size:12px;margin-bottom:6px">Class XII fees from the WBCHSE fee page (within scheduled date): Lab-based 160 + 45, Non-lab 150 + 45, Special 90 + 45 (exam fee + form processing). School adds Centre fee and Misc fee. Semester-IV enrolment window: 02.12.2026 &ndash; 23.12.2026 (WBCHSE notification dt. 19.11.2026). Uses the Semester / Section / Show / Search filters above.</div>
+      <div class="xii-ctl-bar" style="background:#fff;margin-bottom:8px">
+        <div><label>Exam fee &mdash; Lab-based</label><input id="xdL" type="number" min="0" oninput="TF_XII.dCfg()"></div>
+        <div><label>Exam fee &mdash; Non-lab</label><input id="xdN" type="number" min="0" oninput="TF_XII.dCfg()"></div>
+        <div><label>Exam fee &mdash; Special</label><input id="xdS" type="number" min="0" oninput="TF_XII.dCfg()"></div>
+        <div><label>Form processing</label><input id="xdP" type="number" min="0" oninput="TF_XII.dCfg()"></div>
+        <div><label>Centre fee (extra)</label><input id="xdC" type="number" min="0" oninput="TF_XII.dCfg()"></div>
+        <div><label>Misc fee</label><input id="xdM" type="number" min="0" oninput="TF_XII.dCfg()"></div>
+        <div><label>After scheduled date (+100)</label><select id="xdLate" onchange="TF_XII.dCfg()"><option value="0">No &mdash; within date</option><option value="1">Yes &mdash; late (+100 each)</option></select></div>
+      </div>
+      <div class="row" style="margin-bottom:8px"><button class="dv-b" type="button" onclick="TF_XII.distDraw(1)">▶ Make record</button><button class="dv-b g" type="button" onclick="TF_XII.distOut('csv')">📥 Record (CSV)</button><button class="dv-b" type="button" style="background:#8a5600" onclick="TF_XII.distOut('print')">🖨 Print record</button></div>
+      <div id="xdSum" style="font-size:13px;font-weight:700;margin-bottom:6px"></div>
+      <div id="xdOut" data-on="0" style="overflow:auto;max-height:560px"></div>
+    </div>
   </div>
 
   <div id="xiiAcc"></div>
@@ -5579,7 +5595,7 @@ function resDraw(){const o=$('xrOut');if(!o)return;const ks=Object.keys(RES),ss=
  $('xrSum').textContent=L.length+' students · Passed all: '+n.PASS+' · Supplementary: '+n.SUPP+' · Absent: '+n.ABSENT;
  const cell=(x,c)=>{const y=x.r.s.find(z=>z[0]===c);if(!y)return '<td align="center">–</td>';const f=y[4]!=='PASS';return '<td align="center" style="'+(f?'color:#b00020;font-weight:800':'')+(y[5]?';font-style:italic':'')+'">'+esc(y[3])+(y[5]?'*':'')+'</td>'};
  o.innerHTML=L.length?'<table class="marks-table"><tr><th>Sl</th><th>Sec</th><th>Roll</th><th>Name</th><th>Reg. No.</th><th>Council Roll No.</th>'+codes.map(c=>'<th>'+c+'</th>').join('')+'<th>Total</th><th>%</th><th>Result</th></tr>'+
-  L.map((x,i)=>{const t=st(x);return '<tr><td>'+(i+1)+'</td><td>'+esc(x.s.sec)+'</td><td>'+esc(x.s.roll)+'</td><td>'+esc(x.r.n)+'</td><td>'+esc(x.reg)+'</td><td>'+esc(x.r.r)+'</td>'+codes.map(c=>cell(x,c)).join('')+'<td align="center">'+esc(x.r.t)+'/'+esc(x.r.o)+'</td><td align="center">'+esc(x.r.p)+'</td><td style="font-weight:700;color:'+(t==='PASS'?'#145828':'#b00020')+'">'+(t==='PASS'?'PASS':t==='ABSENT'?'ABSENT':'SUPP: '+esc(x.r.u))+'</td></tr>'}).join('')+'</table><div class="mut" style="font-size:11px;margin-top:4px">* Optional elective (not counted in Total). Red = failed / absent in that subject.</div>':'<p class="mut">No result data matches.</p>'}
+  L.map((x,i)=>{const t=st(x);return '<tr><td>'+(i+1)+'</td><td>'+esc(x.s.sec)+'</td><td>'+esc(x.s.roll)+'</td><td>'+esc(x.r.n)+'</td><td>'+esc(x.reg)+'</td><td>'+esc(x.r.r)+'</td>'+codes.map(c=>cell(x,c)).join('')+'<td align="center">'+esc(x.r.t)+'/'+esc(x.r.o)+'</td><td align="center">'+esc(x.r.p)+'</td><td style="font-weight:700;color:'+(t==='PASS'?'#145828':'#b00020')+'">'+(t==='PASS'?'PASS':t==='ABSENT'?'ABSENT':'SUPP: '+esc(x.r.u))+'</td></tr>'}).join('')+'</table><div class="mut" style="font-size:11px;margin-top:4px">* Optional elective (not counted in Total). Red = failed / absent in that subject.</div>':'<p class="mut">No result data matches.</p>';if($('xdOut')&&$('xdOut').dataset.on==='1')distDraw()}
 function resOut(kind){if(role()!=='admin'){alert('Admin only.');return}if(!LASTR||!LASTR.L.length){alert('No results to export.');return}const{L,codes,sem,st}=LASTR;
  const row=(x,i)=>[i+1,x.s.sec,x.s.roll,x.r.n,x.reg,x.r.r].concat(codes.map(c=>{const y=x.r.s.find(z=>z[0]===c);return y?y[3]+(y[5]?'*':''):''}),[x.r.t+'/'+x.r.o,x.r.p,st(x)==='SUPP'?'SUPP: '+x.r.u:st(x)]),H=['Sl','Section','Roll','Name','Registration No','Council Roll No'].concat(codes,['Total','Percentage','Result']);
  if(kind==='csv'){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+[H].concat(L.map(row)).map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv'}));a.download='XII_Semester-'+sem+'_Result.csv';a.click();return}
@@ -5594,8 +5610,35 @@ async function loadResPdf(ev){if(role()!=='admin'){alert('Admin only.');return}i
   try{await ref.parent.doc('xii_results').set({[r.sem]:r.data},{merge:true})}catch(e){M.textContent='Read '+k+' results but Firebase save failed: '+(e.code||e.message);resDraw();return}
  }catch(e){M.textContent='Could not read '+f.name+': '+(e.message||e);return}}
  ev.target.value='';$('xrSem').value=last;resDraw();M.textContent='Loaded '+tot+' result(s) for Semester-'+last+' and saved to Firebase ✔'}
-(window.pt_R||(window.pt_R={})).xiimarks=function(){draw();resDraw()};
-return{resDraw,resOut,loadResPdf,req,act,report,parseRollPdf,parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
+/* ---------- Semester result distribution + Semester-IV form fill-up fee record (WBCHSE Class XII fees) ---------- */
+const FC0={L:160,N:150,S:90,proc:45,centre:70,misc:20,lateOn:0},LATE=100;
+let FC=Object.assign({},FC0),FT={};
+try{FC=Object.assign(FC,JSON.parse(localStorage.getItem('tfhs_xii_fee')||'{}'));FT=JSON.parse(localStorage.getItem('tfhs_xii_ftype')||'{}')}catch(e){}
+const fSave=()=>{try{localStorage.setItem('tfhs_xii_fee',JSON.stringify(FC));localStorage.setItem('tfhs_xii_ftype',JSON.stringify(FT))}catch(e){}};
+const TYN={L:'Lab-based',N:'Non-lab',S:'Special'};
+function fType(x){return FT[x.reg]||(x.r.s.some(y=>{const o=sc(y[0]);return o&&o.t==='Practical'})?'L':'N')}
+function distInit(){const m={xdL:'L',xdN:'N',xdS:'S',xdP:'proc',xdC:'centre',xdM:'misc'};Object.keys(m).forEach(k=>{if($(k))$(k).value=FC[m[k]]});if($('xdLate'))$('xdLate').value=FC.lateOn?'1':'0'}
+function dCfg(){const m={xdL:'L',xdN:'N',xdS:'S',xdP:'proc',xdC:'centre',xdM:'misc'};Object.keys(m).forEach(k=>{FC[m[k]]=+$(k).value||0});FC.lateOn=$('xdLate').value==='1'?1:0;fSave();if($('xdOut').dataset.on==='1')distDraw()}
+function dType(reg,v){FT[reg]=v;fSave();distDraw()}
+function distRows(){if(!LASTR)return[];return LASTR.L.map((x,i)=>{const t=fType(x),st=LASTR.st(x),ex=+(t==='L'?FC.L:t==='S'?FC.S:FC.N)||0,pr=+FC.proc||0,ce=+FC.centre||0,mi=+FC.misc||0,la=FC.lateOn?LATE:0;
+ return{i:i+1,sec:x.s.sec||'',roll:x.s.roll||'',name:x.r.n,reg:x.reg,cr:x.r.r,res:st==='SUPP'?'SUPP: '+x.r.u:st,bad:st!=='PASS',t:t,ex:ex,pr:pr,ce:ce,mi:mi,la:la,tot:ex+pr+ce+mi+la}})}
+function distDraw(go){const o=$('xdOut');if(!o)return;if(go)o.dataset.on='1';if(o.dataset.on!=='1')return;if(role()!=='admin'){o.innerHTML='<p class="mut">Admin only.</p>';return}
+ resDraw0();const R=distRows(),S=k=>R.reduce((a,r)=>a+r[k],0),n={L:0,N:0,S:0};R.forEach(r=>n[r.t]++);
+ $('xdSum').textContent=R.length+' students · Lab-based '+n.L+' · Non-lab '+n.N+' · Special '+n.S+' · Total to collect Rs. '+S('tot')+' (Council: exam+processing'+(FC.lateOn?'+late':'')+' Rs. '+(S('ex')+S('pr')+S('la'))+' · School: centre+misc Rs. '+(S('ce')+S('mi'))+')';
+ const lt=FC.lateOn?'<th>Late</th>':'';
+ o.innerHTML=R.length?'<table class="marks-table"><tr><th>Sl</th><th>Sec</th><th>Roll</th><th>Name</th><th>Reg. No.</th><th>Council Roll No.</th><th>Sem-'+esc(LASTR.sem)+' result</th><th>Type</th><th>Exam fee</th><th>Proc.</th><th>Centre</th><th>Misc</th>'+lt+'<th>Total Rs.</th><th>Marksheet received &mdash; sign</th><th>Date</th><th>Fee paid / Receipt no.</th></tr>'+
+  R.map(r=>'<tr><td>'+r.i+'</td><td>'+esc(r.sec)+'</td><td>'+esc(r.roll)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.reg)+'</td><td>'+esc(r.cr)+'</td><td style="font-weight:700;color:'+(r.bad?'#b00020':'#145828')+'">'+esc(r.res)+'</td><td><select onchange="TF_XII.dType(\''+r.reg+'\',this.value)">'+['L','N','S'].map(v=>'<option value="'+v+'"'+(v===r.t?' selected':'')+'>'+TYN[v]+'</option>').join('')+'</select></td><td align="right">'+r.ex+'</td><td align="right">'+r.pr+'</td><td align="right">'+r.ce+'</td><td align="right">'+r.mi+'</td>'+(FC.lateOn?'<td align="right">'+r.la+'</td>':'')+'<td align="right"><b>'+r.tot+'</b></td><td style="min-width:110px"></td><td style="min-width:70px"></td><td style="min-width:90px"></td></tr>').join('')+
+  '<tr style="font-weight:800;background:#f2f2f2"><td colspan="8" align="right">TOTAL</td><td align="right">'+S('ex')+'</td><td align="right">'+S('pr')+'</td><td align="right">'+S('ce')+'</td><td align="right">'+S('mi')+'</td>'+(FC.lateOn?'<td align="right">'+S('la')+'</td>':'')+'<td align="right">'+S('tot')+'</td><td colspan="3"></td></tr></table><div class="mut" style="font-size:11px;margin-top:4px">Type is set Lab-based when the student has a practical subject (Physics / Chemistry / Biology / Computer / Geography); change it per student if needed &mdash; it is remembered in this browser.</div>':'<p class="mut">No students match &mdash; load the Semester marksheet PDF first.</p>'}
+function resDraw0(){if(!LASTR)resDraw()}
+function distOut(kind){if(role()!=='admin'){alert('Admin only.');return}resDraw0();const R=distRows();if(!R.length){alert('No students to export. Load the Semester marksheet PDF first.');return}
+ const sem=LASTR.sem,late=FC.lateOn,S=k=>R.reduce((a,r)=>a+r[k],0),
+ H=['Sl','Section','Roll','Name','Registration No','Council Roll No','Sem-'+sem+' Result','Type','Exam Fee','Processing','Centre Fee','Misc Fee'].concat(late?['Late Fee']:[],['Total','Marksheet Received (Sign)','Date','Fee Paid / Receipt No']),
+ row=r=>[r.i,r.sec,r.roll,r.name,r.reg,r.cr,r.res,TYN[r.t],r.ex,r.pr,r.ce,r.mi].concat(late?[r.la]:[],[r.tot,'','','']),
+ tr=['','','','TOTAL','','','','',S('ex'),S('pr'),S('ce'),S('mi')].concat(late?[S('la')]:[],[S('tot'),'','','']);
+ if(kind==='csv'){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"',a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+[H].concat(R.map(row),[tr]).map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv'}));a.download='XII_Sem-'+sem+'_Result_Distribution_SemIV_Fee.csv';a.click();return}
+ const w=window.open('','_blank');w.document.write('<html><head><style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial}td,th{border:1px solid #000;padding:4px 3px}tr{page-break-inside:avoid}</style></head><body><h3 style="text-align:center;margin:0 0 4px">TALDANGRA FULMATI HIGH SCHOOL (H.S.)<br>Class XII &mdash; Semester-'+esc(sem)+' Result Distribution &amp; Semester-IV Form Fill-up Fee Record</h3><p style="text-align:center;font-size:11px;margin:0 0 6px">Semester-IV enrolment: 02.12.2026 to 23.12.2026 (WBCHSE notification dt. 19.11.2026) &middot; Fee = Exam fee + Form processing + Centre fee Rs. '+(+FC.centre||0)+' + Misc fee Rs. '+(+FC.misc||0)+(late?' + Late Rs. '+LATE:'')+'</p><table style="border-collapse:collapse;width:100%;font-size:10px"><tr>'+H.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>'+R.map(r=>'<tr>'+row(r).map(v=>'<td style="height:20px">'+esc(v)+'</td>').join('')+'</tr>').join('')+'<tr style="font-weight:bold">'+tr.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr></table><div style="display:flex;justify-content:space-between;margin-top:34px;font-size:12px"><span>Prepared by (Office)</span><span>Class Teacher</span><span>Headmaster</span></div></body></html>');w.document.close();w.print()}
+(window.pt_R||(window.pt_R={})).xiimarks=function(){draw();resDraw();distInit()};
+return{resDraw,resOut,loadResPdf,dCfg,dType,distDraw,distOut,req,act,report,parseRollPdf,parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
 })();
 </script>
 </body>
