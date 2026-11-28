@@ -5648,11 +5648,18 @@ function distOut(kind){if(role()!=='admin'){alert('Admin only.');return}resDraw0
 async function distUnpublish(){const M=$('xdMsg');if(role()!=='admin'){alert('Admin only.');return}if(!ref){M.textContent='Not connected to Firebase.';return}
  if(!confirm('Unpublish? Students will no longer see the Sem-IV fee and form fill-up date with their result. You can publish again any time.'))return;
  try{await ref.parent.doc('xii_fee').delete();M.textContent='Unpublished ✔ — fee break-up and form fill-up date removed from the student result view (tfhs/xii_fee deleted).'}catch(e){M.textContent='Unpublish failed: '+(e.code||e.message)+(e.code==='permission-denied'?' (add a Firestore delete rule for tfhs/xii_fee)':'')}}
+async function encFee(k,obj){const enc=new TextEncoder(),hx=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''),b64=u=>btoa(String.fromCharCode.apply(null,u));
+ const id=hx(await crypto.subtle.digest('SHA-256',enc.encode('fee:'+k))),salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+ const base=await crypto.subtle.importKey('raw',enc.encode(k),'PBKDF2',false,['deriveKey']),key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:100000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt']);
+ const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,enc.encode(JSON.stringify(obj))));return[id,b64(salt)+'.'+b64(iv)+'.'+b64(ct)]}
 async function distPublish(){const M=$('xdMsg');if(role()!=='admin'){alert('Admin only.');return}resDraw0();const R=distRows();if(!R.length){M.textContent='No students to publish. Load the Semester marksheet PDF first.';return}
  if(!ref){M.textContent='Not connected to Firebase.';return}
- const data={};R.forEach(r=>{data[r.reg]={f:r.ft,t:r.tot,p:r.n,fee4:r.f4+r.ce+r.mi,sx:r.sx,fd:r.fd}});
- try{await ref.parent.doc('xii_fee').set({cfg:{sem:'IV',boys:FC.dB||'',girls:FC.dG||'',to:FC.d2||'',toTxt:fmtD(FC.d2),late:FC.lateOn?(+FC.late||0):0,by:me(),ts:firebase.firestore.FieldValue.serverTimestamp()},data:data},{merge:true});
-  M.textContent='Published '+R.length+' student(s) to Firebase (tfhs/xii_fee) ✔ — fee break-up, total fee and the sex-wise form fill-up date are now available to the student result view.'}catch(e){M.textContent='Publish failed: '+(e.code||e.message)+(e.code==='permission-denied'?' (add a Firestore rule for tfhs/xii_fee)':'')}}
+ const dg=v=>String(v||'').replace(/\D/g,''),data={};let n=0,skip=0;
+ try{for(const r of R){if(dg(r.cr).length<8||dg(r.reg).length<8){skip++;continue}
+   const e=await encFee(dg(r.cr)+'|'+dg(r.reg),{f:r.ft,t:r.tot,p:r.n,fd:r.fd});data[e[0]]=e[1];data[r.reg]=firebase.firestore.FieldValue.delete();n++;
+   if(n%10===0)M.textContent='Encrypting '+n+' / '+R.length+' …'}
+  await ref.parent.doc('xii_fee').set({cfg:{sem:'IV',boys:FC.dB||'',girls:FC.dG||'',to:FC.d2||'',toTxt:fmtD(FC.d2),late:FC.lateOn?(+FC.late||0):0,by:me(),ts:firebase.firestore.FieldValue.serverTimestamp()},data:data},{merge:true});
+  M.textContent='Published '+n+' student(s) ✔'+(skip?' ('+skip+' skipped — no Council Roll No. / Registration No.)':'')+'. Each student sees only their own fee and date after entering Roll No. + Registration No. on the result page.'}catch(e){M.textContent='Publish failed: '+(e.code||e.message)+(e.code==='permission-denied'?' (add a Firestore rule for tfhs/xii_fee)':'')}}
 (window.pt_R||(window.pt_R={})).xiimarks=function(){draw();resDraw();distInit()};
 return{resDraw,resOut,loadResPdf,dCfg,distDraw,distOut,distPublish,distUnpublish,req,act,report,parseRollPdf,parsePdfFiles,toggleTextPaste,parsePaste,toggleProfileEditor,pf,ed,sch,rm,addRow,saveProf,saveMarks,draw,print};
 })();
